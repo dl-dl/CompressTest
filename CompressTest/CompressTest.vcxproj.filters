@@ -45,6 +45,9 @@
     <ClInclude Include="coord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sizes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">

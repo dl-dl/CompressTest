@@ -3,9 +3,6 @@
 
 #include "types.h"
 
-#define TILE_CX 256
-#define TILE_CY 256
-
 // PNG layout to normal
 void Invert24(const void* src, void* dst);
 void Invert8(const void* src, void* dst);

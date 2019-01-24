@@ -154,8 +154,8 @@ BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, char id)
 	if (0 == ims->index[zoom].firstBlock)
 		return 0;
 
-	ui32 dx = (ui32)numx - ims->index[zoom].left;
-	ui32 dy = (ui32)numy - ims->index[zoom].top;
+	ui32 dx = numx - ims->index[zoom].left;
+	ui32 dy = numy - ims->index[zoom].top;
 	if (dx >= ims->index[zoom].nx || dy >= ims->index[zoom].ny)
 		return 0;
 

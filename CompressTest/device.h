@@ -2,11 +2,18 @@
 #define __DEVICE_H__
 #include "types.h"
 #include "coord.h"
+#include "sizes.h"
 
 #include <deque>
 
-#define SCREEN_CX 240
-#define SCREEN_CY 400
+struct IMS;
+
+struct MapCacheItem
+{
+	ui8 zoom;
+	ui32 tileX, tileY;
+	ui8 data[TILE_CX * TILE_CY / 2];
+};
 
 class Device
 {
@@ -14,11 +21,11 @@ class Device
 
 public:
 	std::deque<PointFloat> gps;
-	PointFloat currentTilePos;
+	PointFloat currentTile;
 	bool redrawScreen;
 
 	ui8 screen[SCREEN_CX][SCREEN_CY/2];
-	ui8* map[4];
+	MapCacheItem mapCache[6];
 
 	Device(int id_);
 	Device(const Device&) = delete;
@@ -27,6 +34,8 @@ public:
 
 private:
 	void processGps(PointFloat point);
+	void copyTileToScreen(const void* tile, int x, int y);
+	ui32 cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };
 
 #endif // !__DEVICE_H__
