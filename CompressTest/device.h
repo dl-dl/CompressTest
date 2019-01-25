@@ -3,10 +3,11 @@
 #include "types.h"
 #include "coord.h"
 #include "sizes.h"
+#include "fs.h"
 
 #include <deque>
 
-struct IMS;
+struct PaintContext;
 
 struct MapCacheItem
 {
@@ -19,18 +20,21 @@ class Device
 {
 	int id;
 
+	IMS ims;
+	MapCacheItem mapCache[6];
+	PointFloat currentTile;
+	ui8 screen[SCREEN_CX][SCREEN_CY / 2];
+
 public:
 	std::deque<PointFloat> gps;
-	PointFloat currentTile;
 	bool redrawScreen;
 
-	ui8 screen[SCREEN_CX][SCREEN_CY/2];
-	MapCacheItem mapCache[6];
 
 	Device();
 	Device(const Device&) = delete;
 	void init(int id_);
 	void run();
+	void paint(const PaintContext* ctx);
 
 private:
 	void processGps(PointFloat point);

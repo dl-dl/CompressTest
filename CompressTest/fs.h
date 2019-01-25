@@ -58,11 +58,11 @@ struct NewMapStatus
 };
 
 void fsFormat(char id);
-bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, char id);
-bool fsFindIMS(float x, float y, IMS *dst, char id);
-void fsCommitIMS(IMS* ims, BlockAddr addr, char id);
-BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, char id);
-void fsReadTile(BlockAddr addr, void* dst, char id);
+bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id);
+bool fsFindIMS(float x, float y, IMS *dst, int id);
+void fsCommitIMS(IMS* ims, BlockAddr addr, int id);
+BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id);
+void fsReadTile(BlockAddr addr, void* dst, int id);
 
 void imsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom);
-bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, char id);
+bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id);

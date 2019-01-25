@@ -198,7 +198,9 @@
     <ClInclude Include="coord.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="fs.h" />
+    <ClInclude Include="graph.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="paintctx.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="sd.h" />
     <ClInclude Include="sizes.h" />
@@ -213,6 +215,7 @@
     <ClCompile Include="fs.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="sd.cpp" />
+    <ClCompile Include="graph.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CompressTest.rc" />

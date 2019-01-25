@@ -20,7 +20,7 @@ void fsFormat(char id)
 		sdCardWrite(i, b, id);
 }
 
-static bool findFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr* addr, char id)
+static bool findFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr* addr, int id)
 {
 	ui8 b[BLOCK_SIZE];
 	*indexHWM = NUM_IMS_BLOCKS;
@@ -38,7 +38,7 @@ static bool findFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr
 	return false;
 }
 
-bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, char id)
+bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 {
 	BlockAddr dataHWM, indexHWM;
 	if (!findFirstEmptyIMS(&dataHWM, &indexHWM, addr, id))
@@ -69,7 +69,7 @@ bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, char id)
 	return addr;
 }
 
-bool fsFindIMS(float x, float y, IMS *dst, char id)
+bool fsFindIMS(float x, float y, IMS *dst, int id)
 {
 	ui8 b[BLOCK_SIZE];
 	for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
@@ -149,7 +149,7 @@ static ui32 findTileRowB(const ImsIndexDescr *zi, float y)
 }
 #endif
 
-BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, char id)
+BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
 	if (0 == ims->index[zoom].firstBlock)
 		return 0;
@@ -176,7 +176,7 @@ void imsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom)
 	ims->index[status->currentZoom].firstBlock = ims->indexHWM;
 }
 
-bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, char id)
+bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id)
 {
 	assert(ims->dataHWM >= ims->indexHWM);
 
@@ -211,7 +211,7 @@ bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, char id)
 	return true;
 }
 
-void fsCommitIMS(IMS* ims, BlockAddr addr, char id)
+void fsCommitIMS(IMS* ims, BlockAddr addr, int id)
 {
 	ims->status = IMS_READY;
 	ims->checksum = 0;
@@ -221,7 +221,7 @@ void fsCommitIMS(IMS* ims, BlockAddr addr, char id)
 	sdCardWrite(addr, b, id);
 }
 
-void fsReadTile(BlockAddr addr, void* dst, char id)
+void fsReadTile(BlockAddr addr, void* dst, int id)
 {
 	ui8* tile = (ui8*)dst;
 	sdCardRead(addr, tile, id);

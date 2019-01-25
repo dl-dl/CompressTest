@@ -10,7 +10,7 @@ static inline BlockAddr sdCardSize(void)
 	return 1024 * 10;
 }
 
-void sdCardRead(BlockAddr addr, void *dst, char id);
-void sdCardWrite(BlockAddr addr, const void *src, char id);
+void sdCardRead(BlockAddr addr, void *dst, int id);
+void sdCardWrite(BlockAddr addr, const void *src, int id);
 
 #endif //!__SD_H__

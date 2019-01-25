@@ -18,7 +18,7 @@ static void sdclose(HANDLE file)
 	CloseHandle(file);
 }
 
-void sdCardRead(BlockAddr addr, void *dst, char id)
+void sdCardRead(BlockAddr addr, void *dst, int id)
 {
 	assert(addr < sdCardSize());
 	HANDLE f = sdopen(id);
@@ -28,7 +28,7 @@ void sdCardRead(BlockAddr addr, void *dst, char id)
 	sdclose(f);
 }
 
-void sdCardWrite(BlockAddr addr, const void *src, char id)
+void sdCardWrite(BlockAddr addr, const void *src, int id)
 {
 	assert(addr < sdCardSize());
 	HANDLE f = sdopen(id);

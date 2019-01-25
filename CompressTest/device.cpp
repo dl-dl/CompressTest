@@ -3,6 +3,7 @@
 #include "fs.h"
 #include "coord.h"
 #include "convert.h"
+#include "graph.h"
 #include "lodepng.h"
 
 #include <string.h>
@@ -16,6 +17,7 @@ Device::Device()
 	{
 		mapCache[i].zoom = 0; // empty
 	}
+	ims = { 0 };
 }
 
 static NewTile* getTile(int x, int y, ui8 z)
@@ -68,7 +70,6 @@ void Device::init(int id_)
 	id = id_;
 	fsFormat(id);
 
-	IMS ims;
 	BlockAddr addr;
 	RectFloat r;
 	r.left = 38.0f;
@@ -91,19 +92,6 @@ void Device::init(int id_)
 			}
 		fsCommitIMS(&ims, addr, id);
 	}
-}
-
-void Device::copyTileToScreen(const void* tile, int x, int y)
-{
-	for (int i = 0; i < TILE_CX; ++i)
-		for (int j = 0; j < TILE_CY / 2; ++j)
-		{
-			int ii = i + x;
-			int jj = j + y;
-			if ((ii >= 0) && (ii < SCREEN_CX))
-				if ((jj >= 0) && (jj < SCREEN_CY / 2))
-					screen[ii][jj] = *((ui8*)tile + i * TILE_CY / 2 + j);
-		}
 }
 
 static inline ui32 cacheIndex(ui32 x, ui32 y)
@@ -141,9 +129,21 @@ ui32 Device::cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 	return index;
 }
 
+void Device::copyTileToScreen(const void* tile, int x, int y)
+{
+	for (int i = 0; i < TILE_CX; ++i)
+		for (int j = 0; j < TILE_CY / 2; ++j)
+		{
+			int ii = i + x;
+			int jj = j + y;
+			if ((ii >= 0) && (ii < SCREEN_CX))
+				if ((jj >= 0) && (jj < SCREEN_CY / 2))
+					screen[ii][jj] = *((ui8*)tile + i * TILE_CY / 2 + j);
+		}
+}
+
 void Device::processGps(PointFloat point)
 {
-	static IMS ims = { 0 };
 	const ui8 zoom = 12;
 	currentTile.x = lon2tilex(point.x, zoom);
 	currentTile.y = lat2tiley(point.y, zoom);
@@ -182,6 +182,26 @@ void Device::processGps(PointFloat point)
 	}
 	redrawScreen = true;
 }
+
+void Device::paint(const PaintContext* ctx)
+{
+	for (int x = 0; x < SCREEN_CX; ++x)
+		for (int y = 0; y < SCREEN_CY / 2; ++y)
+		{
+			ui8 b = screen[x][y];
+			gPixel(ctx, x, y * 2 + 1, b >> 1);
+			gPixel(ctx, x, y * 2, b >> 5);
+		}
+
+	int x = SCREEN_CX / 2;
+	int y = SCREEN_CY / 2;
+
+	gLine(ctx, x - 10, y, x + 10, y, DEV_RED);
+	gLine(ctx, x, y - 10, x, y + 10, DEV_RED);
+
+	redrawScreen = false;
+}
+
 
 void Device::run()
 {
