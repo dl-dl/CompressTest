@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-Device::Device(int id_) : id(id_)
+Device::Device()
 {
 	for (int i = 0; i < sizeof(mapCache) / sizeof(*mapCache); ++i)
 	{
@@ -63,8 +63,9 @@ static void forgetTile(void* p)
 	free(p);
 }
 
-void Device::init()
+void Device::init(int id_)
 {
+	id = id_;
 	fsFormat(id);
 
 	IMS ims;

@@ -15,20 +15,20 @@
 #include <eh.h>
 
 static HINSTANCE hInst;                                // current instance
-static WCHAR szTitle[128];                  // The title bar text
 static WCHAR szWindowClass[128];            // the main window class name
 
 // Forward declarations of functions included in this code module:
 static ATOM                MyRegisterClass(HINSTANCE hInstance);
 static BOOL                InitInstance(HINSTANCE, int);
 static LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-static INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-static unsigned char* gBmp24;
-static unsigned char gBmp8[TILE_CX][TILE_CY];
-static unsigned char gBmp4[TILE_CX][TILE_CY / 2];
-static Device dev('1');
+//static unsigned char* gBmp24;
+//static unsigned char gBmp8[TILE_CX][TILE_CY];
+//static unsigned char gBmp4[TILE_CX][TILE_CY / 2];
+static const int NUM_DEV = 3;
+static Device dev[NUM_DEV];
 
+/*
 static int test()
 {
 	FILE* f = fopen("..\\1275.4.png", "rb");
@@ -68,8 +68,8 @@ static int test()
 
 	return 0;
 }
-
-static void paintBmp(HDC hdc)
+*/
+static void paintBmp(HWND hWnd, HDC hdc)
 {
 /*	if (!gBmp24)
 		return;
@@ -89,13 +89,16 @@ static void paintBmp(HDC hdc)
 			SetPixel(hdc, x + (TILE_CX + 10), y, RGB((b & flag[0]) ? 0xFF : 0, (b & flag[1]) ? 0xFF : 0, (b & flag[2]) ? 0xFF : 0));
 		}
 */
+	SetWindowOrgEx(hdc, -32, -32, NULL);
+
+	Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	for (int x = 0; x < SCREEN_CX; ++x)
 		for (int y = 0; y < SCREEN_CY / 2; ++y)
 		{
 			static const BYTE flag[6] = { 0x02, 0x04, 0x08, 0x20, 0x40, 0x80 };
-			BYTE b = dev.screen[x][y];
-			SetPixel(hdc, x + (TILE_CX + 10) * 2, y * 2 + 1, RGB((b & flag[0]) ? 0xFF : 0, (b & flag[1]) ? 0xFF : 0, (b & flag[2]) ? 0xFF : 0));
-			SetPixel(hdc, x + (TILE_CX + 10) * 2, y * 2, RGB((b & flag[3]) ? 0xFF : 0, (b & flag[4]) ? 0xFF : 0, (b & flag[5]) ? 0xFF : 0));
+			BYTE b = devPtr->screen[x][y];
+			SetPixel(hdc, x, y * 2 + 1, RGB((b & flag[0]) ? 0xFF : 0, (b & flag[1]) ? 0xFF : 0, (b & flag[2]) ? 0xFF : 0));
+			SetPixel(hdc, x, y * 2, RGB((b & flag[3]) ? 0xFF : 0, (b & flag[4]) ? 0xFF : 0, (b & flag[5]) ? 0xFF : 0));
 		}
 
 //	int x = (int)((dev.currentTilePos.x - floor(dev.currentTilePos.x)) * TILE_CX);
@@ -105,12 +108,14 @@ static void paintBmp(HDC hdc)
 
 	auto pen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
 	SelectObject(hdc, pen);
-	MoveToEx(hdc, x + (TILE_CX + 10) * 2 - 10, y, NULL);
-	LineTo(hdc, x + (TILE_CX + 10) * 2 + 10, y);
-	MoveToEx(hdc, x + (TILE_CX + 10) * 2, y - 10, NULL);
-	LineTo(hdc, x + (TILE_CX + 10) * 2, y + 10);
+	MoveToEx(hdc, x - 10, y, NULL);
+	LineTo(hdc, x + 10, y);
+	MoveToEx(hdc, x, y - 10, NULL);
+	LineTo(hdc, x, y + 10);
 	SelectObject(hdc, GetStockObject(BLACK_PEN));
 	DeleteObject(pen);
+
+	devPtr->redrawScreen = false;
 }
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS*)
@@ -129,7 +134,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_set_se_translator(trans_func);
 
 	// Initialize global strings
-	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, sizeof(szTitle) / sizeof(*szTitle));
 	LoadStringW(hInstance, IDC_COMPRESSTEST, szWindowClass, sizeof(szWindowClass) / sizeof(*szWindowClass));
 	MyRegisterClass(hInstance);
 
@@ -141,8 +145,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_COMPRESSTEST));
 
 //	test();
-	dev.init();
-
 	MSG msg;
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
@@ -153,11 +155,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			if (msg.hwnd)
 			{
-				dev.run();
-				if (dev.redrawScreen)
+				Device* devPtr = (Device*)GetWindowLongPtr(msg.hwnd, GWLP_USERDATA);
+				if (devPtr)
 				{
-					InvalidateRect(msg.hwnd, NULL, FALSE);
-					dev.redrawScreen = false;
+					devPtr->run();
+					if (devPtr->redrawScreen)
+						InvalidateRect(msg.hwnd, NULL, FALSE);
 				}
 			}
 		}
@@ -172,7 +175,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.style = 0; // CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
@@ -201,30 +204,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-							  CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-	if (!hWnd)
+	for (int i = 0; i < 3; ++i)
 	{
-		return FALSE;
+		WCHAR s[64];
+		wsprintf(s, L"Device %u", i);
+		HWND hWnd = CreateWindowW(szWindowClass, s, WS_OVERLAPPEDWINDOW,
+								  CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+		if (!hWnd)
+			return FALSE;
+
+		dev[i].init(i);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
+		ShowWindow(hWnd, nCmdShow);
+		UpdateWindow(hWnd);
 	}
-
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
-
 	return TRUE;
 }
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -236,9 +231,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Parse the menu selections:
 		switch (wmId)
 		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
@@ -251,7 +243,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		paintBmp(hdc);
+		paintBmp(hWnd, hdc);
 		EndPaint(hWnd, &ps);
 	}
 	break;
@@ -268,7 +260,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			point.x += 0.01f;
 		else
 			break;
-		dev.gps.push_back(point);
+		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		devPtr->gps.push_back(point);
 	}
 	break;
 	case WM_DESTROY:
@@ -278,24 +271,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
-}
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
 }

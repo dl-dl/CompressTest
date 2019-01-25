@@ -27,9 +27,9 @@ public:
 	ui8 screen[SCREEN_CX][SCREEN_CY/2];
 	MapCacheItem mapCache[6];
 
-	Device(int id_);
+	Device();
 	Device(const Device&) = delete;
-	void init();
+	void init(int id_);
 	void run();
 
 private:
