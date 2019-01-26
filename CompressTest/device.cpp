@@ -4,12 +4,12 @@
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
+#include "text.h"
 #include "paint.h"
 #include "lodepng.h"
 
 #include <string.h>
 #include <malloc.h>
-#include <stdio.h>
 #include <assert.h>
 
 Device::Device()

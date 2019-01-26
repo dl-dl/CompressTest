@@ -13,7 +13,7 @@ const DevFont *const Fonts[8] =
 	0
 };
 
-static const unsigned char* FindChr(const DevFont* f, unsigned int c)
+static const unsigned char* FindChr(const DevFont* f, ui32 c)
 {
 	const ui32 numBlocks = sizeof(f->block) / sizeof(*(f->block));
 	for (ui32 i = 0; i < numBlocks; ++i)
@@ -24,7 +24,7 @@ static const unsigned char* FindChr(const DevFont* f, unsigned int c)
 	return f->block[0].sym;
 }
 
-static unsigned int PrintChr(unsigned int chr, unsigned int x, unsigned int y, const DevFont* f, ui8 color, Screen* screen)
+static unsigned int PrintChr(ui32 chr, ui32 x, ui32 y, const DevFont* f, ui8 color, Screen* screen)
 {
 	const unsigned char* c = FindChr(f, chr);
 	for (ui32 i = 0; (i < c[0]); ++i)
@@ -38,7 +38,7 @@ static unsigned int PrintChr(unsigned int chr, unsigned int x, unsigned int y, c
 	return c[0];
 }
 
-void PrintStr(const char* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color, Screen* screen)
+void PrintStr(const char* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen)
 {
 	const DevFont* f = Fonts[fontType];
 	if (f == 0)
@@ -48,7 +48,7 @@ void PrintStr(const char* s, unsigned int x, unsigned int y, unsigned int fontTy
 		x += PrintChr(s[i], x, y, f, color, screen);
 }
 
-void PrintStrW(const WIDE_CHAR* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color, Screen* screen)
+void PrintStrW(const ui16* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen)
 {
 	const DevFont* f = Fonts[fontType];
 	if (f == 0)

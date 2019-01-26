@@ -12,7 +12,6 @@
 #include "paintctx.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <eh.h>
 
 static HINSTANCE hInst;                                // current instance

@@ -6,9 +6,7 @@
 
 //#define FONT_NORMAL 0
 
-typedef unsigned short WIDE_CHAR;
-
-void PrintStr(const char* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color, Screen* screen);
-void PrintStrW(const WIDE_CHAR* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color, Screen* screen);
+void PrintStr(const char* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen);
+void PrintStrW(const ui16* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen);
 
 #endif

@@ -2,28 +2,24 @@
 #include "graph.h"
 #include "sizes.h"
 
-void Pixel(int x, int y, ui8 color, Screen* screen)
+void Pixel(ui32 x, ui32 y, ui8 color, Screen* screen)
 {
 	if (x >= SCREEN_CX)
 		return;
 	if (y >= SCREEN_CY)
 		return;
-
-	ui8 *ptr = &screen->line[x].pix[y / 2];
-
-	if (y % 2)
-		*ptr = (*ptr & 0xF0) | (color << 4);
-	else
-		*ptr = (*ptr & 0x0F) | color;
+	color &= 0x0F;
+	ui8 b = screen->line[x].pix[y / 2];
+	screen->line[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | color) : ((b & 0x0F) | (color << 4));
 }
 
-static void VLine(int x, int y, int height, ui8 color, Screen* screen)
+static void VLine(ui32 x, ui32 y, int height, ui8 color, Screen* screen)
 {
 	ui8 *ptr = &screen->line[x].pix[y / 2];
 
 	if (y % 2)
 	{
-		*ptr = ((*ptr & 0xF0) | (color << 4));
+		*ptr = (*ptr & 0xF0) | color;
 		ptr++;
 		height--;
 	}
@@ -32,11 +28,15 @@ static void VLine(int x, int y, int height, ui8 color, Screen* screen)
 		*ptr++ = (color << 4) | color;
 
 	if (height % 2)
-		*ptr = ((*ptr & 0x0F) | color);
+		*ptr = ((*ptr & 0x0F) | (color << 4));
 }
 
-void FillRect(ui16 left, ui16 top, ui16 width, ui16 height, ui8 color, Screen* screen)
+void FillRect(ui32 left, ui32 top, int width, int height, ui8 color, Screen* screen)
 {
+	if (height <= 0)
+		return;
+	if (width <= 0)
+		return;
 	if (left + width > SCREEN_CX)
 		return;
 	if (top + height > SCREEN_CY)
@@ -45,12 +45,13 @@ void FillRect(ui16 left, ui16 top, ui16 width, ui16 height, ui8 color, Screen* s
 	while (width--)
 		VLine(left + width, top, height, color, screen);
 }
+
 static inline int intAbs(int i)
 {
 	return i >= 0 ? i : -i;
 }
 
-void Line(int x0, int y0, int x1, int y1, ui8 color, Screen* screen)
+void Line(ui32 x0, ui32 y0, ui32 x1, ui32 y1, ui8 color, Screen* screen)
 {
 	const int dx = intAbs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 	const int dy = -intAbs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -74,8 +75,10 @@ void Line(int x0, int y0, int x1, int y1, ui8 color, Screen* screen)
 	}
 }
 
-void Circle(int xm, int ym, int r, ui8 color, Screen* screen)
+void Circle(ui32 xm, ui32 ym, int r, ui8 color, Screen* screen)
 {
+	if (r <= 0)
+		return;
 	int x = -r, y = 0, err = 2 - 2 * r;
 	do
 	{
@@ -92,7 +95,7 @@ void Circle(int xm, int ym, int r, ui8 color, Screen* screen)
 	while (x < 0);
 }
 
-void CopyTileToScreen(const void* tile, int x, int y, Screen* screen)
+void CopyTileToScreen(const void* tile, ui32 x, ui32 y, Screen* screen)
 {
 	for (int i = 0; i < TILE_CX; ++i)
 		for (int j = 0; j < TILE_CY / 2; ++j)
