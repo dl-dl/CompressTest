@@ -23,7 +23,7 @@ void fsFormat(char id)
 static bool findFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr* addr, int id)
 {
 	ui8 b[BLOCK_SIZE];
-	*indexHWM = NUM_IMS_BLOCKS;
+	*indexHWM = NUM_IMS_BLOCKS; // init value for empty filel system
 	*dataHWM = sdCardSize() - 1;
 	for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
 	{
@@ -34,6 +34,8 @@ static bool findFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr
 			*addr = i;
 			return true;
 		}
+		*indexHWM = p->indexHWM;
+		*dataHWM = p->dataHWM;
 	}
 	return false;
 }

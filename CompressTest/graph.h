@@ -1,16 +1,11 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 #include "types.h"
+#include "screen.h"
 
-#define DEV_RED 0x01
-#define DEV_GREEN 0x02
-#define DEV_BLUE 0x04
-
-struct PaintContext;
-
-void gPixel(const PaintContext* ctx, int x, int y, ui8 color);
-void gLine(const PaintContext* ctx, int x0, int y0, int x1, int y1, int color);
-void gCircle(const PaintContext* ctx, int x, int y, int r, ui8 color);
-void gText(const PaintContext* ctx, int x, int y, ui8 color);
+void Pixel(int x, int y, ui8 color, Screen* screen);
+void Line(int x0, int y0, int x1, int y1, ui8 color, Screen* screen);
+void Circle(int x, int y, int r, ui8 color, Screen* screen);
+void CopyTileToScreen(const void* tile, int x, int y, Screen* screen);
 
 #endif

@@ -1,53 +1,106 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include "targetver.h"
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-#include <windows.h>
-
 #include "types.h"
 #include "graph.h"
-#include "paintctx.h"
+#include "sizes.h"
 
-static const int BORDERX = -32;
-static const int BORDERY = -32;
-
-static inline COLORREF translateColor(ui8 c)
+void Pixel(int x, int y, ui8 color, Screen* screen)
 {
-	return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
+	if (x >= SCREEN_CX)
+		return;
+	if (y >= SCREEN_CY)
+		return;
+
+	ui8 *ptr = &screen->line[x].pix[y / 2];
+
+	if (y % 2)
+		*ptr = (*ptr & 0xF0) | (color << 4);
+	else
+		*ptr = (*ptr & 0x0F) | color;
 }
 
-void gPixel(const PaintContext* ctx, int x, int y, ui8 color)
+static void VLine(int x, int y, int height, ui8 color, Screen* screen)
 {
-	SetWindowOrgEx(ctx->hdc, BORDERX, BORDERY, NULL);
+	ui8 *ptr = &screen->line[x].pix[y / 2];
 
-	SetPixel(ctx->hdc, x, y, translateColor(color));
+	if (y % 2)
+	{
+		*ptr = ((*ptr & 0xF0) | (color << 4));
+		ptr++;
+		height--;
+	}
+
+	for (ui16 cnt = height / 2; cnt--; )
+		*ptr++ = (color << 4) | color;
+
+	if (height % 2)
+		*ptr = ((*ptr & 0x0F) | color);
 }
 
-void gLine(const PaintContext* ctx, int x0, int y0, int x1, int y1, int color)
+void FillRect(ui16 left, ui16 top, ui16 width, ui16 height, ui8 color, Screen* screen)
 {
-	SetWindowOrgEx(ctx->hdc, BORDERX, BORDERY, NULL);
+	if (left + width > SCREEN_CX)
+		return;
+	if (top + height > SCREEN_CY)
+		return;
 
-	auto pen = CreatePen(PS_SOLID, 0, translateColor(color));
-	SelectObject(ctx->hdc, pen);
-	MoveToEx(ctx->hdc, x0, y0, NULL);
-	LineTo(ctx->hdc, x1, y1);
-	SelectObject(ctx->hdc, GetStockObject(BLACK_PEN));
-	DeleteObject(pen);
+	while (width--)
+		VLine(left + width, top, height, color, screen);
+}
+static inline int intAbs(int i)
+{
+	return i >= 0 ? i : -i;
 }
 
-void gCircle(const PaintContext* ctx, int x, int y, int r, ui8 color)
+void Line(int x0, int y0, int x1, int y1, ui8 color, Screen* screen)
 {
-	SetWindowOrgEx(ctx->hdc, BORDERX, BORDERY, NULL);
-
-	auto pen = CreatePen(PS_SOLID, 0, translateColor(color));
-	SelectObject(ctx->hdc, pen);
-	SelectObject(ctx->hdc, GetStockObject(HOLLOW_BRUSH));
-	Ellipse(ctx->hdc, x - r, y - r, x + r, y + r);
-	SelectObject(ctx->hdc, GetStockObject(BLACK_PEN));
-	DeleteObject(pen);
+	const int dx = intAbs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+	const int dy = -intAbs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+	int err = dx + dy, e2;
+	for (;;)
+	{
+		Pixel(x0, y0, color, screen);
+		if (x0 == x1 && y0 == y1)
+			break;
+		e2 = 2 * err;
+		if (e2 >= dy)
+		{
+			err += dy;
+			x0 += sx;
+		}
+		if (e2 <= dx)
+		{
+			err += dx;
+			y0 += sy;
+		}
+	}
 }
 
-void gText(const PaintContext* ctx, int x, int y, ui8 color)
+void Circle(int xm, int ym, int r, ui8 color, Screen* screen)
 {
-	SetWindowOrgEx(ctx->hdc, BORDERX, BORDERY, NULL);
+	int x = -r, y = 0, err = 2 - 2 * r;
+	do
+	{
+		Pixel(xm - x, ym + y, color, screen);
+		Pixel(xm - y, ym - x, color, screen);
+		Pixel(xm + x, ym - y, color, screen);
+		Pixel(xm + y, ym + x, color, screen);
+		r = err;
+		if (r > x)
+			err += ++x * 2 + 1;
+		if (r <= y)
+			err += ++y * 2 + 1;
+	}
+	while (x < 0);
+}
 
+void CopyTileToScreen(const void* tile, int x, int y, Screen* screen)
+{
+	for (int i = 0; i < TILE_CX; ++i)
+		for (int j = 0; j < TILE_CY / 2; ++j)
+		{
+			int ii = i + x;
+			int jj = j + y;
+			if ((ii >= 0) && (ii < SCREEN_CX))
+				if ((jj >= 0) && (jj < SCREEN_CY / 2))
+					screen->line[ii].pix[jj] = *((ui8*)tile + i * TILE_CY / 2 + j);
+		}
 }

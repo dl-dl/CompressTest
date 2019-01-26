@@ -4,6 +4,7 @@
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
+#include "paint.h"
 #include "lodepng.h"
 
 #include <string.h>
@@ -114,8 +115,8 @@ ui32 Device::cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 		{
 			ui8* tile = (ui8*)malloc(TILE_CX * TILE_CY / 2 + BLOCK_SIZE + sizeof(ui32));
 			fsReadTile(addr, tile, id); // TODO: implement decompress on the fly
-			ui32 sz = *(ui32*)tile;
-			DeCompress(tile + sizeof(ui32), mapCache[index].data);
+			ui32 sz = ((NewTile*)tile)->size;
+			DeCompress(((NewTile*)tile)->data, mapCache[index].data);
 			free(tile);
 		}
 		else
@@ -127,19 +128,6 @@ ui32 Device::cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 		mapCache[index].tileY = tileY;
 	}
 	return index;
-}
-
-void Device::copyTileToScreen(const void* tile, int x, int y)
-{
-	for (int i = 0; i < TILE_CX; ++i)
-		for (int j = 0; j < TILE_CY / 2; ++j)
-		{
-			int ii = i + x;
-			int jj = j + y;
-			if ((ii >= 0) && (ii < SCREEN_CX))
-				if ((jj >= 0) && (jj < SCREEN_CY / 2))
-					screen[ii][jj] = *((ui8*)tile + i * TILE_CY / 2 + j);
-		}
 }
 
 void Device::processGps(PointFloat point)
@@ -155,7 +143,7 @@ void Device::processGps(PointFloat point)
 	int yy = (currentTile.y - tileY) * TILE_CY; // screen offset y
 	yy = SCREEN_CY / 2 - yy;
 	yy /= 2;
-	memset(screen, 0, SCREEN_CX * SCREEN_CY / 2);
+	memset(&screen, 0, sizeof(screen));
 
 	if (!PointInRect(&ims.coord, point.x, point.y))
 		fsFindIMS(point.x, point.y, &ims, id);
@@ -168,40 +156,32 @@ void Device::processGps(PointFloat point)
 	for (int i = 0; i <= abs(dxt); ++i)
 	{
 		ui32 index = cacheRead(&ims, tileX + i * dxt, tileY, zoom);
-		copyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy);
+		CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy, &screen);
 		if (yy > 0)
 		{
 			index = cacheRead(&ims, tileX + i * dxt, tileY - 1, zoom);
-			copyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy - TILE_CY / 2);
+			CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy - TILE_CY / 2, &screen);
 		}
 		if (yy + TILE_CY / 2 < SCREEN_CY)
 		{
 			index = cacheRead(&ims, tileX + i * dxt, tileY + 1, zoom);
-			copyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy + TILE_CY / 2);
+			CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy + TILE_CY / 2, &screen);
 		}
 	}
+
+	const int x = SCREEN_CX / 2;
+	const int y = SCREEN_CY / 2;
+	Line(x - 10, y, x + 10, y, DEV_RED, &screen);
+	Line(x, y - 10, x, y + 10, DEV_RED, &screen);
+
 	redrawScreen = true;
 }
 
 void Device::paint(const PaintContext* ctx)
 {
-	for (int x = 0; x < SCREEN_CX; ++x)
-		for (int y = 0; y < SCREEN_CY / 2; ++y)
-		{
-			ui8 b = screen[x][y];
-			gPixel(ctx, x, y * 2 + 1, b >> 1);
-			gPixel(ctx, x, y * 2, b >> 5);
-		}
-
-	int x = SCREEN_CX / 2;
-	int y = SCREEN_CY / 2;
-
-	gLine(ctx, x - 10, y, x + 10, y, DEV_RED);
-	gLine(ctx, x, y - 10, x, y + 10, DEV_RED);
-
+	PaintScreen(ctx, &screen);
 	redrawScreen = false;
 }
-
 
 void Device::run()
 {

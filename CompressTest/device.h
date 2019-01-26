@@ -4,6 +4,7 @@
 #include "coord.h"
 #include "sizes.h"
 #include "fs.h"
+#include "screen.h"
 
 #include <deque>
 
@@ -23,7 +24,7 @@ class Device
 	IMS ims;
 	MapCacheItem mapCache[6];
 	PointFloat currentTile;
-	ui8 screen[SCREEN_CX][SCREEN_CY / 2];
+	Screen screen;
 
 public:
 	std::deque<PointFloat> gps;
@@ -38,7 +39,6 @@ public:
 
 private:
 	void processGps(PointFloat point);
-	void copyTileToScreen(const void* tile, int x, int y);
 	ui32 cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };
 
