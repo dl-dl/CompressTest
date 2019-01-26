@@ -18,7 +18,7 @@ Device::Device()
 	{
 		mapCache[i].zoom = 0; // empty
 	}
-	ims = { 0 };
+	memset(&ims, 0, sizeof(ims));
 }
 
 static NewTile* getTile(int x, int y, ui8 z)

@@ -30,9 +30,9 @@ public:
 	std::deque<PointFloat> gps;
 	bool redrawScreen;
 
-
 	Device();
 	Device(const Device&) = delete;
+
 	void init(int id_);
 	void run();
 	void paint(const PaintContext* ctx);
