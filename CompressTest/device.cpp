@@ -18,6 +18,7 @@ void Device::init(int id_)
 	memset(&ims, 0, sizeof(ims));
 
 	id = id_;
+	zoom = 12;
 }
 
 static inline ui32 cacheIndex(ui32 x, ui32 y)
@@ -55,9 +56,18 @@ ui32 Device::cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 	return index;
 }
 
+void Device::processKey(ui16 c)
+{
+	if (c == '+' && zoom < 13)
+		zoom++;
+	else if (c == '-' && zoom > 12)
+		zoom--;
+
+	redrawScreen = true;
+}
+
 void Device::processGps(PointFloat point)
 {
-	const ui8 zoom = 12;
 	currentTile.x = lon2tilex(point.x, zoom);
 	currentTile.y = lat2tiley(point.y, zoom);
 	ui32 tileX = (ui32)currentTile.x;
@@ -115,5 +125,10 @@ void Device::run()
 	{
 		processGps(gps.front());
 		gps.pop_front();
+	}
+	while (key.size())
+	{
+		processKey(key.front());
+		key.pop_front();
 	}
 }

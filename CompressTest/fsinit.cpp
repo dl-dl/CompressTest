@@ -68,7 +68,7 @@ void fsInit(int id)
 	r.top = 56.2f;
 	fsAddIMS(&ims, &addr, &r, id);
 
-	for (ui8 z = 12; z < 13; ++z)
+	for (ui8 z = 12; z <= 13; ++z)
 	{
 		NewMapStatus status;
 		imsNextZoom(&ims, &status, z);

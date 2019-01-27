@@ -24,11 +24,13 @@ class Device
 	IMS ims;
 	MapCacheItem mapCache[6];
 	PointFloat currentTile;
+	ui8 zoom;
 	Screen screen;
 
 public:
 	bool redrawScreen;
 	std::deque<PointFloat> gps;
+	std::deque<ui16> key;
 
 	Device()
 	{}
@@ -39,6 +41,7 @@ public:
 	void paint(const PaintContext* ctx);
 
 private:
+	void processKey(ui16 c);
 	void processGps(PointFloat point);
 	ui32 cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };

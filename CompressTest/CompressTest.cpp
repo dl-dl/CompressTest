@@ -52,6 +52,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	MSG msg;
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
+		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
 		if (msg.hwnd)
@@ -143,8 +144,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
+	case WM_CHAR:
+	{
+		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		if ('+' == wParam || '-' == wParam)
+			devPtr->key.push_back(wParam);
+	}
+	break;
 	case WM_KEYDOWN:
 	{
+		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		static PointFloat point = { 38.39f, 56.01f };
 		if (VK_UP == wParam)
 			point.y += 0.01f;
@@ -156,7 +165,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			point.x += 0.01f;
 		else
 			break;
-		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		devPtr->gps.push_back(point);
 	}
 	break;
