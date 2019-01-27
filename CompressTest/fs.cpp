@@ -12,7 +12,7 @@ static ui32 calcCRC(const void* data, ui32 sz) // TODO: implement proper algorit
 	return crc;
 }
 
-void fsFormat(char id)
+void fsFormat(int id)
 {
 	ui8 b[BLOCK_SIZE];
 	memset(b, 0, sizeof(b));
@@ -208,7 +208,9 @@ bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id)
 		ims->indexHWM++;
 		if (ims->dataHWM <= ims->indexHWM)
 			return false;
-		memset(status->currentIndexBlock.idx, 0xFD, sizeof(status->currentIndexBlock.idx)); // TODO: remove debug
+#ifdef _DEBUG
+		memset(status->currentIndexBlock.idx, 0xFD, sizeof(status->currentIndexBlock.idx));
+#endif
 	}
 	return true;
 }

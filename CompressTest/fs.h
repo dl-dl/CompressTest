@@ -57,7 +57,7 @@ struct NewMapStatus
 	IndexBlock currentIndexBlock;
 };
 
-void fsFormat(char id);
+void fsFormat(int id);
 bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id);
 bool fsFindIMS(float x, float y, IMS *dst, int id);
 void fsCommitIMS(IMS* ims, BlockAddr addr, int id);

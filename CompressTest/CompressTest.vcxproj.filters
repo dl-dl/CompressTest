@@ -66,6 +66,9 @@
     <ClInclude Include="devfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fsinit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">
@@ -99,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="devfont32x25.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fsinit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

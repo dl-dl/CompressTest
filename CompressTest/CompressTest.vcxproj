@@ -199,6 +199,7 @@
     <ClInclude Include="devfont.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="fs.h" />
+    <ClInclude Include="fsinit.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="paintctx.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="devfont32x25.c" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="fs.cpp" />
+    <ClCompile Include="fsinit.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="paint.cpp" />
     <ClCompile Include="sd.cpp" />

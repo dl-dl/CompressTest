@@ -7,6 +7,7 @@
 #include "lodepng.h"
 #include "convert.h"
 #include "device.h"
+#include "fsinit.h"
 #include "coord.h"
 #include "graph.h"
 #include "paintctx.h"
@@ -101,6 +102,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 								  CW_USEDEFAULT, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
 		if (!hWnd)
 			return FALSE;
+
+		fsFormat(i);
+		fsInit(i);
 
 		dev[i].init(i);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));

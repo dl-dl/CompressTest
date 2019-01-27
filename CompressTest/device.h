@@ -27,10 +27,11 @@ class Device
 	Screen screen;
 
 public:
-	std::deque<PointFloat> gps;
 	bool redrawScreen;
+	std::deque<PointFloat> gps;
 
-	Device();
+	Device()
+	{}
 	Device(const Device&) = delete;
 
 	void init(int id_);
