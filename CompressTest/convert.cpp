@@ -245,16 +245,16 @@ void DeCompress(const void *src, void *dst)
 	for (int x = 0; x < TILE_CX; x++)
 	{
 		ui8 *dstCol = (ui8 *)dst + x * TILE_CY / 2;
-		if (cntEqLine)
-		{
-			memcpy(dstCol, dstCol - TILE_CY / 2, TILE_CY / 2);
-			cntEqLine--;
-			continue;
-		}
 		if (*srcPtr == 0x01) // eq string
 		{
 			srcPtr++;
-			cntEqLine = *srcPtr++;
+			ui8 cntEqLine = *srcPtr++;
+			x += cntEqLine - 1;
+			while (cntEqLine--)
+			{
+				memcpy(dstCol, dstCol - TILE_CY / 2, TILE_CY / 2);
+				dstCol += TILE_CY / 2;
+			}
 			continue;
 		}
 
