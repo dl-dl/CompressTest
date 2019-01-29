@@ -3,7 +3,8 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 
-#include "CompressTest.h"
+#include "resource.h"
+
 #include "lodepng.h"
 #include "convert.h"
 #include "device.h"
@@ -156,13 +157,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		static PointFloat point = { 38.39f, 56.01f };
 		if (VK_UP == wParam)
-			point.y += 0.01f;
+			point.y += 0.001f;
 		else if (VK_DOWN == wParam)
-			point.y -= 0.01f;
+			point.y -= 0.001f;
 		else if (VK_LEFT == wParam)
-			point.x -= 0.01f;
+			point.x -= 0.001f;
 		else if (VK_RIGHT == wParam)
-			point.x += 0.01f;
+			point.x += 0.001f;
 		else
 			break;
 		devPtr->gps.push_back(point);

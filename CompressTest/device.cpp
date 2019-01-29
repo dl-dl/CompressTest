@@ -19,6 +19,8 @@ void Device::init(int id_)
 
 	id = id_;
 	zoom = 12;
+	currentPoint = { 0, 0 };
+	tileShift = { 0, 0 };
 }
 
 static inline ui32 cacheIndex(ui32 x, ui32 y)
@@ -63,54 +65,65 @@ void Device::processKey(ui16 c)
 	else if (c == '-' && zoom > 12)
 		zoom--;
 
+	screenToPoint();
+}
+
+void Device::screenToPoint()
+{
+	currentTile.x = lon2tilex(currentPoint.x, zoom);
+	currentTile.y = lat2tiley(currentPoint.y, zoom);
+	PointInt tileInt;
+	tileInt.x = (int)currentTile.x;
+	tileInt.y = (int)currentTile.y;
+	PointInt tilePart;
+	tilePart.x = (int)((currentTile.x - tileInt.x) * TILE_CX);
+	tilePart.y = (int)((currentTile.y - tileInt.y) * TILE_CY);
+	PointInt shift;
+	shift.x = SCREEN_CX / 2 - tilePart.x;
+	shift.y = SCREEN_CY / 2 - tilePart.y;
+	if ((abs(tilePart.x + tileShift.x - SCREEN_CX / 2) > SCREEN_CX / 10)
+		|| (abs(tilePart.y + tileShift.y - SCREEN_CY / 2)) > SCREEN_CY / 10)
+		tileShift = shift;
+#ifdef _DEBUG
+	memset(&screen, 0, sizeof(screen));
+#endif
+	if (!PointInRect(&ims.coord, currentPoint.x, currentPoint.y))
+		fsFindIMS(currentPoint.x, currentPoint.y, &ims, id);
+
+	int dxt = 0;
+	if (tileShift.x > 0)
+		dxt = -1;
+	else if (tileShift.x + TILE_CX < SCREEN_CX)
+		dxt = 1;
+	for (int i = 0; i <= abs(dxt); ++i)
+	{
+		ui32 index = cacheRead(&ims, tileInt.x + i * dxt, tileInt.y, zoom);
+		CopyTileToScreen(mapCache[index].data, tileShift.x + i * dxt * TILE_CX, tileShift.y / 2, &screen);
+		if (tileShift.y / 2 > 0)
+		{
+			index = cacheRead(&ims, tileInt.x + i * dxt, tileInt.y - 1, zoom);
+			CopyTileToScreen(mapCache[index].data, tileShift.x + i * dxt * TILE_CX, (tileShift.y - TILE_CY) / 2, &screen);
+		}
+		if ((tileShift.y + TILE_CY) / 2 < SCREEN_CY)
+		{
+			index = cacheRead(&ims, tileInt.x + i * dxt, tileInt.y + 1, zoom);
+			CopyTileToScreen(mapCache[index].data, tileShift.x + i * dxt * TILE_CX, (tileShift.y + TILE_CY) / 2, &screen);
+		}
+	}
+
+	const int x = tilePart.x + tileShift.x;
+	const int y = tilePart.y + tileShift.y;
+	Line(x - 10, y, x + 10, y, DEV_RED, &screen);
+	Line(x, y - 10, x, y + 10, DEV_RED, &screen);
+
 	redrawScreen = true;
 }
 
 void Device::processGps(PointFloat point)
 {
-	currentTile.x = lon2tilex(point.x, zoom);
-	currentTile.y = lat2tiley(point.y, zoom);
-	ui32 tileX = (ui32)currentTile.x;
-	ui32 tileY = (ui32)currentTile.y;
+	currentPoint = point;
 
-	int xx = (int)((currentTile.x - tileX) * TILE_CX); // screen offset x
-	xx = SCREEN_CX / 2 - xx;
-	int yy = (int)((currentTile.y - tileY) * TILE_CY); // screen offset y
-	yy = SCREEN_CY / 2 - yy;
-	yy /= 2;
-#ifdef _DEBUG
-	memset(&screen, 0, sizeof(screen));
-#endif
-	if (!PointInRect(&ims.coord, point.x, point.y))
-		fsFindIMS(point.x, point.y, &ims, id);
-
-	int dxt = 0;
-	if (xx > 0)
-		dxt = -1;
-	else if (xx + TILE_CX < SCREEN_CX)
-		dxt = 1;
-	for (int i = 0; i <= abs(dxt); ++i)
-	{
-		ui32 index = cacheRead(&ims, tileX + i * dxt, tileY, zoom);
-		CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy, &screen);
-		if (yy > 0)
-		{
-			index = cacheRead(&ims, tileX + i * dxt, tileY - 1, zoom);
-			CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy - TILE_CY / 2, &screen);
-		}
-		if (yy + TILE_CY / 2 < SCREEN_CY)
-		{
-			index = cacheRead(&ims, tileX + i * dxt, tileY + 1, zoom);
-			CopyTileToScreen(mapCache[index].data, xx + i * dxt * TILE_CX, yy + TILE_CY / 2, &screen);
-		}
-	}
-
-	const int x = SCREEN_CX / 2;
-	const int y = SCREEN_CY / 2;
-	Line(x - 10, y, x + 10, y, DEV_RED, &screen);
-	Line(x, y - 10, x, y + 10, DEV_RED, &screen);
-
-	redrawScreen = true;
+	screenToPoint();
 }
 
 void Device::paint(const PaintContext* ctx)

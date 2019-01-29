@@ -241,7 +241,6 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
 void DeCompress(const void *src, void *dst)
 {
 	const ui8 *srcPtr = (ui8 *)src;
-	ui8 cntEqLine = 0;
 	for (int x = 0; x < TILE_CX; x++)
 	{
 		ui8 *dstCol = (ui8 *)dst + x * TILE_CY / 2;

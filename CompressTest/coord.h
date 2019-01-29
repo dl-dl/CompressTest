@@ -1,6 +1,10 @@
 #ifndef __COORD_H_
 #define __COORD_H_
 
+struct PointInt
+{
+	int x, y;
+};
 
 struct PointFloat
 {
