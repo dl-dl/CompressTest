@@ -116,6 +116,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
+static PointFloat nextGps(int i, WPARAM w)
+{
+//	static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
+	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
+	if (VK_UP == w)
+		point[i].y += 0.001f;
+	else if (VK_DOWN == w)
+		point[i].y -= 0.001f;
+	else if (VK_LEFT == w)
+		point[i].x -= 0.001f;
+	else if (VK_RIGHT == w)
+		point[i].x += 0.001f;
+	return point[i];
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -155,18 +170,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 	{
 		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		static PointFloat point = { 38.39f, 56.01f };
-		if (VK_UP == wParam)
-			point.y += 0.001f;
-		else if (VK_DOWN == wParam)
-			point.y -= 0.001f;
-		else if (VK_LEFT == wParam)
-			point.x -= 0.001f;
-		else if (VK_RIGHT == wParam)
-			point.x += 0.001f;
-		else
-			break;
-		devPtr->gps.push_back(point);
+		devPtr->gps.push_back(nextGps(devPtr->id, wParam));
 	}
 	break;
 	case WM_DESTROY:

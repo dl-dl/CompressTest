@@ -19,8 +19,6 @@ struct MapCacheItem
 
 class Device
 {
-	int id;
-
 	IMS ims;
 	MapCacheItem mapCache[6];
 	PointFloat currentPoint;
@@ -30,6 +28,7 @@ class Device
 	Screen screen;
 
 public:
+	int id;
 	bool redrawScreen;
 	std::deque<PointFloat> gps;
 	std::deque<ui16> key;

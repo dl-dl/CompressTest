@@ -11,10 +11,10 @@
 #include <assert.h>
 #include <stdio.h>
 
-static NewTile* getTile(int x, int y, ui8 z)
+static NewTile* getTile(int x, int y, ui8 z, const char* region)
 {
 	char path[1024];
-	sprintf(path, "C:\\tmp\\%u\\%u\\%u.png", z, x, y);
+	sprintf(path, "C:\\tmp\\%s\\%u\\%u\\%u.png", region, z, x, y );
 
 	FILE* f = fopen(path, "rb");
 	if (!f)
@@ -59,27 +59,39 @@ static void forgetTile(void* p)
 void fsInit(int id)
 {
 	IMS ims;
-
 	BlockAddr addr;
-	RectFloat r;
-	r.left = 38.0f;
-	r.right = 38.4f;
-	r.bottom = 55.95f;
-	r.top = 56.2f;
-	fsAddIMS(&ims, &addr, &r, id);
+	RectFloat r[2];
+	r[0].left = 38.0f;
+	r[0].right = 38.4f;
+	r[0].top = 56.2f;
+	r[0].bottom = 55.95f;
+	r[1].left = -71.65f;
+	r[1].right = -71.4f;
+	r[1].top = -33.0f;
+	r[1].bottom = -33.1f;
+	const char* region[2] = { "cher", "valparaiso" };
 
-	for (ui8 z = 12; z <= 13; ++z)
+	for (int i = 0; i < 2; ++i)
 	{
-		NewMapStatus status;
-		imsNextZoom(&ims, &status, z);
-		for (float x = lon2tilex(r.left, z); x <= lon2tilex(r.right, z); ++x)
-			for (float y = lat2tiley(r.top, z); y <= lat2tiley(r.bottom, z); ++y)
-			{
-				NewTile* tile = getTile((int)x, (int)y, z);
-				bool res = imsAddTile(&ims, &status, tile, id);
-				assert(res);
-				forgetTile(tile);
-			}
-		fsCommitIMS(&ims, addr, id);
+		fsAddIMS(&ims, &addr, r + i, id);
+
+		for (ui8 z = 12; z <= 13; ++z)
+		{
+			NewMapStatus status;
+			imsNextZoom(&ims, &status, z);
+			int startX = (int)lon2tilex(r[i].left, z);
+			int startY = (int)lat2tiley(r[i].top, z);
+			int stopX = (int)lon2tilex(r[i].right, z);
+			int stopY = (int)lat2tiley(r[i].bottom, z);
+			for (int x = startX; x <= stopX; ++x)
+				for (int y = startY; y <= stopY; ++y)
+				{
+					NewTile* tile = getTile(x, y, z, region[i]);
+					bool res = imsAddTile(&ims, &status, tile, id);
+					assert(res);
+					forgetTile(tile);
+				}
+			fsCommitIMS(&ims, addr, id);
+		}
 	}
 }
