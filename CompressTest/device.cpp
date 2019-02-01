@@ -16,6 +16,7 @@ void Device::init(int id_)
 		mapCache[i].zoom = 0; // empty
 	}
 	memset(&ims, 0, sizeof(ims));
+	timer = false;
 
 	id = id_;
 	zoom = 12;
@@ -65,7 +66,7 @@ void Device::processKey(ui16 c)
 	else if (c == '-' && zoom > 12)
 		zoom--;
 
-	screenToPoint();
+	redrawScreen = true;
 }
 
 void Device::screenToPoint()
@@ -115,19 +116,37 @@ void Device::screenToPoint()
 	const int y = tilePart.y + tileShift.y;
 	Line(x - 10, y, x + 10, y, DEV_RED, &screen);
 	Line(x, y - 10, x, y + 10, DEV_RED, &screen);
+	for (const auto& i : groupPos)
+	{
+		if (i.first == id)
+		{
 
-	redrawScreen = true;
+		}
+		else
+		{
+
+		}
+	}
 }
 
 void Device::processGps(PointFloat point)
 {
 	currentPoint = point;
-
-	screenToPoint();
+	broadcast(id, point);
+	redrawScreen = true;
 }
+
+void Device::processRadio(PadioMsg point)
+{
+	groupPos[point.id] = point.pos;
+}
+
+void Device::processTimer()
+{}
 
 void Device::paint(const PaintContext* ctx)
 {
+	screenToPoint();
 	PaintScreen(ctx, &screen);
 	redrawScreen = false;
 }
@@ -139,9 +158,19 @@ void Device::run()
 		processGps(gps.front());
 		gps.pop_front();
 	}
+	while (radio.size())
+	{
+		processRadio(radio.front());
+		radio.pop_front();
+	}
 	while (key.size())
 	{
 		processKey(key.front());
 		key.pop_front();
+	}
+	if (timer)
+	{
+		processTimer();
+		timer = false;
 	}
 }

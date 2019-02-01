@@ -26,6 +26,7 @@ static LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 static const int NUM_DEV = 3;
 static Device dev[NUM_DEV];
+static HWND wnd[NUM_DEV];
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS*)
 {
@@ -46,9 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	MyRegisterClass(hInstance);
 
 	if (!InitInstance(hInstance, nCmdShow))
-	{
 		return FALSE;
-	}
 
 	MSG msg;
 	while (GetMessage(&msg, nullptr, 0, 0))
@@ -56,18 +55,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		if (msg.hwnd)
+		for (int i = 0; i < NUM_DEV; ++i)
+			dev[i].run();
+		for (int i = 0; i < NUM_DEV; ++i)
 		{
-			Device* devPtr = (Device*)GetWindowLongPtr(msg.hwnd, GWLP_USERDATA);
-			if (devPtr)
-			{
-				devPtr->run();
-				if (devPtr->redrawScreen)
-					InvalidateRect(msg.hwnd, NULL, FALSE);
-			}
+			if (dev[i].redrawScreen)
+				InvalidateRect(wnd[i], NULL, FALSE);
 		}
 	}
-
 	return (int)msg.wParam;
 }
 
@@ -96,7 +91,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < NUM_DEV; ++i)
 	{
 		WCHAR s[64];
 		wsprintf(s, L"Device %u", i);
@@ -105,30 +100,41 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		if (!hWnd)
 			return FALSE;
 
+		wnd[i] = hWnd;
 		fsFormat(i);
 		fsInit(i);
-
 		dev[i].init(i);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
+		SetTimer(hWnd, 1, 1000, NULL);
 		ShowWindow(hWnd, nCmdShow);
 		UpdateWindow(hWnd);
 	}
 	return TRUE;
 }
 
-static PointFloat nextGps(int i, WPARAM w)
+static PointFloat nextGps(int id, WPARAM w)
 {
 //	static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
 	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
 	if (VK_UP == w)
-		point[i].y += 0.001f;
+		point[id].y += 0.001f;
 	else if (VK_DOWN == w)
-		point[i].y -= 0.001f;
+		point[id].y -= 0.001f;
 	else if (VK_LEFT == w)
-		point[i].x -= 0.001f;
+		point[id].x -= 0.001f;
 	else if (VK_RIGHT == w)
-		point[i].x += 0.001f;
-	return point[i];
+		point[id].x += 0.001f;
+	return point[id];
+}
+
+void broadcast(int srcId, PointFloat point)
+{
+	PadioMsg msg;
+	msg.pos = point;
+	msg.id = srcId;
+	for(int i = 0; i < NUM_DEV; ++i)
+		if (dev[i].id != srcId)
+			dev[i].radio.push_back(msg);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -171,6 +177,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		devPtr->gps.push_back(nextGps(devPtr->id, wParam));
+	}
+	break;
+	case WM_TIMER:
+	{
+		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		devPtr->timer = true;
 	}
 	break;
 	case WM_DESTROY:
