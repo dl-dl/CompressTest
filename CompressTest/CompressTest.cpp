@@ -56,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		DispatchMessage(&msg);
 
 		for (int i = 0; i < NUM_DEV; ++i)
-			dev[i].run();
+			dev[i].Run();
 		for (int i = 0; i < NUM_DEV; ++i)
 		{
 			if (dev[i].redrawScreen)
@@ -103,7 +103,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		wnd[i] = hWnd;
 		fsFormat(i);
 		fsInit(i);
-		dev[i].init(i);
+		dev[i].Init(i);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
 		SetTimer(hWnd, 1, 1000, NULL);
 		ShowWindow(hWnd, nCmdShow);
@@ -127,7 +127,7 @@ static PointFloat nextGps(int id, WPARAM w)
 	return point[id];
 }
 
-void broadcast(int srcId, PointFloat point)
+void Broadcast(int srcId, PointFloat point)
 {
 	PadioMsg msg;
 	msg.pos = point;
@@ -162,7 +162,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PaintContext ctx;
 		ctx.hdc = hdc;
 		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		devPtr->paint(&ctx);
+		devPtr->Paint(&ctx);
 		EndPaint(hWnd, &ps);
 	}
 	break;

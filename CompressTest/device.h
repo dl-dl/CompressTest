@@ -28,9 +28,8 @@ class Device
 {
 	IMS ims;
 	MapCacheItem mapCache[6];
-	PointFloat currentPoint;
-	PointFloat currentTile;
-	PointInt tileShift;
+	PointFloat currentPos;
+	PointInt screenStart;
 	ui8 zoom;
 	Screen screen;
 
@@ -47,21 +46,23 @@ public:
 	{}
 	Device(const Device&) = delete;
 
-	void init(int id_);
-	void run();
-	void paint(const PaintContext* ctx);
+	void Init(int id_);
+	void Run();
+	void Paint(const PaintContext* ctx);
 
 private:
-	void screenToPoint();
+	void AdjustScreenPos(PointInt pos);
+	void DrawMap();
+	void DrawGroup();
 
-	void processKey(ui16 c);
-	void processGps(PointFloat point);
-	void processRadio(PadioMsg point);
-	void processTimer();
+	void ProcessKey(ui16 c);
+	void ProcessGps(PointFloat point);
+	void ProcessRadio(PadioMsg point);
+	void ProcessTimer();
 
-	ui32 cacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
+	ui32 CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };
 
-extern void broadcast(int srcId, PointFloat msg);
+extern void Broadcast(int srcId, PointFloat msg);
 
 #endif // !__DEVICE_H__
