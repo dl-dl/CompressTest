@@ -1,9 +1,10 @@
 #include <assert.h>
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
+#define NOGDI
+#define NOUSER
 #include <Windows.h>
 #include "sd.h"
-
-#ifdef _WIN32_WINNT
 
 static HANDLE sdopen(int id)
 {

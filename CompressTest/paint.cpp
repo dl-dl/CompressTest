@@ -1,9 +1,8 @@
-#include "paintctx.h"
 #include "types.h"
-#include "paint.h"
 #include "sizes.h"
-
-#ifdef _WIN32_WINNT
+#ifdef WIN32
+#include "paint.h"
+#include "paintctx.h"
 
 static const int BORDERX = -32;
 static const int BORDERY = -32;
