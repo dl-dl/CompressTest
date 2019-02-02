@@ -16,8 +16,9 @@ void Device::Init(int id_)
 		mapCache[i].zoom = 0; // empty
 	}
 	memset(&ims, 0, sizeof(ims));
-	timer = false;
+	group.n = 0;
 
+	timer = false;
 	id = id_;
 	zoom = 12;
 	currentPos = { 0, 0 };
@@ -107,27 +108,57 @@ void Device::DrawMap()
 
 void Device::DrawGroup()
 {
-	for (const auto& i : groupPos)
+	for (int i = 0; i < group.n; ++i)
 	{
-		PointInt pos = PointFloat2Int(i.second, zoom);
+		int dd;
+		if (group.data[i].id == id)
+			dd = 10;
+		else
+			dd = 5;
+
+		PointInt pos = PointFloat2Int(group.data[i].pos, zoom);
 		const int x = pos.x - screenStart.x;
 		const int y = pos.y - screenStart.y;
-		Line(x - 10, y, x + 10, y, DEV_RED, &screen);
-		Line(x, y - 10, x, y + 10, DEV_RED, &screen);
+		Line(x - dd, y, x + dd, y, DEV_RED, &screen);
+		Line(x, y - dd, x, y + dd, DEV_RED, &screen);
 	}
+}
+
+static int FindInGroup(const GroupData* g, int id)
+{
+	for (int i = 0; i < g->n; ++i)
+	{
+		if (g->data[i].id == id)
+			return i;
+	}
+	return -1;
 }
 
 void Device::ProcessGps(PointFloat point)
 {
 	currentPos = point;
-	groupPos[id] = currentPos;
-	Broadcast(id, currentPos);
+	int i = FindInGroup(&group, id);
+	if (i >= 0)
+	{
+		group.data[i].pos = point;
+	}
+	else
+	{
+		group.data[group.n].id = id;
+		group.data[group.n].pos = point;
+		group.n++;
+	}
+	Broadcast(id, point);
 	redrawScreen = true;
 }
 
-void Device::ProcessRadio(PadioMsg point)
+void Device::ProcessRadio(const RadioMsg* msg)
 {
-	groupPos[point.id] = point.pos;
+	int i = FindInGroup(&group, msg->id);
+	if (i >= 0)
+		group.data[i] = *msg;
+	else
+		group.data[group.n++] = *msg;
 	redrawScreen = true;
 }
 
@@ -154,7 +185,7 @@ void Device::Run()
 	}
 	while (radio.size())
 	{
-		ProcessRadio(radio.front());
+		ProcessRadio(&radio.front());
 		radio.pop_front();
 	}
 	while (key.size())

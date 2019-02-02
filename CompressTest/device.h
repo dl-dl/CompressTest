@@ -6,8 +6,7 @@
 #include "fs.h"
 #include "screen.h"
 
-#include <deque>
-#include <map>
+#include <deque> // TODO: remove
 
 struct PaintContext;
 
@@ -18,10 +17,16 @@ struct MapCacheItem
 	ui8 data[TILE_CX * TILE_CY / 2];
 };
 
-struct PadioMsg
+struct RadioMsg
 {
 	PointFloat pos;
 	ui32 id;
+};
+
+struct GroupData
+{
+	RadioMsg data[16];
+	int n;
 };
 
 class Device
@@ -37,10 +42,11 @@ public:
 	int id;
 	bool redrawScreen;
 	std::deque<PointFloat> gps;
-	std::deque<PadioMsg> radio;
+	std::deque<RadioMsg> radio;
 	std::deque<ui16> key;
 	bool timer;
-	std::map<ui32, PointFloat> groupPos;
+
+	GroupData group;
 
 	Device()
 	{}
@@ -57,7 +63,7 @@ private:
 
 	void ProcessKey(ui16 c);
 	void ProcessGps(PointFloat point);
-	void ProcessRadio(PadioMsg point);
+	void ProcessRadio(const RadioMsg* point);
 	void ProcessTimer();
 
 	ui32 CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);

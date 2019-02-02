@@ -129,7 +129,7 @@ static PointFloat nextGps(int id, WPARAM w)
 
 void Broadcast(int srcId, PointFloat point)
 {
-	PadioMsg msg;
+	RadioMsg msg;
 	msg.pos = point;
 	msg.id = srcId;
 	for(int i = 0; i < NUM_DEV; ++i)
