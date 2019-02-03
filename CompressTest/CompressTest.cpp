@@ -126,7 +126,7 @@ static PointFloat nextGps(int id, WPARAM w)
 	return point[id];
 }
 
-void Broadcast(int srcId, PointFloat point)
+void Broadcast(int srcId, PointInt point)
 {
 	RadioMsg msg;
 	msg.pos = point;

@@ -19,7 +19,7 @@ struct MapCacheItem
 
 struct RadioMsg
 {
-	PointFloat pos;
+	PointInt pos;
 	ui32 id;
 };
 
@@ -69,6 +69,6 @@ private:
 	ui32 CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };
 
-extern void Broadcast(int srcId, PointFloat msg);
+extern void Broadcast(int srcId, PointInt data);
 
 #endif // !__DEVICE_H__

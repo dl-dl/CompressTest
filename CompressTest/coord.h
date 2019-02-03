@@ -1,6 +1,9 @@
 #ifndef __COORD_H_
 #define __COORD_H_
 
+#define MAX_ZOOM_LEVEL 18
+#define MIN_ZOOM_LEVEL 4
+
 struct PointInt
 {
 	int x, y;

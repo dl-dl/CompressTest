@@ -53,15 +53,16 @@ bool fsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 	ims->dataHWM = dataHWM;
 	ims->indexHWM = indexHWM;
 
-	for (ui8 z = 1; z < MAX_ZOOM_LEVEL; ++z)
+	for (ui8 z = MIN_ZOOM_LEVEL; z <= MAX_ZOOM_LEVEL; ++z)
 	{
-		ims->index[z].firstBlock = 0;
-		ims->index[z].left = (ui32)lon2tilex(ims->coord.left, z);
-		ims->index[z].top = (ui32)lat2tiley(ims->coord.top, z);
-		ui32 dx = (ui32)lon2tilex(ims->coord.right, z) - ims->index[z].left + 1;
-		ui32 dy = (ui32)lat2tiley(ims->coord.bottom, z) - ims->index[z].top + 1;
-		ims->index[z].nx = dx;
-		ims->index[z].ny = dy;
+		int i = z - MIN_ZOOM_LEVEL;
+		ims->index[i].firstBlock = 0;
+		ims->index[i].left = (ui32)lon2tilex(ims->coord.left, z);
+		ims->index[i].top = (ui32)lat2tiley(ims->coord.top, z);
+		ui32 dx = (ui32)lon2tilex(ims->coord.right, z) - ims->index[i].left + 1;
+		ui32 dy = (ui32)lat2tiley(ims->coord.bottom, z) - ims->index[i].top + 1;
+		ims->index[i].nx = dx;
+		ims->index[i].ny = dy;
 		ui32 numBlocks = (dx * dy) / INDEX_ITEMS_PER_BLOCK;
 		if ((dx * dy) % INDEX_ITEMS_PER_BLOCK)
 			numBlocks++;
@@ -153,17 +154,20 @@ static ui32 findTileRowB(const ImsIndexDescr *zi, float y)
 
 BlockAddr fsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
-	if (0 == ims->index[zoom].firstBlock)
+	assert(zoom >= MIN_ZOOM_LEVEL);
+	assert(zoom <= MAX_ZOOM_LEVEL);
+	ui32 i = zoom - MIN_ZOOM_LEVEL;
+	if (0 == ims->index[i].firstBlock)
 		return 0;
 
-	ui32 dx = numx - ims->index[zoom].left;
-	ui32 dy = numy - ims->index[zoom].top;
-	if (dx >= ims->index[zoom].nx || dy >= ims->index[zoom].ny)
+	ui32 dx = numx - ims->index[i].left;
+	ui32 dy = numy - ims->index[i].top;
+	if (dx >= ims->index[i].nx || dy >= ims->index[i].ny)
 		return 0;
 
-	ui32 offs = dx * ims->index[zoom].ny + dy;
+	ui32 offs = dx * ims->index[i].ny + dy;
 	ui8 b[BLOCK_SIZE];
-	sdCardRead(ims->index[zoom].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
+	sdCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
 	const IndexBlock* p = (IndexBlock*)b;
 	if (p->checksum != calcCRC(p->idx, sizeof(p->idx)))
 		return 0;
@@ -175,7 +179,7 @@ void imsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom)
 	status->currentZoom = zoom;
 	status->tilesAtCurrentZoom = 0;
 	memset(status->currentIndexBlock.idx, 0xFD, sizeof(status->currentIndexBlock.idx));
-	ims->index[status->currentZoom].firstBlock = ims->indexHWM;
+	ims->index[status->currentZoom - MIN_ZOOM_LEVEL].firstBlock = ims->indexHWM;
 }
 
 bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id)
@@ -192,16 +196,19 @@ bool imsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id)
 	}
 	status->tilesAtCurrentZoom++;
 
-	if ((status->tilesAtCurrentZoom == ims->index[status->currentZoom].nx * ims->index[status->currentZoom].ny)
+	assert(status->currentZoom >= MIN_ZOOM_LEVEL);
+	assert(status->currentZoom <= MAX_ZOOM_LEVEL);
+	ui32 i = status->currentZoom - MIN_ZOOM_LEVEL;
+	if ((status->tilesAtCurrentZoom == ims->index[i].nx * ims->index[i].ny)
 		|| (status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK == 0))
 	{
 		if (status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK)
 		{
-			assert(ims->indexHWM == ims->index[status->currentZoom].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
+			assert(ims->indexHWM == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
 		}
 		else
 		{
-			assert(ims->indexHWM + 1 == ims->index[status->currentZoom].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
+			assert(ims->indexHWM + 1 == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
 		}
 		status->currentIndexBlock.checksum = calcCRC(status->currentIndexBlock.idx, sizeof(status->currentIndexBlock.idx));
 		sdCardWrite(ims->indexHWM, &status->currentIndexBlock, id);
@@ -220,6 +227,7 @@ void fsCommitIMS(IMS* ims, BlockAddr addr, int id)
 	ims->status = IMS_READY;
 	ims->checksum = 0;
 	ims->checksum = calcCRC(ims, sizeof(*ims));
+	assert(sizeof(*ims) <= BLOCK_SIZE);
 	ui8 b[BLOCK_SIZE];
 	memcpy(b, ims, sizeof(*ims));
 	sdCardWrite(addr, b, id);

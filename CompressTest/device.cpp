@@ -110,15 +110,10 @@ void Device::DrawGroup()
 {
 	for (int i = 0; i < group.n; ++i)
 	{
-		int dd;
-		if (group.data[i].id == id)
-			dd = 10;
-		else
-			dd = 5;
-
-		PointInt pos = PointFloat2Int(group.data[i].pos, zoom);
-		const int x = pos.x - screenStart.x;
-		const int y = pos.y - screenStart.y;
+		int dd = (group.data[i].id == id) ? 10 : 5;
+		PointInt pos = group.data[i].pos;
+		const int x = (pos.x >> (MAX_ZOOM_LEVEL - zoom)) - screenStart.x;
+		const int y = (pos.y >> (MAX_ZOOM_LEVEL - zoom)) - screenStart.y;
 		Line(x - dd, y, x + dd, y, DEV_RED, &screen);
 		Line(x, y - dd, x, y + dd, DEV_RED, &screen);
 	}
@@ -138,17 +133,18 @@ void Device::ProcessGps(PointFloat point)
 {
 	currentPos = point;
 	int i = FindInGroup(&group, id);
+	const PointInt pos = PointFloat2Int(point, MAX_ZOOM_LEVEL);
 	if (i >= 0)
 	{
-		group.data[i].pos = point;
+		group.data[i].pos = pos;
 	}
 	else
 	{
 		group.data[group.n].id = id;
-		group.data[group.n].pos = point;
+		group.data[group.n].pos = pos;
 		group.n++;
 	}
-	Broadcast(id, point);
+	Broadcast(id, pos);
 	redrawScreen = true;
 }
 

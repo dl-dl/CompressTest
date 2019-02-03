@@ -7,7 +7,6 @@
 static const ui32 INDEX_ITEMS_PER_BLOCK = (BLOCK_SIZE - sizeof(ui32)) / sizeof(BlockAddr);
 
 static const ui32 NUM_IMS_BLOCKS = 1000;
-static const ui32 MAX_ZOOM_LEVEL = 16;
 
 struct ImsIndexDescr
 {
@@ -27,7 +26,7 @@ struct IMS
 	ui16 name[32];
 	BlockAddr dataHWM;
 	BlockAddr indexHWM;
-	ImsIndexDescr index[MAX_ZOOM_LEVEL + 1]; // zoom levels
+	ImsIndexDescr index[MAX_ZOOM_LEVEL - MIN_ZOOM_LEVEL + 1]; // zoom levels
 	ui32 checksum;
 };
 
