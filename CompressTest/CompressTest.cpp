@@ -100,7 +100,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 
 		wnd[i] = hWnd;
-		fsFormat(i);
+		FsFormat(i);
 		fsInit(i);
 		dev[i].Init(i);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
@@ -113,8 +113,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 static PointFloat nextGps(int id, WPARAM w)
 {
-//	static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
-	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
+	static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
+//	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
 	if (VK_UP == w)
 		point[id].y += 0.001f;
 	else if (VK_DOWN == w)

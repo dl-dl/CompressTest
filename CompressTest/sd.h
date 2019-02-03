@@ -1,9 +1,7 @@
 #ifndef __SD_H__
 #define __SD_H__
 #include "types.h"
-
-typedef ui32 BlockAddr;
-static const ui32 BLOCK_SIZE = 512;
+#include "sizes.h"
 
 static inline BlockAddr sdCardSize(void)
 {

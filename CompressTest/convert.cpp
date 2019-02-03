@@ -5,8 +5,7 @@
 
 static ui8 FindColor(ui8 bCol, ui8 gCol, ui8 rCol)
 {
-	static const ui8 ColorTabl[22][4] =
-	{
+	static const ui8 ColorTabl[22][4] = {
 		{ 0x3F, 0x00, 0x00, 1 },
 	{ 0x7F, 0x00, 0x00, 1 },
 	{ 0xFF, 0x00, 0x00, 1 },
@@ -92,13 +91,13 @@ void ConvertInv24To8Approx(const void *src, void *dst)
 {
 	for (int y = 0; y < TILE_CY; y++)
 	{
-		const ui8 *srcPtr = (ui8*)src + y * TILE_CX * 3;
+		const ui8 *srcPtr = (ui8 *)src + y * TILE_CX * 3;
 		for (int x = 0; x < TILE_CX; x++)
 		{
 			ui8 bCol = *srcPtr++;
 			ui8 gCol = *srcPtr++;
 			ui8 rCol = *srcPtr++;
-			*((ui8*)dst + x * TILE_CY + y) = FindColor(bCol, gCol, rCol);
+			*((ui8 *)dst + x * TILE_CY + y) = FindColor(bCol, gCol, rCol);
 		}
 	}
 }
@@ -238,46 +237,64 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
 	return CompressPtr - (ui8 *)dst;
 }
 
-void DeCompress(const void *src, void *dst)
+void DecompImit(DecompState *s, ui8 *dst)
 {
-	const ui8 *srcPtr = (ui8 *)src;
-	for (int x = 0; x < TILE_CX; x++)
-	{
-		ui8 *dstCol = (ui8 *)dst + x * TILE_CY / 2;
-		if (*srcPtr == 0x01) // eq string
-		{
-			srcPtr++;
-			ui8 cntEqLine = *srcPtr++;
-			x += cntEqLine - 1;
-			while (cntEqLine--)
-			{
-				memcpy(dstCol, dstCol - TILE_CY / 2, TILE_CY / 2);
-				dstCol += TILE_CY / 2;
-			}
-			continue;
-		}
+	s->x = s->y = 0;
+	s->numPixel = 0;
+	s->eqString = false;
+	s->dst = dst;
+}
 
-		for (int y = 0; y < TILE_CY / 2;)
+static inline void PutByte(DecompState *s, ui8 v)
+{
+	*(s->dst + s->x * TILE_CY / 2 + s->y) = v;
+	s->y++;
+	if (s->y >= TILE_CY / 2)
+	{
+		s->y = 0;
+		s->x++;
+	}
+}
+
+static inline void CopyPrevLine(DecompState *s)
+{
+	ui8 *dstCol = s->dst + s->x * TILE_CY / 2;
+	memcpy(dstCol, dstCol - TILE_CY / 2, TILE_CY / 2);
+	s->x++;
+}
+
+void DeCompressOne(ui8 src, DecompState *s)
+{
+	if (s->eqString)
+	{
+		while (src--) // src == repeat count
+			CopyPrevLine(s);
+		s->eqString = false;
+	}
+	else if (s->numPixel)
+	{
+		for (ui8 cnt = 0; cnt < s->numPixel; cnt++)
+			PutByte(s, src);
+		s->numPixel = 0;
+	}
+	else
+	{
+		if (0x01 == src)
 		{
-			if (*srcPtr & 0x01) // eq pixels
-			{
-				ui8 numPixel = *srcPtr++ >> 1;
-				ui8 pixel = *srcPtr++;
-				for (ui8 cnt = 0; cnt < numPixel; cnt++)
-				{
-					dstCol[y++] = pixel;
-				}
-			}
-			else if (*srcPtr & 0x10) // 2 eq pixels
-			{
-				ui8 pixel = *srcPtr++ & ~0x10;
-				dstCol[y++] = pixel;
-				dstCol[y++] = pixel;
-			}
-			else
-			{
-				dstCol[y++] = *srcPtr++;
-			}
+			s->eqString = true;
+		}
+		else if (src & 0x01)
+		{
+			s->numPixel = src >> 1;
+		}
+		else if (src & 0x10)
+		{
+			PutByte(s, src & ~0x10);
+			PutByte(s, src & ~0x10);
+		}
+		else
+		{
+			PutByte(s, src);
 		}
 	}
 }

@@ -73,12 +73,12 @@ void fsInit(int id)
 
 	for (int i = 0; i < 2; ++i)
 	{
-		fsAddIMS(&ims, &addr, r + i, id);
+		FsAddIMS(&ims, &addr, r + i, id);
 
 		for (ui8 z = 12; z <= 13; ++z)
 		{
 			NewMapStatus status;
-			imsNextZoom(&ims, &status, z);
+			ImsNextZoom(&ims, &status, z);
 			int startX = (int)lon2tilex(r[i].left, z);
 			int startY = (int)lat2tiley(r[i].top, z);
 			int stopX = (int)lon2tilex(r[i].right, z);
@@ -87,11 +87,11 @@ void fsInit(int id)
 				for (int y = startY; y <= stopY; ++y)
 				{
 					NewTile* tile = getTile(x, y, z, region[i]);
-					bool res = imsAddTile(&ims, &status, tile, id);
+					bool res = ImsAddTile(&ims, &status, tile, id);
 					assert(res);
 					forgetTile(tile);
 				}
-			fsCommitIMS(&ims, addr, id);
+			FsCommitIMS(&ims, addr, id);
 		}
 	}
 }

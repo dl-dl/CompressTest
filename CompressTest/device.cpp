@@ -47,19 +47,11 @@ ui32 Device::CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 	ui32 index = CacheIndex(tileX, tileY);
 	if (!CacheEq(&mapCache[index], tileX, tileY, zoom))
 	{
-		auto addr = fsFindTile(ims, zoom, tileX, tileY, id);
+		auto addr = FsFindTile(ims, zoom, tileX, tileY, id);
 		if (addr)
-		{
-			ui8* tile = (ui8*)malloc(TILE_CX * TILE_CY / 2 + BLOCK_SIZE + sizeof(ui32));
-			fsReadTile(addr, tile, id); // TODO: implement decompress on the fly
-			ui32 sz = ((NewTile*)tile)->size;
-			DeCompress(((NewTile*)tile)->data, mapCache[index].data);
-			free(tile);
-		}
+			FsReadTile(addr, mapCache[index].data, id);
 		else
-		{
 			memset(mapCache[index].data, 0xFF, TILE_CX * TILE_CY / 2);
-		}
 		mapCache[index].zoom = zoom;
 		mapCache[index].tileX = tileX;
 		mapCache[index].tileY = tileY;
@@ -96,7 +88,7 @@ void Device::DrawMap()
 	memset(&screen, 0, sizeof(screen));
 #endif
 	if (!PointInRect(&ims.coord, currentPos.x, currentPos.y))
-		fsFindIMS(currentPos.x, currentPos.y, &ims, id);
+		FsFindIMS(currentPos.x, currentPos.y, &ims, id);
 
 	for (int x = (screenStart.x / TILE_CX) * TILE_CX; x < screenStart.x + SCREEN_CX; x += TILE_CX)
 		for (int y = (screenStart.y / TILE_CY) * TILE_CY; y < screenStart.y + SCREEN_CY; y += TILE_CY)
