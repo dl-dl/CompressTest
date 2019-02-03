@@ -13,7 +13,7 @@ struct ImsIndexDescr
 	ui32 nx, ny; // number of tiles
 	ui32 left, top; // world tile numbers
 	BlockAddr firstBlock;
-	// firstBlock - addres of the first sector of an array of TileDescr.
+	// firstBlock - address of the first sector of an array of TileDescr.
 	// This array contains addresses of all tiles for the zoom level.
 	// The array is sorted by top, left. ([x0, y0] [x1, y0] [x2, y0], [x0, y1] [x1, y1] ...
 };

@@ -14,7 +14,7 @@
 static NewTile* getTile(int x, int y, ui8 z, const char* region)
 {
 	char path[1024];
-	sprintf(path, "C:\\tmp\\%s\\%u\\%u\\%u.png", region, z, x, y );
+	sprintf(path, "C:\\tmp\\%s\\%u\\%u\\%u.png", region, z, x, y);
 
 	FILE* f = fopen(path, "rb");
 	if (!f)

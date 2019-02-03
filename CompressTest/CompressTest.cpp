@@ -95,7 +95,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		WCHAR s[64];
 		wsprintf(s, L"Device %u", i);
 		HWND hWnd = CreateWindowW(szWindowClass, s, WS_OVERLAPPEDWINDOW,
-								  CW_USEDEFAULT, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
+			(240 + 64 + 20) * i, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
 		if (!hWnd)
 			return FALSE;
 
@@ -131,7 +131,7 @@ void Broadcast(int srcId, PointInt point)
 	RadioMsg msg;
 	msg.pos = point;
 	msg.id = srcId;
-	for(int i = 0; i < NUM_DEV; ++i)
+	for (int i = 0; i < NUM_DEV; ++i)
 		if (dev[i].id != srcId)
 			dev[i].radio.push_back(msg);
 }

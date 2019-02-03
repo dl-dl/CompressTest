@@ -1,6 +1,6 @@
 #include "types.h"
 #include "sizes.h"
-#ifdef WIN32
+#ifdef _WINDOWS
 #include "paint.h"
 #include "paintctx.h"
 
@@ -15,7 +15,7 @@ static inline COLORREF translateColor(ui8 c)
 void PaintScreen(const PaintContext* ctx, Screen* screen)
 {
 	SetWindowOrgEx(ctx->hdc, BORDERX, BORDERY, NULL);
-	for(int x = 0; x < SCREEN_CX; ++x)
+	for (int x = 0; x < SCREEN_CX; ++x)
 		for (int y = 0; y < SCREEN_CY / 2; ++y)
 		{
 			ui8 c = screen->line[x].pix[y];

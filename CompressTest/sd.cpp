@@ -1,5 +1,5 @@
 #include <assert.h>
-#ifdef WIN32
+#ifdef _WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #define NOGDI
 #define NOUSER
