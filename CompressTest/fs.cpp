@@ -41,7 +41,7 @@ static bool FindFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr
 	return false;
 }
 
-bool FsAddIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
+bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 {
 	BlockAddr dataHWM, indexHWM;
 	if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, addr, id))
@@ -235,10 +235,10 @@ void FsCommitIMS(IMS* ims, BlockAddr addr, int id)
 	sdCardWrite(addr, b, id);
 }
 
-void FsReadTile(BlockAddr addr, void* dst, int id)
+void FsReadTile(BlockAddr addr, ui8* dst, int id)
 {
 	DecompState s;
-	DecompImit(&s, (ui8*)dst);
+	DecompImit(&s, dst);
 
 	ui8 b[BLOCK_SIZE];
 	sdCardRead(addr--, b, id);

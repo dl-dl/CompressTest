@@ -19,8 +19,8 @@ void PaintScreen(const PaintContext* ctx, Screen* screen)
 		for (int y = 0; y < SCREEN_CY / 2; ++y)
 		{
 			ui8 c = screen->line[x].pix[y];
-			SetPixel(ctx->hdc, x, y * 2 + 1, translateColor(c));
-			SetPixel(ctx->hdc, x, y * 2, translateColor(c >> 4));
+			SetPixelV(ctx->hdc, x, y * 2 + 1, translateColor(c));
+			SetPixelV(ctx->hdc, x, y * 2, translateColor(c >> 4));
 		}
 }
 

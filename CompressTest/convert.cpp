@@ -240,7 +240,7 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
 void DecompImit(DecompState *s, ui8 *dst)
 {
 	s->x = s->y = 0;
-	s->numPixel = 0;
+	s->numEqPixel = 0;
 	s->eqString = false;
 	s->dst = dst;
 }
@@ -271,11 +271,11 @@ void DeCompressOne(ui8 src, DecompState *s)
 			CopyPrevLine(s);
 		s->eqString = false;
 	}
-	else if (s->numPixel)
+	else if (s->numEqPixel)
 	{
-		for (ui8 cnt = 0; cnt < s->numPixel; cnt++)
+		for (ui8 cnt = 0; cnt < s->numEqPixel; cnt++)
 			PutByte(s, src);
-		s->numPixel = 0;
+		s->numEqPixel = 0;
 	}
 	else
 	{
@@ -285,7 +285,7 @@ void DeCompressOne(ui8 src, DecompState *s)
 		}
 		else if (src & 0x01)
 		{
-			s->numPixel = src >> 1;
+			s->numEqPixel = src >> 1;
 		}
 		else if (src & 0x10)
 		{

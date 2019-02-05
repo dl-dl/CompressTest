@@ -20,10 +20,10 @@ unsigned int Compress4BitBuffer(const void* src, void* dst);
 
 struct DecompState
 {
-	int x, y;
 	ui8* dst;
+	int x, y;
 	bool eqString;
-	ui8 numPixel;
+	ui8 numEqPixel;
 };
 
 void DecompImit(DecompState* s, ui8* dst);

@@ -56,7 +56,7 @@ static void forgetTile(void* p)
 	free(p);
 }
 
-void fsInit(int id)
+void FsInit(int id)
 {
 	IMS ims;
 	BlockAddr addr;
@@ -73,7 +73,7 @@ void fsInit(int id)
 
 	for (int i = 0; i < 2; ++i)
 	{
-		FsAddIMS(&ims, &addr, r + i, id);
+		FsNewIMS(&ims, &addr, r + i, id);
 
 		for (ui8 z = 12; z <= 13; ++z)
 		{

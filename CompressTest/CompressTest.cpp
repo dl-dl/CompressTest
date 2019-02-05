@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <eh.h>
 
+//#define CREATE_NEW_SD
+
 static HINSTANCE hInst;                                // current instance
 static WCHAR szWindowClass[128];            // the main window class name
 
@@ -100,8 +102,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 
 		wnd[i] = hWnd;
+#ifdef CREATE_NEW_SD
 		FsFormat(i);
-		fsInit(i);
+		FsInit(i);
+#endif
 		dev[i].Init(i);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
 		SetTimer(hWnd, 1, 1000, NULL);

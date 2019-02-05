@@ -1,6 +1,6 @@
 #ifndef __FSINIT_H
 #define __FSINIT_H
 
-void fsInit(int id);
+void FsInit(int id);
 
 #endif
