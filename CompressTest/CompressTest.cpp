@@ -11,11 +11,11 @@
 #include "coord.h"
 #include "graph.h"
 #include "paintctx.h"
+#include "sizes.h"
 
 #include <stdlib.h>
 #include <eh.h>
-
-//#define CREATE_NEW_SD
+#include <assert.h>
 
 static HINSTANCE hInst;                                // current instance
 static WCHAR szWindowClass[128];            // the main window class name
@@ -59,10 +59,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (int i = 0; i < NUM_DEV; ++i)
 			dev[i].Run();
 		for (int i = 0; i < NUM_DEV; ++i)
-		{
 			if (dev[i].redrawScreen)
 				InvalidateRect(wnd[i], NULL, FALSE);
-		}
 	}
 	return (int)msg.wParam;
 }
@@ -106,8 +104,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		FsFormat(i);
 		FsInit(i);
 #endif
+//		BlockAddr sz = FsFreeSpace(i);
 		dev[i].Init(i);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(&dev[i]));
 		SetTimer(hWnd, 1, 1000, NULL);
 		ShowWindow(hWnd, nCmdShow);
 		UpdateWindow(hWnd);
@@ -140,6 +138,15 @@ void Broadcast(int srcId, PointInt point)
 			dev[i].radio.push_back(msg);
 }
 
+static Device* getDevice(HWND hwnd)
+{
+	for (int i = 0; i < NUM_DEV; ++i)
+		if (hwnd == wnd[i])
+			return dev + i;
+	assert(0);
+	return 0;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -164,27 +171,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HDC hdc = BeginPaint(hWnd, &ps);
 		PaintContext ctx;
 		ctx.hdc = hdc;
-		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		Device* devPtr = getDevice(hWnd);
 		devPtr->Paint(&ctx);
 		EndPaint(hWnd, &ps);
 	}
 	break;
 	case WM_CHAR:
 	{
-		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		if ('+' == wParam || '-' == wParam)
+		{
+			Device* devPtr = getDevice(hWnd);
 			devPtr->key.push_back(wParam);
+		}
 	}
 	break;
 	case WM_KEYDOWN:
 	{
-		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		Device* devPtr = getDevice(hWnd);
 		devPtr->gps.push_back(nextGps(devPtr->id, wParam));
 	}
 	break;
 	case WM_TIMER:
 	{
-		Device* devPtr = (Device*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		Device* devPtr = getDevice(hWnd);
 		devPtr->timer = true;
 	}
 	break;

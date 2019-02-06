@@ -57,6 +57,7 @@ struct NewMapStatus
 };
 
 void FsFormat(int id);
+BlockAddr FsFreeSpace(int id);
 bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id);
 bool FsFindIMS(float x, float y, IMS *dst, int id);
 void FsCommitIMS(IMS* ims, BlockAddr addr, int id);

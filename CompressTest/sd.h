@@ -5,7 +5,7 @@
 
 static inline BlockAddr sdCardSize(void)
 {
-	return 1024 * 10;
+	return 1024 * 16;
 }
 
 void sdCardRead(BlockAddr addr, void *dst, int id);

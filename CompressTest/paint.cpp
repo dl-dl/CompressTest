@@ -1,7 +1,10 @@
 #include "types.h"
 #include "sizes.h"
-#ifdef _WINDOWS
 #include "paint.h"
+#ifdef _WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#define NOUSER
+#include <windows.h>
 #include "paintctx.h"
 
 static const int BORDERX = -32;

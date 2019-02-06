@@ -1,6 +1,8 @@
 #ifndef __SIZES_H_
 #define __SIZES_H_
 
+#include "types.h"
+
 #define SCREEN_CX 240
 #define SCREEN_CY 400
 
@@ -13,5 +15,7 @@
 
 typedef ui32 BlockAddr;
 static const ui32 BLOCK_SIZE = 512;
+
+//#define CREATE_NEW_SD
 
 #endif // __SIZES_H_

@@ -60,22 +60,22 @@ void FsInit(int id)
 {
 	IMS ims;
 	BlockAddr addr;
-	RectFloat r[2];
-	r[0].left = 38.0f;
-	r[0].right = 38.4f;
-	r[0].top = 56.2f;
+	RectFloat r[1];
+	r[0].left = 38.1f;
+	r[0].right = 38.6f;
+	r[0].top = 56.1f;
 	r[0].bottom = 55.95f;
-	r[1].left = -71.65f;
+/*	r[1].left = -71.65f;
 	r[1].right = -71.4f;
 	r[1].top = -33.0f;
 	r[1].bottom = -33.1f;
-	const char* region[2] = { "cher", "valparaiso" };
+*/	const char* region[2] = { "cher", "valparaiso" };
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < sizeof(r)/sizeof(*r); ++i)
 	{
 		FsNewIMS(&ims, &addr, r + i, id);
 
-		for (ui8 z = 12; z <= 13; ++z)
+		for (ui8 z = 12; z <= 14; ++z)
 		{
 			NewMapStatus status;
 			ImsNextZoom(&ims, &status, z);

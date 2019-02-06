@@ -61,7 +61,7 @@ ui32 Device::CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 
 void Device::ProcessKey(ui16 c)
 {
-	if (c == '+' && zoom < 13)
+	if (c == '+' && zoom < 14)
 		zoom++;
 	else if (c == '-' && zoom > 12)
 		zoom--;
@@ -123,6 +123,8 @@ static int FindInGroup(const GroupData* g, int id)
 
 void Device::ProcessGps(PointFloat point)
 {
+	if (0 == memcmp(&point, &currentPos, sizeof(point)))
+		return;
 	currentPos = point;
 	int i = FindInGroup(&group, id);
 	const PointInt pos = PointFloat2Int(point, MAX_ZOOM_LEVEL);

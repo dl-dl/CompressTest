@@ -41,6 +41,14 @@ static bool FindFirstEmptyIMS(BlockAddr* dataHWM, BlockAddr* indexHWM, BlockAddr
 	return false;
 }
 
+BlockAddr FsFreeSpace(int id)
+{
+	BlockAddr dataHWM, indexHWM, addr;
+	if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr, id))
+		return sdCardSize() - 2;
+	return dataHWM - indexHWM;
+}
+
 bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 {
 	BlockAddr dataHWM, indexHWM;
