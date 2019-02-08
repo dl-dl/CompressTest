@@ -2,6 +2,7 @@
 #include "sizes.h"
 #include "paint.h"
 #ifdef _WINDOWS
+#include "targetver.h"
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
 #include <windows.h>

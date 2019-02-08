@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#include "targetver.h"
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 
@@ -31,6 +32,7 @@ static HWND wnd[NUM_DEV];
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS*)
 {
+	Beep(440, 200);
 	throw code;
 }
 

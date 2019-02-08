@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <assert.h>
 #ifdef _WINDOWS
+#include "targetver.h"
 #define WIN32_LEAN_AND_MEAN
 #define NOGDI
 #define NOUSER
@@ -38,11 +39,9 @@ void sdCardRead(BlockAddr addr, void *dst, int id)
 	HANDLE f = sdopen(id);
 	DWORD fp = SetFilePointer(f, addr*BLOCK_SIZE, NULL, FILE_BEGIN);
 	assert(fp == addr * BLOCK_SIZE);
-	if (!ReadFile(f, dst, BLOCK_SIZE, NULL, NULL))
-	{
-		assert("ReadFile" == 0);
-		memset(dst, 0, BLOCK_SIZE);
-	}
+	DWORD n = 0;
+	ReadFile(f, dst, BLOCK_SIZE, &n, NULL);
+	assert(n == BLOCK_SIZE);
 	sdclose(f);
 }
 
@@ -50,8 +49,11 @@ void sdCardWrite(BlockAddr addr, const void *src, int id)
 {
 	assert(addr < sdCardSize());
 	HANDLE f = sdopen(id);
-	SetFilePointer(f, addr*BLOCK_SIZE, NULL, FILE_BEGIN);
-	WriteFile(f, src, BLOCK_SIZE, NULL, NULL);
+	DWORD fp = SetFilePointer(f, addr*BLOCK_SIZE, NULL, FILE_BEGIN);
+	assert(fp == addr * BLOCK_SIZE);
+	DWORD n = 0;
+	WriteFile(f, src, BLOCK_SIZE, &n, NULL);
+	assert(n == BLOCK_SIZE);
 	sdclose(f);
 }
 
