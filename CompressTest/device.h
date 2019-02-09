@@ -60,6 +60,7 @@ private:
 	void AdjustScreenPos(PointInt pos);
 	void DrawMap();
 	void DrawGroup();
+	void DrawCompass();
 
 	void ProcessKey(ui16 c);
 	void ProcessGps(PointFloat point);

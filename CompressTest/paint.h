@@ -6,6 +6,6 @@
 
 struct PaintContext;
 
-void PaintScreen(const PaintContext* ctx, Screen* screen);
+void PaintScreen(const PaintContext* ctx, const Screen* screen);
 
 #endif

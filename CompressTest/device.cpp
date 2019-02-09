@@ -111,6 +111,21 @@ void Device::DrawGroup()
 	}
 }
 
+void Device::DrawCompass()
+{
+	const int COMPASS_POS_X = 20;
+	const int COMPASS_POS_Y = 20;
+	const int COMPASS_R = 16;
+	Circle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED, &screen);
+
+	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
+		 COMPASS_POS_X, COMPASS_POS_Y + COMPASS_R, DEV_RED, &screen);
+	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
+		 COMPASS_POS_X - 2, COMPASS_POS_Y - COMPASS_R + COMPASS_R / 2, DEV_RED, &screen);
+	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
+		 COMPASS_POS_X + 2, COMPASS_POS_Y - COMPASS_R + COMPASS_R / 2, DEV_RED, &screen);
+}
+
 static int FindInGroup(const GroupData* g, int id)
 {
 	for (int i = 0; i < g->n; ++i)
@@ -160,6 +175,7 @@ void Device::Paint(const PaintContext* ctx)
 	PointInt pos = PointFloat2Int(currentPos, zoom);
 	AdjustScreenPos(pos);
 	DrawMap();
+	DrawCompass();
 	DrawGroup();
 
 	PaintScreen(ctx, &screen);

@@ -173,8 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HDC hdc = BeginPaint(hWnd, &ps);
 		PaintContext ctx;
 		ctx.hdc = hdc;
-		Device* devPtr = getDevice(hWnd);
-		devPtr->Paint(&ctx);
+		getDevice(hWnd)->Paint(&ctx);
 		EndPaint(hWnd, &ps);
 	}
 	break;
@@ -182,8 +181,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if ('+' == wParam || '-' == wParam)
 		{
-			Device* devPtr = getDevice(hWnd);
-			devPtr->key.push_back(wParam);
+			getDevice(hWnd)->key.push_back(wParam);
 		}
 	}
 	break;
@@ -195,8 +193,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_TIMER:
 	{
-		Device* devPtr = getDevice(hWnd);
-		devPtr->timer = true;
+		getDevice(hWnd)->timer = true;
 	}
 	break;
 	case WM_DESTROY:

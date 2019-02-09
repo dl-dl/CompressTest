@@ -39,8 +39,9 @@ void sdCardRead(BlockAddr addr, void *dst, int id)
 	HANDLE f = sdopen(id);
 	DWORD fp = SetFilePointer(f, addr*BLOCK_SIZE, NULL, FILE_BEGIN);
 	assert(fp == addr * BLOCK_SIZE);
-	DWORD n = 0;
-	ReadFile(f, dst, BLOCK_SIZE, &n, NULL);
+	DWORD n;
+	BOOL res = ReadFile(f, dst, BLOCK_SIZE, &n, NULL);
+	assert(res);
 	assert(n == BLOCK_SIZE);
 	sdclose(f);
 }
@@ -51,8 +52,9 @@ void sdCardWrite(BlockAddr addr, const void *src, int id)
 	HANDLE f = sdopen(id);
 	DWORD fp = SetFilePointer(f, addr*BLOCK_SIZE, NULL, FILE_BEGIN);
 	assert(fp == addr * BLOCK_SIZE);
-	DWORD n = 0;
-	WriteFile(f, src, BLOCK_SIZE, &n, NULL);
+	DWORD n;
+	BOOL res = WriteFile(f, src, BLOCK_SIZE, &n, NULL);
+	assert(res);
 	assert(n == BLOCK_SIZE);
 	sdclose(f);
 }
