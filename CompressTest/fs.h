@@ -4,8 +4,6 @@
 #include "sizes.h"
 #include "coord.h"
 
-static const ui32 INDEX_ITEMS_PER_BLOCK = (BLOCK_SIZE - sizeof(ui32)) / sizeof(BlockAddr);
-
 static const ui32 NUM_IMS_BLOCKS = 1000;
 
 struct ImsIndexDescr
@@ -35,16 +33,18 @@ enum ImsStatus
 	IMS_EMPTY = 0, IMS_READY = 1
 };
 
-struct IndexBlock
+struct IndexItem
 {
-	BlockAddr idx[INDEX_ITEMS_PER_BLOCK];
-	ui32 checksum;
+	BlockAddr addr;
+	ui32 sz;
 };
 
-struct NewTile
+static const ui32 INDEX_ITEMS_PER_BLOCK = (BLOCK_SIZE - sizeof(ui32)) / sizeof(IndexItem);
+
+struct IndexBlock
 {
-	ui32 size;
-	ui8 data[1];
+	IndexItem idx[INDEX_ITEMS_PER_BLOCK];
+	ui32 checksum;
 };
 #pragma pack(pop)
 
@@ -61,8 +61,8 @@ BlockAddr FsFreeSpace(int id);
 bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id);
 bool FsFindIMS(float x, float y, IMS *dst, int id);
 void FsCommitIMS(IMS* ims, BlockAddr addr, int id);
-BlockAddr FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id);
-void FsReadTile(BlockAddr addr, ui8* dst, int id);
+IndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id);
+void FsReadTile(BlockAddr addr, ui32 sz, ui8* dst, int id);
 
 void ImsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom);
-bool ImsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id);
+bool ImsAddTile(IMS* ims, NewMapStatus* status, const ui8* tile, ui32 sz, int id);

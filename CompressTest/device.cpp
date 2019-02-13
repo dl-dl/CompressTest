@@ -47,9 +47,9 @@ ui32 Device::CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 	ui32 index = CacheIndex(tileX, tileY);
 	if (!CacheEq(&mapCache[index], tileX, tileY, zoom))
 	{
-		auto addr = FsFindTile(ims, zoom, tileX, tileY, id);
-		if (addr)
-			FsReadTile(addr, mapCache[index].data, id);
+		IndexItem i = FsFindTile(ims, zoom, tileX, tileY, id);
+		if (i.addr)
+			FsReadTile(i.addr, i.sz, mapCache[index].data, id);
 		else
 			memset(mapCache[index].data, 0xFF, sizeof(mapCache[0].data));
 		mapCache[index].zoom = zoom;

@@ -160,25 +160,26 @@ static ui32 findTileRowB(const ImsIndexDescr *zi, float y)
 }
 #endif
 
-BlockAddr FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
+IndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
+	IndexItem zero = { 0, 0 };
 	assert(zoom >= MIN_ZOOM_LEVEL);
 	assert(zoom <= MAX_ZOOM_LEVEL);
 	ui32 i = zoom - MIN_ZOOM_LEVEL;
 	if (0 == ims->index[i].firstBlock)
-		return 0;
+		return zero;
 
 	ui32 dx = numx - ims->index[i].left;
 	ui32 dy = numy - ims->index[i].top;
 	if (dx >= ims->index[i].nx || dy >= ims->index[i].ny)
-		return 0;
+		return zero;
 
 	ui32 offs = dx * ims->index[i].ny + dy;
 	ui8 b[BLOCK_SIZE];
 	sdCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
 	const IndexBlock* p = (IndexBlock*)b;
 	if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
-		return 0;
+		return zero;
 	return p->idx[offs % INDEX_ITEMS_PER_BLOCK];
 }
 
@@ -192,14 +193,15 @@ void ImsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom)
 	ims->index[status->currentZoom - MIN_ZOOM_LEVEL].firstBlock = ims->indexHWM;
 }
 
-bool ImsAddTile(IMS* ims, NewMapStatus* status, const NewTile* tile, int id)
+bool ImsAddTile(IMS* ims, NewMapStatus* status, const ui8* tile, ui32 sz, int id)
 {
 	assert(ims->dataHWM >= ims->indexHWM);
 
-	status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK] = ims->dataHWM;
-	for (ui32 written = 0; tile->size > written; written += BLOCK_SIZE) // write data
+	status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK].addr = ims->dataHWM;
+	status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK].sz = sz;
+	for (ui32 written = 0; written < sz; written += BLOCK_SIZE) // write data
 	{
-		sdCardWrite(ims->dataHWM, (ui8*)tile + written, id);
+		sdCardWrite(ims->dataHWM, tile + written, id);
 		ims->dataHWM--;
 		if (ims->dataHWM <= ims->indexHWM)
 			return false;
@@ -243,18 +245,18 @@ void FsCommitIMS(IMS* ims, BlockAddr addr, int id)
 	sdCardWrite(addr, b, id);
 }
 
-void FsReadTile(BlockAddr addr, ui8* dst, int id)
+void FsReadTile(BlockAddr addr, ui32 sz, ui8* dst, int id)
 {
 	DecompState s;
 	DecompImit(&s, dst);
 
 	ui8 b[BLOCK_SIZE];
-	sdCardRead(addr--, b, id);
-	ui32 sz = ((NewTile*)b)->size;
-	for (ui32 i = sizeof(sz); i < sz; ++i)
+	for (ui32 i = 0; i < sz; ++i)
 	{
 		if (0 == (i % BLOCK_SIZE))
 			sdCardRead(addr--, b, id);
 		DeCompressOne(b[i % BLOCK_SIZE], &s);
 	}
+	assert(s.x == TILE_CX);
+	assert(s.y == 0);
 }

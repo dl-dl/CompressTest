@@ -11,20 +11,27 @@
 #include <assert.h>
 #include <stdio.h>
 
-static NewTile* getTile(int x, int y, ui8 z, const char* region)
+struct NewTile
+{
+	ui32 size;
+	ui8* data;
+};
+
+static NewTile getTile(int x, int y, ui8 z, const char* region)
 {
 	char path[1024];
 	sprintf(path, "C:\\tmp\\%s\\%u\\%u\\%u.png", region, z, x, y);
+	NewTile t = { 0, 0 };
 
 	FILE* f = fopen(path, "rb");
 	if (!f)
-		return NULL;
+		return t;
 	fseek(f, 0, SEEK_END);
 	size_t pngsize = ftell(f);
 	fseek(f, 0, SEEK_SET);
 	ui8* png = (unsigned char*)malloc(pngsize);
 	if (NULL == png)
-		return NULL;
+		return t;
 	fread(png, 1, pngsize, f);
 	fclose(f);
 
@@ -32,7 +39,7 @@ static NewTile* getTile(int x, int y, ui8 z, const char* region)
 	ui8* b;
 	unsigned error = lodepng_decode_memory(&b, &width, &height, png, pngsize, LCT_RGB, 8);
 	if (error)
-		return NULL;
+		return t;
 	free(png);
 
 	ui8* p24 = (ui8*)malloc(TILE_CX * TILE_CY * 3);
@@ -45,15 +52,14 @@ static NewTile* getTile(int x, int y, ui8 z, const char* region)
 	ui8* p4 = (ui8*)malloc(TILE_CX * TILE_CY / 2);
 	Convert8To4(p8, p4);
 	free(p8);
-	NewTile* p = (NewTile*)malloc(TILE_CX * TILE_CY + BLOCK_SIZE); // round up to BLOCK_SIZE
-	ui32 sz = Compress4BitBuffer(p4, p->data);
-	p->size = sz + sizeof(p->size);
-	return (NewTile*)p;
+	t.data = (ui8*)malloc(TILE_CX * TILE_CY + BLOCK_SIZE); // round up to BLOCK_SIZE
+	t.size = Compress4BitBuffer(p4, t.data);
+	return t;
 }
 
-static void forgetTile(void* p)
+static void forgetTile(NewTile t)
 {
-	free(p);
+	free(t.data);
 }
 
 void FsInit(int id)
@@ -86,8 +92,9 @@ void FsInit(int id)
 			for (int x = startX; x <= stopX; ++x)
 				for (int y = startY; y <= stopY; ++y)
 				{
-					NewTile* tile = getTile(x, y, z, region[i]);
-					bool res = ImsAddTile(&ims, &status, tile, id);
+					NewTile tile = getTile(x, y, z, region[i]);
+					assert(tile.data);
+					bool res = ImsAddTile(&ims, &status, tile.data, tile.size, id);
 					assert(res);
 					forgetTile(tile);
 				}
