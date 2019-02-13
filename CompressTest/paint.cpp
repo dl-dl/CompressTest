@@ -11,7 +11,7 @@
 static const int BORDERX = -32;
 static const int BORDERY = -32;
 
-static inline COLORREF translateColor(ui8 c)
+static inline COLORREF TranslateColor(ui8 c)
 {
 	return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
 }
@@ -28,8 +28,8 @@ void PaintScreen(const PaintContext* ctx, const Screen* screen)
 		for (int y = 0; y < SCREEN_CY / 2; ++y)
 		{
 			ui8 c = screen->line[x].pix[y];
-			SetPixelV(hdcMem, x, y * 2 + 1, translateColor(c));
-			SetPixelV(hdcMem, x, y * 2, translateColor(c >> 4));
+			SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c));
+			SetPixelV(hdcMem, x, y * 2, TranslateColor(c >> 4));
 		}
 
 	BitBlt(ctx->hdc, 0, 0, SCREEN_CX, SCREEN_CY, hdcMem, 0, 0, SRCCOPY);

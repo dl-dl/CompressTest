@@ -21,6 +21,11 @@ struct RectFloat
 
 bool PointInRect(const RectFloat* r, float x, float y);
 
+static inline bool PointFloatEq(const PointFloat* a, const PointFloat* b)
+{
+	return (a->x == b->x) && (a->y == b->y);
+}
+
 float lon2tilex(float lon, unsigned int z);
 float lat2tiley(float lat, unsigned int z);
 

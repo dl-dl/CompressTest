@@ -88,7 +88,8 @@ void Device::DrawMap()
 	memset(&screen, 0, sizeof(screen));
 #endif
 	if (!PointInRect(&ims.coord, currentPos.x, currentPos.y))
-		FsFindIMS(currentPos.x, currentPos.y, &ims, id);
+		if (!FsFindIMS(currentPos.x, currentPos.y, &ims, id))
+			return;
 
 	for (int x = (screenStart.x / TILE_CX) * TILE_CX; x < screenStart.x + SCREEN_CX; x += TILE_CX)
 		for (int y = (screenStart.y / TILE_CY) * TILE_CY; y < screenStart.y + SCREEN_CY; y += TILE_CY)
@@ -138,7 +139,7 @@ static int FindInGroup(const GroupData* g, int id)
 
 void Device::ProcessGps(PointFloat point)
 {
-	if (0 == memcmp(&point, &currentPos, sizeof(point)))
+	if (PointFloatEq(&point, &currentPos))
 		return;
 	currentPos = point;
 	int i = FindInGroup(&group, id);
