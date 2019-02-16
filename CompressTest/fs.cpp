@@ -49,7 +49,7 @@ BlockAddr FsFreeSpace(int id)
 	return dataHWM - indexHWM;
 }
 
-bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
+bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectInt* coord, int id)
 {
 	BlockAddr dataHWM, indexHWM;
 	if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, addr, id))
@@ -66,10 +66,10 @@ bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 	{
 		int i = z - MIN_ZOOM_LEVEL;
 		ims->index[i].firstBlock = 0;
-		ims->index[i].left = (ui32)lon2tilex(ims->coord.left, z);
-		ims->index[i].top = (ui32)lat2tiley(ims->coord.top, z);
-		ui32 dx = (ui32)lon2tilex(ims->coord.right, z) - ims->index[i].left + 1;
-		ui32 dy = (ui32)lat2tiley(ims->coord.bottom, z) - ims->index[i].top + 1;
+		ims->index[i].left = ScaleDownCoord(ims->coord.left, z);
+		ims->index[i].top = ScaleDownCoord(ims->coord.top, z);
+		ui32 dx = ScaleDownCoord(ims->coord.right, z) - ims->index[i].left + 1;
+		ui32 dy = ScaleDownCoord(ims->coord.bottom, z) - ims->index[i].top + 1;
 		ims->index[i].nx = dx;
 		ims->index[i].ny = dy;
 		ui32 numBlocks = (dx * dy) / INDEX_ITEMS_PER_BLOCK;
@@ -81,7 +81,7 @@ bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id)
 	return addr;
 }
 
-bool FsFindIMS(float x, float y, IMS *dst, int id)
+bool FsFindIMS(int x, int y, IMS *dst, int id)
 {
 	ui8 b[BLOCK_SIZE];
 	for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
@@ -96,12 +96,11 @@ bool FsFindIMS(float x, float y, IMS *dst, int id)
 			return false;
 		if (IMS_READY == ims->status)
 		{
-			if (x >= ims->coord.left && x < ims->coord.right)
-				if (y >= ims->coord.bottom && y < ims->coord.top)
-				{
-					*dst = *ims;
-					return true;
-				}
+			if (PointInRectInt(&ims->coord, x, y))
+			{
+				*dst = *ims;
+				return true;
+			}
 		}
 	}
 	return false;
@@ -160,9 +159,9 @@ static ui32 findTileRowB(const ImsIndexDescr *zi, float y)
 }
 #endif
 
-IndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
+TileIndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
-	IndexItem zero = { 0, 0 };
+	TileIndexItem zero = { 0, 0 };
 	assert(zoom >= MIN_ZOOM_LEVEL);
 	assert(zoom <= MAX_ZOOM_LEVEL);
 	ui32 i = zoom - MIN_ZOOM_LEVEL;
@@ -177,7 +176,7 @@ IndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 	ui32 offs = dx * ims->index[i].ny + dy;
 	ui8 b[BLOCK_SIZE];
 	sdCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
-	const IndexBlock* p = (IndexBlock*)b;
+	const TileIndexBlock* p = (TileIndexBlock*)b;
 	if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
 		return zero;
 	return p->idx[offs % INDEX_ITEMS_PER_BLOCK];
@@ -196,9 +195,9 @@ void ImsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom)
 bool ImsAddTile(IMS* ims, NewMapStatus* status, const ui8* tile, ui32 sz, int id)
 {
 	assert(ims->dataHWM >= ims->indexHWM);
-
-	status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK].addr = ims->dataHWM;
-	status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK].sz = sz;
+	TileIndexItem* ii = &status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK];
+	ii->addr = ims->dataHWM;
+	ii->sz = sz;
 	for (ui32 written = 0; written < sz; written += BLOCK_SIZE) // write data
 	{
 		sdCardWrite(ims->dataHWM, tile + written, id);

@@ -20,7 +20,7 @@ struct IMS
 {
 	ui32 version;
 	ui32 status;
-	RectFloat coord;
+	RectInt coord;
 	ui16 name[32];
 	BlockAddr dataHWM;
 	BlockAddr indexHWM;
@@ -33,17 +33,17 @@ enum ImsStatus
 	IMS_EMPTY = 0, IMS_READY = 1
 };
 
-struct IndexItem
+struct TileIndexItem
 {
 	BlockAddr addr;
 	ui32 sz;
 };
 
-static const ui32 INDEX_ITEMS_PER_BLOCK = (BLOCK_SIZE - sizeof(ui32)) / sizeof(IndexItem);
+static const ui32 INDEX_ITEMS_PER_BLOCK = (BLOCK_SIZE - sizeof(ui32)) / sizeof(TileIndexItem);
 
-struct IndexBlock
+struct TileIndexBlock
 {
-	IndexItem idx[INDEX_ITEMS_PER_BLOCK];
+	TileIndexItem idx[INDEX_ITEMS_PER_BLOCK];
 	ui32 checksum;
 };
 #pragma pack(pop)
@@ -53,15 +53,15 @@ struct NewMapStatus
 	BlockAddr imsAddr;
 	ui8 currentZoom;
 	ui32 tilesAtCurrentZoom;
-	IndexBlock currentIndexBlock;
+	TileIndexBlock currentIndexBlock;
 };
 
 void FsFormat(int id);
 BlockAddr FsFreeSpace(int id);
-bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectFloat* coord, int id);
-bool FsFindIMS(float x, float y, IMS *dst, int id);
+bool FsNewIMS(IMS* ims, BlockAddr* addr, const RectInt* coord, int id);
+bool FsFindIMS(int x, int y, IMS *dst, int id);
 void FsCommitIMS(IMS* ims, BlockAddr addr, int id);
-IndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id);
+TileIndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id);
 void FsReadTile(BlockAddr addr, ui32 sz, ui8* dst, int id);
 
 void ImsNextZoom(IMS* ims, NewMapStatus* status, ui8 zoom);

@@ -26,14 +26,14 @@ struct RadioMsg
 struct GroupData
 {
 	RadioMsg data[16];
-	int n;
+	ui32 n;
 };
 
 class Device
 {
 	IMS ims;
 	MapCacheItem mapCache[6];
-	PointFloat currentPos;
+	PointInt currentPos;
 	PointInt screenStart;
 	ui8 zoom;
 	Screen screen;

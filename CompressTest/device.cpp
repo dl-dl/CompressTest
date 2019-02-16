@@ -21,15 +21,7 @@ void Device::Init(int id_)
 	timer = false;
 	id = id_;
 	zoom = 12;
-	currentPos = { 0, 0 };
-}
-
-static PointInt PointFloat2Int(PointFloat pos, int zoom)
-{
-	PointInt p;
-	p.x = (int)(lon2tilex(pos.x, zoom) * TILE_CX);
-	p.y = (int)(lat2tiley(pos.y, zoom) * TILE_CY);
-	return p;
+	currentPos = { 0x7FFFFFFF, 0x7FFFFFFF };
 }
 
 static inline ui32 CacheIndex(ui32 x, ui32 y)
@@ -47,11 +39,11 @@ ui32 Device::CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
 	ui32 index = CacheIndex(tileX, tileY);
 	if (!CacheEq(&mapCache[index], tileX, tileY, zoom))
 	{
-		IndexItem i = FsFindTile(ims, zoom, tileX, tileY, id);
+		TileIndexItem i = FsFindTile(ims, zoom, tileX, tileY, id);
 		if (i.addr)
 			FsReadTile(i.addr, i.sz, mapCache[index].data, id);
 		else
-			memset(mapCache[index].data, 0xFF, sizeof(mapCache[0].data));
+			memset(mapCache[index].data, 0x55, sizeof(mapCache[0].data));
 		mapCache[index].zoom = zoom;
 		mapCache[index].tileX = tileX;
 		mapCache[index].tileY = tileY;
@@ -72,6 +64,8 @@ void Device::ProcessKey(ui16 c)
 
 void Device::AdjustScreenPos(PointInt pos)
 {
+	pos.x = ScaleDownCoord(pos.x, zoom);
+	pos.y = ScaleDownCoord(pos.y, zoom);
 	pos.x -= SCREEN_CX / 2;
 	pos.y -= SCREEN_CY / 2;
 
@@ -87,8 +81,11 @@ void Device::DrawMap()
 #ifdef _DEBUG
 	memset(&screen, 0, sizeof(screen));
 #endif
-	if (!PointInRect(&ims.coord, currentPos.x, currentPos.y))
-		if (!FsFindIMS(currentPos.x, currentPos.y, &ims, id))
+	PointInt pos;
+	pos.x = currentPos.x / TILE_CX;
+	pos.y = currentPos.y / TILE_CY;
+	if (!PointInRectInt(&ims.coord, pos.x, pos.y))
+		if (!FsFindIMS(pos.x, pos.y, &ims, id))
 			return;
 
 	for (int x = (screenStart.x / TILE_CX) * TILE_CX; x < screenStart.x + SCREEN_CX; x += TILE_CX)
@@ -101,12 +98,12 @@ void Device::DrawMap()
 
 void Device::DrawGroup()
 {
-	for (int i = 0; i < group.n; ++i)
+	for (ui32 i = 0; i < group.n; ++i)
 	{
-		int dd = (group.data[i].id == id) ? 10 : 5;
 		PointInt pos = group.data[i].pos;
-		const int x = (pos.x >> (MAX_ZOOM_LEVEL - zoom)) - screenStart.x;
-		const int y = (pos.y >> (MAX_ZOOM_LEVEL - zoom)) - screenStart.y;
+		int x = ScaleDownCoord(pos.x, zoom) - screenStart.x;
+		int y = ScaleDownCoord(pos.y, zoom) - screenStart.y;
+		int dd = (group.data[i].id == id) ? 10 : 5;
 		Line(x - dd, y, x + dd, y, DEV_RED, &screen);
 		Line(x, y - dd, x, y + dd, DEV_RED, &screen);
 	}
@@ -129,7 +126,7 @@ void Device::DrawCompass()
 
 static int FindInGroup(const GroupData* g, int id)
 {
-	for (int i = 0; i < g->n; ++i)
+	for (ui32 i = 0; i < g->n; ++i)
 	{
 		if (g->data[i].id == id)
 			return i;
@@ -137,13 +134,15 @@ static int FindInGroup(const GroupData* g, int id)
 	return -1;
 }
 
-void Device::ProcessGps(PointFloat point)
+void Device::ProcessGps(PointFloat fpoint)
 {
-	if (PointFloatEq(&point, &currentPos))
+	PointInt pos;
+	pos.x = lon2tilex(fpoint.x, MAX_ZOOM_LEVEL);
+	pos.y = lat2tiley(fpoint.y, MAX_ZOOM_LEVEL);
+	if (PointEqInt(&pos, &currentPos))
 		return;
-	currentPos = point;
+	currentPos = pos;
 	int i = FindInGroup(&group, id);
-	const PointInt pos = PointFloat2Int(point, MAX_ZOOM_LEVEL);
 	if (i >= 0)
 	{
 		group.data[i].pos = pos;
@@ -173,8 +172,7 @@ void Device::ProcessTimer()
 
 void Device::Paint(const PaintContext* ctx)
 {
-	PointInt pos = PointFloat2Int(currentPos, zoom);
-	AdjustScreenPos(pos);
+	AdjustScreenPos(currentPos);
 	DrawMap();
 	DrawCompass();
 	DrawGroup();

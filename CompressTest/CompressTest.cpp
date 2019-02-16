@@ -115,10 +115,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
-static PointFloat nextGps(int id, WPARAM w)
+static PointFloat NextGps(int id, WPARAM w)
 {
 	static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
 //	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
+
 	if (VK_UP == w)
 		point[id].y += 0.001f;
 	else if (VK_DOWN == w)
@@ -188,7 +189,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 	{
 		Device* devPtr = getDevice(hWnd);
-		devPtr->gps.push_back(nextGps(devPtr->id, wParam));
+		devPtr->gps.push_back(NextGps(devPtr->id, wParam));
 	}
 	break;
 	case WM_TIMER:

@@ -66,39 +66,37 @@ void FsInit(int id)
 {
 	IMS ims;
 	BlockAddr addr;
-	RectFloat r[1];
-	r[0].left = 38.1f;
-	r[0].right = 38.6f;
-	r[0].top = 56.1f;
-	r[0].bottom = 55.95f;
-/*	r[1].left = -71.65f;
-	r[1].right = -71.4f;
-	r[1].top = -33.0f;
-	r[1].bottom = -33.1f;
-*/	const char* region[2] = { "cher", "valparaiso" };
+	RectInt r[2];
+	r[0].left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_CX;
+	r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_CX;
+	r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_CY;
+	r[0].bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_CY;
+
+	r[1].left = lon2tilex(-71.65f, MAX_ZOOM_LEVEL) / TILE_CX;
+	r[1].right = lon2tilex(-71.4f, MAX_ZOOM_LEVEL) / TILE_CX;
+	r[1].top = lat2tiley(-33.0f, MAX_ZOOM_LEVEL) / TILE_CY;
+	r[1].bottom = lat2tiley(-33.1f, MAX_ZOOM_LEVEL) / TILE_CY;
+	const char* region[2] = { "cher", "valparaiso" };
 
 	for (int i = 0; i < sizeof(r)/sizeof(*r); ++i)
 	{
 		FsNewIMS(&ims, &addr, r + i, id);
 
-		for (ui8 z = 12; z <= 14; ++z)
+		for (ui8 z = 12; z <= 14 - i; ++z)
 		{
 			NewMapStatus status;
 			ImsNextZoom(&ims, &status, z);
-			int startX = (int)lon2tilex(r[i].left, z);
-			int startY = (int)lat2tiley(r[i].top, z);
-			int stopX = (int)lon2tilex(r[i].right, z);
-			int stopY = (int)lat2tiley(r[i].bottom, z);
-			for (int x = startX; x <= stopX; ++x)
-				for (int y = startY; y <= stopY; ++y)
+			const ImsIndexDescr* idx = &ims.index[z - MIN_ZOOM_LEVEL];
+			for (ui32 x = 0; x < idx->nx; ++x)
+				for (ui32 y = 0; y < idx->ny; ++y)
 				{
-					NewTile tile = getTile(x, y, z, region[i]);
+					NewTile tile = getTile(idx->left + x, idx->top + y, z, region[i]);
 					assert(tile.data);
 					bool res = ImsAddTile(&ims, &status, tile.data, tile.size, id);
 					assert(res);
 					forgetTile(tile);
 				}
-			FsCommitIMS(&ims, addr, id);
 		}
+		FsCommitIMS(&ims, addr, id);
 	}
 }
