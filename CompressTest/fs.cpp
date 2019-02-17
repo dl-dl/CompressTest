@@ -87,10 +87,8 @@ bool FsFindIMS(int x, int y, IMS *dst, int id)
 	for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
 	{
 		sdCardRead(i, b, id);
-		IMS *ims = (IMS *)b;
-		ui32 checksum = ims->checksum;
-		ims->checksum = 0;
-		if (checksum != CalcCRC(ims, sizeof(*ims)))
+		const IMS* ims = (IMS*)b;
+		if (ims->checksum != CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum)))
 			return false;
 		if (IMS_EMPTY == ims->status)
 			return false;
@@ -105,59 +103,6 @@ bool FsFindIMS(int x, int y, IMS *dst, int id)
 	}
 	return false;
 }
-#if 0
-static ui32 findTileColA(ui8 zoom, ui32 mapLeft, float x)
-{
-	return (ui32)lon2tilex(x, zoom) - mapLeft;
-}
-
-static ui32 findTileRowA(ui8 zoom, ui32 mapTop, float y)
-{
-	return (ui32)lat2tiley(y, zoom) - mapTop;
-}
-
-static ui32 findTileColB(const ImsIndexDescr *zi, float x)
-{
-	ui8 b[BLOCK_SIZE];
-	ui32 offset = 0;
-	ui32 offsetOld = -1;
-	for (ui32 i = 0; i < zi->nx; ++i) // linear search. can be implemented as binary search
-	{
-		offset = i / (BLOCK_SIZE / sizeof(TileDescr));
-		if (offset != offsetOld)
-		{
-			SdCardRead(zi->firstBlock + offset, b);
-			offsetOld = offset;
-		}
-		ui32 j = i % (BLOCK_SIZE / sizeof(TileDescr));
-		const TileDescr *td = (TileDescr *)b;
-		if (td[j].left <= x && x < td[j].right)
-			return i;
-	}
-	return 0;
-}
-
-static ui32 findTileRowB(const ImsIndexDescr *zi, float y)
-{
-	ui8 b[BLOCK_SIZE];
-	ui32 offset = 0;
-	ui32 offsetOld = -1;
-	for (ui32 i = 0; i < zi->ny; ++i) // linear search. can be implemented as binary search
-	{
-		offset = (i * zi->nx) / (BLOCK_SIZE / sizeof(TileDescr));
-		if (offset != offsetOld)
-		{
-			SdCardRead(zi->firstBlock + offset, b);
-			offsetOld = offset;
-		}
-		ui32 j = (i * zi->nx) % (BLOCK_SIZE / sizeof(TileDescr));
-		const TileDescr *td = (TileDescr *)b;
-		if (td[j].left <= y && y < td[j].right)
-			return i;
-	}
-	return 0;
-}
-#endif
 
 TileIndexItem FsFindTile(const IMS* ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
@@ -236,11 +181,10 @@ bool ImsAddTile(IMS* ims, NewMapStatus* status, const ui8* tile, ui32 sz, int id
 void FsCommitIMS(IMS* ims, BlockAddr addr, int id)
 {
 	ims->status = IMS_READY;
-	ims->checksum = 0;
-	ims->checksum = CalcCRC(ims, sizeof(*ims));
+	ims->checksum = CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum));
 	assert(sizeof(*ims) <= BLOCK_SIZE);
 	ui8 b[BLOCK_SIZE];
-	memcpy(b, ims, sizeof(*ims));
+	*(IMS*)b = *ims;
 	sdCardWrite(addr, b, id);
 }
 
