@@ -8,7 +8,6 @@
 #include "lodepng.h"
 #include "convert.h"
 #include "device.h"
-#include "fsinit.h"
 #include "coord.h"
 #include "graph.h"
 #include "paintctx.h"
@@ -102,11 +101,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 
 		wnd[i] = hWnd;
-#ifdef CREATE_NEW_SD
-		FsFormat(i);
-		FsInit(i);
-#endif
-//		BlockAddr sz = FsFreeSpace(i);
 		dev[i].Init(i);
 		SetTimer(hWnd, 1, 5000, NULL);
 		ShowWindow(hWnd, nCmdShow);
@@ -137,7 +131,7 @@ void Broadcast(int srcId, PointInt point)
 	msg.pos = point;
 	msg.id = srcId;
 	for (int i = 0; i < NUM_DEV; ++i)
-		if (dev[i].id != srcId)
+		if (dev[i].deviceId != srcId)
 			dev[i].radio.push_back(msg);
 }
 
@@ -189,7 +183,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 	{
 		auto devPtr = getDevice(hWnd);
-		devPtr->gps.push_back(NextGps(devPtr->id, wParam));
+		devPtr->gps.push_back(NextGps(devPtr->deviceId, wParam));
 	}
 	break;
 	case WM_TIMER:

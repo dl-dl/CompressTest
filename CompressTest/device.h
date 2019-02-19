@@ -4,18 +4,12 @@
 #include "coord.h"
 #include "sizes.h"
 #include "fs.h"
+#include "fscache.h"
 #include "screen.h"
 
 #include <deque> // TODO: remove
 
 struct PaintContext;
-
-struct MapCacheItem
-{
-	ui8 zoom;
-	ui32 tileX, tileY;
-	ui8 data[TILE_CX * TILE_CY / 2];
-};
 
 struct RadioMsg
 {
@@ -36,8 +30,7 @@ struct GroupData
 
 class Device
 {
-	IMS ims;
-	MapCacheItem mapCache[6];
+	FsMapCache FsCache;
 	PointInt currentPos;
 	PointInt screenStart;
 	ui8 zoom;
@@ -46,7 +39,7 @@ class Device
 	CompassData currentCompass;
 
 public:
-	int id;
+	int deviceId;
 	bool redrawScreen;
 	std::deque<PointFloat> gps;
 	std::deque<RadioMsg> radio;
@@ -73,8 +66,6 @@ private:
 	void ProcessRadio(const RadioMsg* point);
 	void ProcessTimer(void);
 	void ProcessCompass(CompassData d);
-
-	ui32 CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };
 
 extern void Broadcast(int srcId, PointInt data);

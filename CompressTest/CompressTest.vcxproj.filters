@@ -66,6 +66,9 @@
     <ClInclude Include="fsinit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fscache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fsinit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fscache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

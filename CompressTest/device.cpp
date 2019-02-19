@@ -11,44 +11,18 @@
 
 void Device::Init(int id_)
 {
-	for (int i = 0; i < sizeof(mapCache) / sizeof(*mapCache); ++i)
-	{
-		mapCache[i].zoom = 0; // empty
-	}
-	memset(&ims, 0, sizeof(ims));
-	group.n = 0;
+#ifdef CREATE_NEW_SD
+	FsFormat(id_);
+	FsInit(id_);
+#endif
+//	BlockAddr sz = FsFreeSpace(id_);
+	CacheInit(&FsCache, id_);
 
+	group.n = 0;
 	timer = false;
-	id = id_;
+	deviceId = id_; // TODO: replace with hardware device id
 	zoom = 12;
 	currentPos = { 0x7FFFFFFF, 0x7FFFFFFF };
-}
-
-static inline ui32 CacheIndex(ui32 x, ui32 y)
-{
-	return (x % 2) + (y % 3) * 2;
-}
-
-static inline bool CacheEq(const MapCacheItem* p, ui32 x, ui32 y, ui32 z)
-{
-	return (p->tileX == x) && (p->tileY == y) && (p->zoom == z);
-}
-
-ui32 Device::CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom)
-{
-	ui32 index = CacheIndex(tileX, tileY);
-	if (!CacheEq(&mapCache[index], tileX, tileY, zoom))
-	{
-		TileIndexItem i = FsFindTile(ims, zoom, tileX, tileY, id);
-		if (i.addr)
-			FsReadTile(i.addr, i.sz, mapCache[index].data, id);
-		else
-			memset(mapCache[index].data, 0x55, sizeof(mapCache[0].data));
-		mapCache[index].zoom = zoom;
-		mapCache[index].tileX = tileX;
-		mapCache[index].tileY = tileY;
-	}
-	return index;
 }
 
 void Device::ProcessKey(ui16 c)
@@ -84,15 +58,14 @@ void Device::DrawMap()
 	PointInt pos;
 	pos.x = currentPos.x / TILE_CX;
 	pos.y = currentPos.y / TILE_CY;
-	if (!PointInRectInt(&ims.coord, pos.x, pos.y))
-		if (!FsFindIMS(pos.x, pos.y, &ims, id))
-			return;
+	if (!CacheFetchIMS(&FsCache, pos.x, pos.y))
+		return;
 
 	for (int x = (screenStart.x / TILE_CX) * TILE_CX; x < screenStart.x + SCREEN_CX; x += TILE_CX)
 		for (int y = (screenStart.y / TILE_CY) * TILE_CY; y < screenStart.y + SCREEN_CY; y += TILE_CY)
 		{
-			ui32 index = CacheRead(&ims, x / TILE_CX, y / TILE_CY, zoom);
-			CopyTileToScreen(mapCache[index].data, x - screenStart.x, (y - screenStart.y) / 2, &screen);
+			ui32 index = CacheRead(&FsCache, x / TILE_CX, y / TILE_CY, zoom);
+			CopyTileToScreen(FsCache.map[index].data, x - screenStart.x, (y - screenStart.y) / 2, &screen);
 		}
 }
 
@@ -103,7 +76,7 @@ void Device::DrawGroup()
 		PointInt pos = group.data[i].pos;
 		int x = ScaleDownCoord(pos.x, zoom) - screenStart.x;
 		int y = ScaleDownCoord(pos.y, zoom) - screenStart.y;
-		int dd = (group.data[i].id == id) ? 10 : 5;
+		int dd = (group.data[i].id == deviceId) ? 10 : 5;
 		Line(x - dd, y, x + dd, y, DEV_RED, &screen);
 		Line(x, y - dd, x, y + dd, DEV_RED, &screen);
 	}
@@ -159,18 +132,18 @@ void Device::ProcessGps(PointFloat fpoint)
 	if (PointEqInt(&pos, &currentPos))
 		return;
 	currentPos = pos;
-	int i = FindInGroup(&group, id);
+	int i = FindInGroup(&group, deviceId);
 	if (i >= 0)
 	{
 		group.data[i].pos = pos;
 	}
 	else
 	{
-		group.data[group.n].id = id;
+		group.data[group.n].id = deviceId;
 		group.data[group.n].pos = pos;
 		group.n++;
 	}
-	Broadcast(id, pos);
+	Broadcast(deviceId, pos);
 	redrawScreen = true;
 }
 
