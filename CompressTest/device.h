@@ -23,6 +23,11 @@ struct RadioMsg
 	ui32 id;
 };
 
+struct CompassData
+{
+	int x, y, z;
+};
+
 struct GroupData
 {
 	RadioMsg data[16];
@@ -36,7 +41,9 @@ class Device
 	PointInt currentPos;
 	PointInt screenStart;
 	ui8 zoom;
-	Screen screen;
+	mutable Screen screen;
+	GroupData group;
+	CompassData currentCompass;
 
 public:
 	int id;
@@ -44,9 +51,8 @@ public:
 	std::deque<PointFloat> gps;
 	std::deque<RadioMsg> radio;
 	std::deque<ui16> key;
+	std::deque<CompassData> compass;
 	bool timer;
-
-	GroupData group;
 
 	Device()
 	{}
@@ -58,14 +64,15 @@ public:
 
 private:
 	void AdjustScreenPos(PointInt pos);
-	void DrawMap();
-	void DrawGroup();
-	void DrawCompass();
+	void DrawMap(void);
+	void DrawGroup(void);
+	void DrawCompass(void);
 
 	void ProcessKey(ui16 c);
 	void ProcessGps(PointFloat point);
 	void ProcessRadio(const RadioMsg* point);
-	void ProcessTimer();
+	void ProcessTimer(void);
+	void ProcessCompass(CompassData d);
 
 	ui32 CacheRead(const IMS* ims, ui32 tileX, ui32 tileY, ui32 zoom);
 };

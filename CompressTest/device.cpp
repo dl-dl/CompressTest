@@ -114,14 +114,31 @@ void Device::DrawCompass()
 	const int COMPASS_POS_X = 20;
 	const int COMPASS_POS_Y = 20;
 	const int COMPASS_R = 16;
-	Circle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED, &screen);
+//	const int COMPASS_POS_X = 120;
+//	const int COMPASS_POS_Y = 200;
+//	const int COMPASS_R = COMPASS_POS_X - 8;
 
-	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
-		 COMPASS_POS_X, COMPASS_POS_Y + COMPASS_R, DEV_RED, &screen);
-	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
-		 COMPASS_POS_X - 2, COMPASS_POS_Y - COMPASS_R + COMPASS_R / 2, DEV_RED, &screen);
-	Line(COMPASS_POS_X, COMPASS_POS_Y - COMPASS_R,
-		 COMPASS_POS_X + 2, COMPASS_POS_Y - COMPASS_R + COMPASS_R / 2, DEV_RED, &screen);
+	Circle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED, &screen);
+	const ui32 MIN2_COMPASS = 0x800; // TODO: find reasonable value
+	const ui32 MIN3_COMPASS = 0x10000; // TODO: find reasonable value
+	CompassData d = currentCompass;
+	ui32 r2 = d.x * d.x + d.y * d.y;
+	ui32 r3 = r2 + d.z * d.z;
+	if (r3 > MIN3_COMPASS && r2 > MIN2_COMPASS)
+	{
+		float q = (float)COMPASS_R / sqrtf((float)r2);
+		d.x = (ui32)(d.x * q);
+		d.y = (ui32)(d.y * q);
+	}
+	else
+	{
+		return;
+	}
+
+	Line(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y,
+		 COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED, &screen);
+	Circle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8, DEV_RED, &screen);
+	Circle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8 + 1, DEV_RED | DEV_GREEN | DEV_BLUE, &screen);
 }
 
 static int FindInGroup(const GroupData* g, int id)
@@ -170,6 +187,12 @@ void Device::ProcessRadio(const RadioMsg* msg)
 void Device::ProcessTimer()
 {}
 
+void Device::ProcessCompass(CompassData d)
+{
+	currentCompass = d;
+	redrawScreen = true;
+}
+
 void Device::Paint(const PaintContext* ctx)
 {
 	AdjustScreenPos(currentPos);
@@ -197,6 +220,11 @@ void Device::Run()
 	{
 		ProcessKey(key.front());
 		key.pop_front();
+	}
+	while (compass.size())
+	{
+		ProcessCompass(compass.front());
+		compass.pop_front();
 	}
 	if (timer)
 	{

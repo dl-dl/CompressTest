@@ -108,7 +108,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 #endif
 //		BlockAddr sz = FsFreeSpace(i);
 		dev[i].Init(i);
-		SetTimer(hWnd, 1, 1000, NULL);
+		SetTimer(hWnd, 1, 5000, NULL);
 		ShowWindow(hWnd, nCmdShow);
 		UpdateWindow(hWnd);
 	}
@@ -188,13 +188,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_KEYDOWN:
 	{
-		Device* devPtr = getDevice(hWnd);
+		auto devPtr = getDevice(hWnd);
 		devPtr->gps.push_back(NextGps(devPtr->id, wParam));
 	}
 	break;
 	case WM_TIMER:
 	{
-		getDevice(hWnd)->timer = true;
+		CompassData c;
+		c.x = rand() % 4096 - 2048;
+		c.y = rand() % 4096 - 2048;
+		c.z = rand() % 4096 - 2048;
+		auto devPtr = getDevice(hWnd);
+		devPtr->compass.push_back(c);
+		devPtr->timer = true;
 	}
 	break;
 	case WM_DESTROY:
