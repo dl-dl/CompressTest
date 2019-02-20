@@ -4,8 +4,7 @@
 #include "types.h"
 #include "screen.h"
 
-struct PaintContext;
-
-void PaintScreen(const PaintContext* ctx, const Screen* screen);
+void CopyScreen(HDC hdc, const Screen* screen);
+ui8 TestButton(int x, int y);
 
 #endif

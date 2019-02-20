@@ -11,4 +11,6 @@ static inline BlockAddr sdCardSize(void)
 void sdCardRead(BlockAddr addr, void *dst, int id);
 void sdCardWrite(BlockAddr addr, const void *src, int id);
 
+#define CREATE_NEW_SD 0
+
 #endif //!__SD_H__

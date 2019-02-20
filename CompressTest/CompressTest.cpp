@@ -10,14 +10,14 @@
 #include "device.h"
 #include "coord.h"
 #include "graph.h"
-#include "paintctx.h"
+#include "paint.h"
 #include "sizes.h"
 
 #include <stdlib.h>
 #include <eh.h>
 #include <assert.h>
 
-static HINSTANCE hInst;                                // current instance
+static HINSTANCE hInst;                     // current instance
 static WCHAR szWindowClass[128];            // the main window class name
 
 // Forward declarations of functions included in this code module:
@@ -166,9 +166,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		PaintContext ctx;
-		ctx.hdc = hdc;
-		getDevice(hWnd)->Paint(&ctx);
+
+		auto devPtr = getDevice(hWnd);
+		devPtr->Paint();
+		CopyScreen(hdc, &devPtr->screen);
+		devPtr->redrawScreen = false;
+
 		EndPaint(hWnd, &ps);
 	}
 	break;
@@ -195,6 +198,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		auto devPtr = getDevice(hWnd);
 		devPtr->compass.push_back(c);
 		devPtr->timer = true;
+	}
+	break;
+	case WM_LBUTTONDOWN:
+	{
+		if (wParam == MK_LBUTTON)
+		{
+			int x = LOWORD(lParam);
+			int y = HIWORD(lParam);
+			ui8 b = TestButton(x, y);
+			if (b)
+			{
+				auto devPtr = getDevice(hWnd);
+				devPtr->button.push_back(b);
+			}
+		}
 	}
 	break;
 	case WM_DESTROY:

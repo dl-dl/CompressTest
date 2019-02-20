@@ -7,7 +7,6 @@
 #define NOUSER
 #include <windows.h>
 #include "sd.h"
-#include "sizes.h"
 
 static HANDLE sdopen(int id)
 {
@@ -18,7 +17,7 @@ static HANDLE sdopen(int id)
 	{
 		char fname[] = "SD .BIN";
 		fname[2] = id + '0';
-#ifdef CREATE_NEW_SD
+#if CREATE_NEW_SD
 		file_handles[id] = CreateFileA(fname, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #else
 		file_handles[id] = CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);

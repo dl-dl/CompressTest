@@ -16,6 +16,4 @@
 typedef ui32 BlockAddr;
 static const ui32 BLOCK_SIZE = 512;
 
-//#define CREATE_NEW_SD
-
 #endif // __SIZES_H_

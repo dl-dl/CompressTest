@@ -4,14 +4,13 @@
 #include "convert.h"
 #include "graph.h"
 #include "text.h"
-#include "paint.h"
 
 #include <string.h>
 #include <assert.h>
 
 void Device::Init(int id_)
 {
-#ifdef CREATE_NEW_SD
+#if CREATE_NEW_SD
 	FsFormat(id_);
 	FsInit(id_);
 #endif
@@ -166,15 +165,16 @@ void Device::ProcessCompass(CompassData d)
 	redrawScreen = true;
 }
 
-void Device::Paint(const PaintContext* ctx)
+void Device::ProcessButton(ui8 b)
+{
+}
+
+void Device::Paint()
 {
 	AdjustScreenPos(currentPos);
 	DrawMap();
 	DrawCompass();
 	DrawGroup();
-
-	PaintScreen(ctx, &screen);
-	redrawScreen = false;
 }
 
 void Device::Run()
@@ -198,6 +198,11 @@ void Device::Run()
 	{
 		ProcessCompass(compass.front());
 		compass.pop_front();
+	}
+	while (button.size())
+	{
+		ProcessButton(button.front());
+		button.pop_front();
 	}
 	if (timer)
 	{

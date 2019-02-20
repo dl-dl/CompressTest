@@ -221,7 +221,6 @@
     <ClInclude Include="fsinit.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="lodepng.h" />
-    <ClInclude Include="paintctx.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="paint.h" />
     <ClInclude Include="screen.h" />

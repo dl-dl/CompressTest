@@ -9,8 +9,6 @@
 
 #include <deque> // TODO: remove
 
-struct PaintContext;
-
 struct RadioMsg
 {
 	PointInt pos;
@@ -34,17 +32,18 @@ class Device
 	PointInt currentPos;
 	PointInt screenStart;
 	ui8 zoom;
-	mutable Screen screen;
 	GroupData group;
 	CompassData currentCompass;
 
 public:
 	int deviceId;
+	mutable Screen screen;
 	bool redrawScreen;
 	std::deque<PointFloat> gps;
 	std::deque<RadioMsg> radio;
 	std::deque<ui16> key;
 	std::deque<CompassData> compass;
+	std::deque<ui8> button;
 	bool timer;
 
 	Device()
@@ -53,7 +52,7 @@ public:
 
 	void Init(int id_);
 	void Run();
-	void Paint(const PaintContext* ctx);
+	void Paint();
 
 private:
 	void AdjustScreenPos(PointInt pos);
@@ -66,6 +65,7 @@ private:
 	void ProcessRadio(const RadioMsg* point);
 	void ProcessTimer(void);
 	void ProcessCompass(CompassData d);
+	void ProcessButton(ui8 b);
 };
 
 extern void Broadcast(int srcId, PointInt data);

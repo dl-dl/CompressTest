@@ -48,9 +48,6 @@
     <ClInclude Include="graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="paintctx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="paint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
