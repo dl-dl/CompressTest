@@ -44,11 +44,16 @@ ui8 TestButton(int x, int y)
 	return 0;
 }
 
+static void DrawButtons(HDC hdc)
+{
+	for (size_t i = 0; i < buttons.size(); ++i)
+		FillRect(hdc, &buttons[i], (HBRUSH)GetStockObject(GRAY_BRUSH));
+}
+
 void CopyScreen(HDC hdc, const Screen* screen)
 {
 	InitButtons();
-	for (size_t i = 0; i < buttons.size(); ++i)
-		FillRect(hdc, &buttons[i], (HBRUSH)GetStockObject(GRAY_BRUSH));
+	DrawButtons(hdc);
 
 	SetWindowOrgEx(hdc, BORDERX, BORDERY, NULL);
 

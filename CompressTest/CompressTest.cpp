@@ -179,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if ('+' == wParam || '-' == wParam)
 		{
-			getDevice(hWnd)->key.push_back(wParam);
+			getDevice(hWnd)->key.push_back((ui16)wParam);
 		}
 	}
 	break;
