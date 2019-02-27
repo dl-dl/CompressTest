@@ -12,11 +12,6 @@ static const int BORDERY = -32;
 
 static std::vector<RECT> buttons;
 
-static inline COLORREF TranslateColor(ui8 c)
-{
-	return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
-}
-
 static void InitButtons()
 {
 	if (buttons.size())
@@ -48,6 +43,11 @@ static void DrawButtons(HDC hdc)
 {
 	for (size_t i = 0; i < buttons.size(); ++i)
 		FillRect(hdc, &buttons[i], (HBRUSH)GetStockObject(GRAY_BRUSH));
+}
+
+static inline COLORREF TranslateColor(ui8 c)
+{
+	return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
 }
 
 void CopyScreen(HDC hdc, const Screen* screen)

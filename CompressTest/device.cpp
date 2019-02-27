@@ -78,6 +78,10 @@ void Device::DrawGroup()
 		int dd = (group.data[i].id == deviceId) ? 10 : 5;
 		Line(x - dd, y, x + dd, y, DEV_RED, &screen);
 		Line(x, y - dd, x, y + dd, DEV_RED, &screen);
+		char s[2];
+		s[0] = '0' + i;
+		s[1] = 0;
+		PrintStr(s, x + 2, y - 27, 0, DEV_RED, &screen);
 	}
 }
 
@@ -166,8 +170,7 @@ void Device::ProcessCompass(CompassData d)
 }
 
 void Device::ProcessButton(ui8 b)
-{
-}
+{}
 
 void Device::Paint()
 {
