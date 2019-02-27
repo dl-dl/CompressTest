@@ -14,6 +14,6 @@
 #define DEV_BLUE 0x08
 
 typedef ui32 BlockAddr;
-static const ui32 BLOCK_SIZE = 512;
+#define BLOCK_SIZE 512
 
 #endif // __SIZES_H_

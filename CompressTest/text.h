@@ -5,8 +5,15 @@
 #include "screen.h"
 
 //#define FONT_NORMAL 0
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-void PrintStr(const char* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen);
-void PrintStrW(const ui16* s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen* screen);
+ void PrintStr(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen *screen);
+ void PrintStrW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen *screen);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

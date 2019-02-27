@@ -5,11 +5,18 @@
 
 static inline BlockAddr sdCardSize(void)
 {
-	return 1024 * 16;
+ return 1024 * 16; // Number of blocks.
 }
 
-void sdCardRead(BlockAddr addr, void *dst, int id);
-void sdCardWrite(BlockAddr addr, const void *src, int id);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+ void sdCardRead(BlockAddr addr, void *dst, int id);
+ void sdCardWrite(BlockAddr addr, const void *src, int id);
+#ifdef __cplusplus
+}
+#endif
 
 #define CREATE_NEW_SD 0
 

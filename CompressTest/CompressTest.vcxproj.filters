@@ -71,31 +71,13 @@
     <ClCompile Include="CompressTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="convert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="coord.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="paint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="devfont32x25.c">
@@ -104,7 +86,25 @@
     <ClCompile Include="fsinit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fscache.cpp">
+    <ClCompile Include="sd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fscache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="convert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coord.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="text.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,22 +4,28 @@
 #include "sizes.h"
 #include "fs.h"
 
-struct MapCacheItem
+typedef struct
 {
-	ui8 zoom;
-	ui32 tileX, tileY;
-	ui8 data[TILE_CX * TILE_CY / 2];
-};
+ ui8 zoom;
+ ui32 tileX, tileY;
+ ui8 data[TILE_CX * TILE_CY / 2];
+} MapCacheItem;
 
-struct FsMapCache
+typedef struct
 {
-	IMS ims;
-	MapCacheItem map[6];
-	int id; // TODO: tmp; to be removed
-};
+ IMS ims;
+ MapCacheItem map[6];
+ int id; // TODO: tmp; to be removed
+} FsMapCache;
 
-void CacheInit(FsMapCache* cache, int id);
-bool CacheFetchIMS(FsMapCache* cache, ui32 x, ui32 y);
-ui32 CacheRead(FsMapCache* cache, ui32 tileX, ui32 tileY, ui32 zoom);
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+ void CacheInit(FsMapCache *cache, int id);
+ bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y);
+ ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom);
+#ifdef __cplusplus
+}
+#endif
 #endif // !__FSCHACHE_H
