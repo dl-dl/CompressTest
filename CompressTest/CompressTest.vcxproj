@@ -216,6 +216,8 @@
     <ClInclude Include="coord.h" />
     <ClInclude Include="devfont.h" />
     <ClInclude Include="device.h" />
+    <ClInclude Include="devio.h" />
+    <ClInclude Include="devioimpl.h" />
     <ClInclude Include="fs.h" />
     <ClInclude Include="fscache.h" />
     <ClInclude Include="fsinit.h" />
@@ -236,6 +238,7 @@
     <ClCompile Include="coord.c" />
     <ClCompile Include="devfont32x25.c" />
     <ClCompile Include="device.cpp" />
+    <ClCompile Include="devio.cpp" />
     <ClCompile Include="fs.c" />
     <ClCompile Include="fscache.c" />
     <ClCompile Include="fsinit.cpp" />

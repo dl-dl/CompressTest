@@ -66,6 +66,12 @@
     <ClInclude Include="fscache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="devio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="devioimpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">
@@ -105,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="text.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="devio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

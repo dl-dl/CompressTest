@@ -2,7 +2,7 @@
 #include "devfont.h"
 #include "graph.h"
 
-const DevFont *const Fonts[8] = {
+static const DevFont *const Fonts[8] = {
  // &font21x15,
  // &font24x18,
  // &font24x19,
