@@ -47,3 +47,13 @@ void GetRadio(RadioMsg *dst, int id)
  *dst = input[id].radio.front();
  input[id].radio.pop_front();
 }
+
+void Broadcast(int hardwareId, PointInt point, int id)
+{
+ RadioMsg msg;
+ msg.pos = point;
+ msg.hardwareId = hardwareId;
+ for (int i = 0; i < NUM_DEV; ++i)
+  if (i != id)
+   input[i].radio.push_back(msg);
+}

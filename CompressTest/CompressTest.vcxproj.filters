@@ -80,9 +80,6 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="paint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -114,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="devio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="device.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

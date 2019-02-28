@@ -27,10 +27,11 @@ static ATOM MyRegisterClass(HINSTANCE hInstance);
 static BOOL InitInstance(HINSTANCE, int);
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-static Device dev[NUM_DEV];
 static HWND wnd[NUM_DEV];
 
 extern DeviceInput input[NUM_DEV];
+struct Device;
+extern "C" Device dev[NUM_DEV];
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS *)
 {
@@ -61,9 +62,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
    DispatchMessage(&msg);
 
    for (int i = 0; i < NUM_DEV; ++i)
-    dev[i].Run();
+    Run(i);
    for (int i = 0; i < NUM_DEV; ++i)
-    if (dev[i].redrawScreen)
+    if (NeedRedraw(i))
      InvalidateRect(wnd[i], NULL, FALSE);
   }
  return (int)msg.wParam;
@@ -104,7 +105,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     return FALSE;
 
    wnd[i] = hWnd;
-   dev[i].Init(i);
+   Init(i);
    SetTimer(hWnd, 1, 5000, NULL);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -128,21 +129,11 @@ static PointFloat NextGps(int id, WPARAM w)
  return point[id];
 }
 
-void Broadcast(int srcId, PointInt point)
-{
- RadioMsg msg;
- msg.pos = point;
- msg.id = srcId;
- for (int i = 0; i < NUM_DEV; ++i)
-  if (dev[i].deviceId != srcId)
-   input[i].radio.push_back(msg);
-}
-
-static Device *getDevice(HWND hwnd)
+static int getDevice(HWND hwnd)
 {
  for (int i = 0; i < NUM_DEV; ++i)
   if (hwnd == wnd[i])
-   return dev + i;
+   return i;
  assert(0);
  return 0;
 }
@@ -170,10 +161,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      PAINTSTRUCT ps;
      HDC hdc = BeginPaint(hWnd, &ps);
 
-     auto devPtr = getDevice(hWnd);
-     devPtr->Paint();
-     CopyScreen(hdc, &devPtr->screen);
-     devPtr->redrawScreen = false;
+     int id = getDevice(hWnd);
+     Paint(id);
+     CopyScreen(hdc, GetScreen(id));
+     ResetRedraw(id);
 
      EndPaint(hWnd, &ps);
     }
@@ -182,15 +173,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
      if ('+' == wParam || '-' == wParam)
       {
-       auto devPtr = getDevice(hWnd);
-       input[devPtr->deviceId].button.push_back(('-' == wParam) ? 1 : 2);
+       int id = getDevice(hWnd);
+       input[id].button.push_back(('-' == wParam) ? 1 : 2);
       }
     }
     break;
    case WM_KEYDOWN:
     {
-     auto devPtr = getDevice(hWnd);
-     input[devPtr->deviceId].gps.push_back(NextGps(devPtr->deviceId, wParam));
+     int id = getDevice(hWnd);
+     input[id].gps.push_back(NextGps(id, wParam));
     }
     break;
    case WM_TIMER:
@@ -199,9 +190,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      c.x = rand() % 4096 - 2048;
      c.y = rand() % 4096 - 2048;
      c.z = rand() % 4096 - 2048;
-     auto devPtr = getDevice(hWnd);
-     input[devPtr->deviceId].compass.push_back(c);
-     devPtr->timer = true;
+     int id = getDevice(hWnd);
+     input[id].compass.push_back(c);
     }
     break;
    case WM_LBUTTONDOWN:
@@ -213,8 +203,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
        ui8 b = TestButton(x, y);
        if (b)
         {
-         auto devPtr = getDevice(hWnd);
-         input[devPtr->deviceId].button.push_back(b);
+         int id = getDevice(hWnd);
+         input[id].button.push_back(b);
         }
       }
     }

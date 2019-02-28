@@ -8,46 +8,28 @@
 #include "screen.h"
 #include "devio.h"
 
-struct GroupData
+typedef struct
 {
-	RadioMsg data[16];
-	ui32 n;
-};
+ RadioMsg data[16];
+ ui32 n;
+} GroupData;
 
-class Device
+#ifdef __cplusplus
+extern "C"
 {
-	FsMapCache FsCache;
-	PointInt currentPos;
-	PointInt screenStart;
-	ui8 zoom;
-	GroupData group;
-	CompassData currentCompass;
-
-public:
-	int deviceId;
-	mutable Screen screen;
-	bool redrawScreen;
-	bool timer;
-
-	Device()
-	{}
-	Device(const Device&) = delete;
-
-	void Init(int id_);
-	void Run();
-	void Paint();
-
-private:
-	void AdjustScreenPos(PointInt pos);
-	void DrawMap(void);
-	void DrawGroup(void);
-	void DrawCompass(void);
-
-	void ProcessGps(PointFloat point);
-	void ProcessRadio(const RadioMsg* point);
-	void ProcessTimer(void);
-	void ProcessCompass(CompassData d);
-	void ProcessButton(ui8 b);
-};
+#endif
+ void Init(int id);
+ void Run(int id);
+ void Paint(int id);
+ bool NeedRedraw(int id);
+ void ResetRedraw(int id);
+ Screen *GetScreen(int id);
+ void ProcessButton(ui8 b, int id);
+ void ProcessGps(PointFloat point, int id);
+ void ProcessRadio(const RadioMsg *point, int id);
+ void ProcessCompass(CompassData d, int id);
+#ifdef __cplusplus
+}
+#endif
 
 #endif // !__DEVICE_H__
