@@ -16,6 +16,10 @@
 typedef ui32 BlockAddr;
 #define BLOCK_SIZE 512
 
-#define NUM_DEV 3 // TODO: tmp, to be removed
+#ifdef _WINDOWS
+#define NUM_DEV 3
+#else
+#define NUM_DEV 1
+#endif
 
 #endif // __SIZES_H_

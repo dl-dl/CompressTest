@@ -9,6 +9,8 @@ typedef unsigned char       ui8;
 typedef unsigned short int  ui16;
 typedef unsigned int        ui32;
 
+typedef unsigned short int WIDE_CHAR;
+
 #ifndef __cplusplus
 typedef unsigned char bool;
 #define false 0

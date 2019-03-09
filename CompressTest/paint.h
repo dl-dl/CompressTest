@@ -4,7 +4,7 @@
 #include "types.h"
 #include "screen.h"
 
-void CopyScreen(HDC hdc, const Screen* screen);
+void DisplayRedraw(HDC hdc, const Screen* screen);
 ui8 TestButton(int x, int y);
 
 #endif

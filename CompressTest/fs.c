@@ -18,17 +18,17 @@ void FsFormat(int id)
  ui8 b[BLOCK_SIZE];
  memset(b, 0, sizeof(b));
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
-  sdCardWrite(i, b, id);
+  SDCardWrite(i, b, id);
 }
 
 static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr *addr, int id)
 {
  ui8 b[BLOCK_SIZE];
  *indexHWM = NUM_IMS_BLOCKS; // init value for empty filel system
- *dataHWM = sdCardSize() - 1;
+ *dataHWM = SDCardSize() - 1;
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   sdCardRead(i, b, id);
+   SDCardRead(i, b, id);
    const IMS *p = (IMS *)b;
    if (IMS_EMPTY == p->status)
     {
@@ -45,7 +45,7 @@ BlockAddr FsFreeSpace(int id)
 {
  BlockAddr dataHWM, indexHWM, addr;
  if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr, id))
-  return sdCardSize() - 2;
+  return SDCardSize() - 2;
  return dataHWM - indexHWM;
 }
 
@@ -86,7 +86,7 @@ bool FsFindIMS(int x, int y, IMS *dst, int id)
  ui8 b[BLOCK_SIZE];
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   sdCardRead(i, b, id);
+   SDCardRead(i, b, id);
    const IMS *ims = (IMS *)b;
    if (ims->checksum != CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum)))
     return false;
@@ -120,7 +120,7 @@ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 
  ui32 offs = dx * ims->index[i].ny + dy;
  ui8 b[BLOCK_SIZE];
- sdCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
+ SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, id);
  const TileIndexBlock *p = (TileIndexBlock *)b;
  if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
   return zero;
@@ -145,7 +145,7 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
  ii->sz = sz;
  for (ui32 written = 0; written < sz; written += BLOCK_SIZE) // write data
   {
-   sdCardWrite(ims->dataHWM, tile + written, id);
+   SDCardWrite(ims->dataHWM, tile + written, id);
    ims->dataHWM--;
    if (ims->dataHWM <= ims->indexHWM)
     return false;
@@ -166,7 +166,7 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
      assert(ims->indexHWM + 1 == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
     }
    status->currentIndexBlock.checksum = CalcCRC(status->currentIndexBlock.idx, sizeof(status->currentIndexBlock.idx));
-   sdCardWrite(ims->indexHWM, &status->currentIndexBlock, id);
+   SDCardWrite(ims->indexHWM, &status->currentIndexBlock, id);
    ims->indexHWM++;
    if (ims->dataHWM <= ims->indexHWM)
     return false;
@@ -184,7 +184,7 @@ void FsCommitIMS(IMS *ims, BlockAddr addr, int id)
  assert(sizeof(*ims) <= BLOCK_SIZE);
  ui8 b[BLOCK_SIZE];
  *(IMS *)b = *ims;
- sdCardWrite(addr, b, id);
+ SDCardWrite(addr, b, id);
 }
 
 void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
@@ -196,7 +196,7 @@ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
  for (ui32 i = 0; i < sz; ++i)
   {
    if (0 == (i % BLOCK_SIZE))
-    sdCardRead(addr--, b, id);
+    SDCardRead(addr--, b, id);
    DeCompressOne(b[i % BLOCK_SIZE], &s);
   }
  assert(s.x == TILE_CX);

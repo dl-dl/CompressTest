@@ -105,7 +105,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     return FALSE;
 
    wnd[i] = hWnd;
-   Init(i);
+   DeviceInit(i);
    SetTimer(hWnd, 1, 5000, NULL);
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -162,8 +162,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      HDC hdc = BeginPaint(hWnd, &ps);
 
      int id = getDevice(hWnd);
-     Paint(id);
-     CopyScreen(hdc, GetScreen(id));
+     ScreenPaint(id);
+     DisplayRedraw(hdc, GetScreen(id));
      ResetRedraw(id);
 
      EndPaint(hWnd, &ps);
@@ -187,9 +187,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
    case WM_TIMER:
     {
      CompassData c;
-     c.x = rand() % 4096 - 2048;
-     c.y = rand() % 4096 - 2048;
-     c.z = rand() % 4096 - 2048;
+     c.x = rand() % 256 - 128;
+     c.y = rand() % 256 - 128;
+     c.z = rand() % 256 - 128;
      int id = getDevice(hWnd);
      input[id].compass.push_back(c);
     }

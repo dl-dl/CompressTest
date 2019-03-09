@@ -4,15 +4,20 @@
 
 DeviceInput input[NUM_DEV];
 
+void GetAdc(int id)
+{
+}
+
 bool GpsReady(int id)
 {
  return input[id].gps.size() > 0;
 }
 
-void GetGps(PointFloat *dst, int id)
+bool GetGps(PointFloat *dst, int id)
 {
  *dst = input[id].gps.front();
  input[id].gps.pop_front();
+ return true;
 }
 
 bool CompassReady(int id)
@@ -31,10 +36,11 @@ bool ButtonReady(int id)
  return input[id].button.size() > 0;
 }
 
-void GetButton(ui8 *dst, int id)
+ui8 GetButton(int id)
 {
- *dst = input[id].button.front();
+ auto res = input[id].button.front();
  input[id].button.pop_front();
+ return res;
 }
 
 bool RadioReady(int id)
@@ -48,11 +54,22 @@ void GetRadio(RadioMsg *dst, int id)
  input[id].radio.pop_front();
 }
 
+bool UsbReady(int id)
+{
+ return false;
+}
+
+ui32 GetUsb(ui8 **buff, int id)
+{
+ return 0;
+}
+
 void Broadcast(int hardwareId, PointInt point, int id)
 {
  RadioMsg msg;
- msg.pos = point;
- msg.hardwareId = hardwareId;
+ *(int *)(msg.data + 2) = point.x;
+ *(int *)(msg.data + 6) = point.y;
+ msg.data[0] = hardwareId;
  for (int i = 0; i < NUM_DEV; ++i)
   if (i != id)
    input[i].radio.push_back(msg);

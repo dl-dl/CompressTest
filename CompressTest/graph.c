@@ -2,7 +2,12 @@
 #include "graph.h"
 #include "sizes.h"
 
-void Pixel(int x, int y, ui8 color, Screen *screen)
+void DisplayClear(Screen *screen)
+{
+ memset(screen, 0, sizeof(Screen));
+}
+
+void DisplayPixel(int x, int y, ui8 color, Screen *screen)
 {
  if ((unsigned)x >= SCREEN_CX)
   return;
@@ -31,7 +36,7 @@ static void VLine(int x, int y, int height, ui8 color, Screen *screen)
   *ptr = ((*ptr & 0x0F) | (color << 4));
 }
 
-void SolidRect(int left, int top, int width, int height, ui8 color, Screen *screen)
+void DisplayFillRect(int left, int top, int width, int height, ui8 color, Screen *screen)
 {
  if (height <= 0)
   return;
@@ -51,14 +56,14 @@ static inline int intAbs(int i)
  return i >= 0 ? i : -i;
 }
 
-void Line(int x0, int y0, int x1, int y1, ui8 color, Screen *screen)
+void DisplayLine(int x0, int y0, int x1, int y1, ui8 color, Screen *screen)
 {
  const int dx = intAbs(x1 - x0), sx = x0 < x1 ? 1 : -1;
  const int dy = -intAbs(y1 - y0), sy = y0 < y1 ? 1 : -1;
  int err = dx + dy, e2;
  for (;;)
   {
-   Pixel(x0, y0, color, screen);
+   DisplayPixel(x0, y0, color, screen);
    if (x0 == x1 && y0 == y1)
     break;
    e2 = 2 * err;
@@ -75,17 +80,17 @@ void Line(int x0, int y0, int x1, int y1, ui8 color, Screen *screen)
   }
 }
 
-void Circle(int xm, int ym, int r, ui8 color, Screen *screen)
+void DisplayCircle(int xm, int ym, int r, ui8 color, Screen *screen)
 {
  if (r <= 0)
   return;
  int x = -r, y = 0, err = 2 - 2 * r;
  do
   {
-   Pixel(xm - x, ym + y, color, screen);
-   Pixel(xm - y, ym - x, color, screen);
-   Pixel(xm + x, ym - y, color, screen);
-   Pixel(xm + y, ym + x, color, screen);
+   DisplayPixel(xm - x, ym + y, color, screen);
+   DisplayPixel(xm - y, ym - x, color, screen);
+   DisplayPixel(xm + x, ym - y, color, screen);
+   DisplayPixel(xm + y, ym + x, color, screen);
    r = err;
    if (r > x)
     err += ++x * 2 + 1;

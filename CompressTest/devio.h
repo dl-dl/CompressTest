@@ -10,22 +10,24 @@ typedef struct
 
 typedef struct
 {
- PointInt pos;
- ui32 hardwareId;
+ ui8 data[10];
 } RadioMsg;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+ void GetAdc(int id);
  bool GpsReady(int id);
- void GetGps(PointFloat *dst, int id);
+ bool GetGps(PointFloat *dst, int id);
  bool CompassReady(int id);
  void GetCompass(CompassData *dst, int id);
  bool ButtonReady(int id);
- void GetButton(ui8 *dst, int id);
+ ui8 GetButton(int id);
  bool RadioReady(int id);
  void GetRadio(RadioMsg *dst, int id);
+ bool UsbReady(int id);
+ ui32 GetUsb(ui8** buff, int id);
  void Broadcast(int hardwareId, PointInt data, int id);
 #ifdef __cplusplus
 }

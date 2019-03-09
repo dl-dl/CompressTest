@@ -18,16 +18,17 @@ typedef struct
 extern "C"
 {
 #endif
- void Init(int id);
+ void DeviceInit(int id);
  void Run(int id);
- void Paint(int id);
+ void ScreenPaint(int id);
  bool NeedRedraw(int id);
  void ResetRedraw(int id);
  Screen *GetScreen(int id);
- void ProcessButton(ui8 b, int id);
- void ProcessGps(PointFloat point, int id);
- void ProcessRadio(const RadioMsg *point, int id);
- void ProcessCompass(CompassData d, int id);
+ void ProcessButton(int id);
+ void ProcessGps(int id);
+ void ProcessRadio(int id);
+ void ProcessCompass(int id);
+ void ProcessUsb(int id);
 #ifdef __cplusplus
 }
 #endif

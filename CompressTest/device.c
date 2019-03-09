@@ -1,5 +1,6 @@
 #include "device.h"
 #include "fs.h"
+#include "sd.h"
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
@@ -31,7 +32,7 @@ static void DrawMap(int id);
 static void DrawGroup(int id);
 static void DrawCompass(int id);
 
-void Init(int id)
+void DeviceInit(int id)
 {
 #if CREATE_NEW_SD
  FsFormat(id);
@@ -46,6 +47,11 @@ void Init(int id)
  dev[id].currentPos.y = dev[id].currentPos.x = 0x7FFFFFFF;
 }
 
+static inline int intabs(int a)
+{
+ return (a >= 0) ? a : -a;
+}
+
 void AdjustScreenPos(PointInt pos, int id)
 {
  pos.x = ScaleDownCoord(pos.x, dev[id].zoom);
@@ -53,8 +59,8 @@ void AdjustScreenPos(PointInt pos, int id)
  pos.x -= SCREEN_CX / 2;
  pos.y -= SCREEN_CY / 2;
 
- if ((abs(dev[id].screenStart.x - pos.x) > SCREEN_CX / 8) ||
-     (abs(dev[id].screenStart.y - pos.y) > SCREEN_CY / 8))
+ if ((intabs(dev[id].screenStart.x - pos.x) > SCREEN_CX / 8) ||
+     (intabs(dev[id].screenStart.y - pos.y) > SCREEN_CY / 8))
   {
    dev[id].screenStart = pos;
   }
@@ -63,7 +69,7 @@ void AdjustScreenPos(PointInt pos, int id)
 void DrawMap(int id)
 {
 #ifdef _DEBUG
- memset(&dev[id].screen, 0, sizeof(dev[0].screen));
+ DisplayClear(&dev[id].screen);
 #endif
  PointInt pos;
  pos.x = dev[id].currentPos.x / TILE_CX;
@@ -83,16 +89,18 @@ void DrawGroup(int id)
 {
  for (ui32 i = 0; i < dev[id].group.n; ++i)
   {
-   PointInt pos = dev[id].group.data[i].pos;
+   PointInt pos;
+   pos.x = *(int *)(dev[id].group.data[i].data + 2);
+   pos.y = *(int *)(dev[id].group.data[i].data + 6);
    int x = ScaleDownCoord(pos.x, dev[id].zoom) - dev[id].screenStart.x;
    int y = ScaleDownCoord(pos.y, dev[id].zoom) - dev[id].screenStart.y;
-   int dd = (dev[id].group.data[i].hardwareId == dev[id].hardwareId) ? 10 : 5;
-   Line(x - dd, y, x + dd, y, DEV_RED, &dev[id].screen);
-   Line(x, y - dd, x, y + dd, DEV_RED, &dev[id].screen);
+   int dd = (dev[id].group.data[i].data[0] == dev[id].hardwareId) ? 10 : 5;
+   DisplayLine(x - dd, y, x + dd, y, DEV_RED, &dev[id].screen);
+   DisplayLine(x, y - dd, x, y + dd, DEV_RED, &dev[id].screen);
    char s[2];
-   s[0] = '0' + dev[id].group.data[i].hardwareId % 10;
+   s[0] = '0' + dev[id].group.data[i].data[0] % 10;
    s[1] = 0;
-   PrintStr(s, x + 2, y - 27, 0, DEV_RED, &dev[id].screen);
+   DisplayText(s, x + 2, y - 27, 0, DEV_RED, &dev[id].screen);
   }
 }
 
@@ -105,9 +113,9 @@ void DrawCompass(int id)
  //	const int COMPASS_POS_Y = 200;
  //	const int COMPASS_R = COMPASS_POS_X - 8;
 
- Circle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED, &dev[id].screen);
- const ui32 MIN2_COMPASS = 0x800;   // TODO: find reasonable value
- const ui32 MIN3_COMPASS = 0x10000; // TODO: find reasonable value
+ DisplayCircle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED, &dev[id].screen);
+ const ui32 MIN2_COMPASS = 0x100;  // TODO: find reasonable value
+ const ui32 MIN3_COMPASS = 0x1000; // TODO: find reasonable value
  CompassData d = dev[id].currentCompass;
  ui32 r2 = d.x * d.x + d.y * d.y;
  ui32 r3 = r2 + d.z * d.z;
@@ -122,24 +130,28 @@ void DrawCompass(int id)
    return;
   }
 
- Line(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y,
-      COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED, &dev[id].screen);
- Circle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8, DEV_RED, &dev[id].screen);
- Circle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8 + 1, DEV_RED | DEV_GREEN | DEV_BLUE, &dev[id].screen);
+ DisplayLine(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y,
+             COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED, &dev[id].screen);
+ DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8, DEV_RED, &dev[id].screen);
+ DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8 + 1, DEV_RED | DEV_GREEN | DEV_BLUE, &dev[id].screen);
 }
 
 static int FindInGroup(const GroupData *g, int hardwareId)
 {
  for (ui32 i = 0; i < g->n; ++i)
   {
-   if (g->data[i].hardwareId == hardwareId)
+   if (g->data[i].data[0] == hardwareId)
     return i;
   }
  return -1;
 }
 
-void ProcessGps(PointFloat fpoint, int id)
+void ProcessGps(int id)
 {
+ PointFloat fpoint;
+ if (!GetGps(&fpoint, id))
+  return;
+
  PointInt pos;
  pos.x = lon2tilex(fpoint.x, MAX_ZOOM_LEVEL);
  pos.y = lat2tiley(fpoint.y, MAX_ZOOM_LEVEL);
@@ -149,37 +161,46 @@ void ProcessGps(PointFloat fpoint, int id)
  int i = FindInGroup(&dev[id].group, dev[id].hardwareId);
  if (i >= 0)
   {
-   dev[id].group.data[i].pos = pos;
+   *(int *)(dev[id].group.data[i].data + 2) = pos.x;
+   *(int *)(dev[id].group.data[i].data + 6) = pos.x;
   }
  else
   {
    i = dev[id].group.n;
-   dev[id].group.data[i].hardwareId = dev[id].hardwareId;
-   dev[id].group.data[i].pos = pos;
+   dev[id].group.data[i].data[0] = dev[id].hardwareId;
+   *(int *)(dev[id].group.data[i].data + 2) = pos.x;
+   *(int *)(dev[id].group.data[i].data + 6) = pos.x;
    dev[id].group.n++;
   }
  Broadcast(dev[id].hardwareId, pos, id);
  dev[id].redrawScreen = true;
 }
 
-void ProcessRadio(const RadioMsg *msg, int id)
+void ProcessRadio(int id)
 {
- int i = FindInGroup(&dev[id].group, msg->hardwareId);
+ RadioMsg msg;
+ GetRadio(&msg, id);
+
+ int i = FindInGroup(&dev[id].group, msg.data[0]);
  if (i >= 0)
-  dev[id].group.data[i] = *msg;
+  dev[id].group.data[i] = msg;
  else
-  dev[id].group.data[dev[id].group.n++] = *msg;
+  dev[id].group.data[dev[id].group.n++] = msg;
  dev[id].redrawScreen = true;
 }
 
-void ProcessCompass(CompassData d, int id)
+void ProcessCompass(int id)
 {
+ CompassData d;
+ GetCompass(&d, id);
+
  dev[id].currentCompass = d;
  dev[id].redrawScreen = true;
 }
 
-void ProcessButton(ui8 b, int id)
+void ProcessButton(int id)
 {
+ ui8 b = GetButton(id);
  if (b == 2 && dev[id].zoom < 14)
   dev[id].zoom++;
  else if (b == 1 && dev[id].zoom > 12)
@@ -189,7 +210,26 @@ void ProcessButton(ui8 b, int id)
  dev[id].redrawScreen = true;
 }
 
-void Paint(int id)
+void ProcessUsb(int id)
+{
+ ui8 *data;
+ ui32 sz = GetUsb(&data, id);
+ ui32 sectorNum = *((ui32 *)data);
+ data += 4;
+ sz -= 4;
+ int n = sz / BLOCK_SIZE;
+ if (sz % BLOCK_SIZE)
+  n++;
+
+ while (n--)
+  {
+   SDCardWrite(sectorNum, data, id);
+   sectorNum++;
+   data += BLOCK_SIZE;
+  }
+}
+
+void ScreenPaint(int id)
 {
  AdjustScreenPos(dev[id].currentPos, id);
  DrawMap(id);
@@ -199,29 +239,27 @@ void Paint(int id)
 
 void Run(int id)
 {
+ GetAdc(id);
+
+ while (UsbReady(id))
+  {
+   ProcessUsb(id);
+  }
  while (GpsReady(id))
   {
-   PointFloat d;
-   GetGps(&d, id);
-   ProcessGps(d, id);
+   ProcessGps(id);
   }
  while (RadioReady(id))
   {
-   RadioMsg d;
-   GetRadio(&d, id);
-   ProcessRadio(&d, id);
+   ProcessRadio(id);
   }
  while (CompassReady(id))
   {
-   CompassData d;
-   GetCompass(&d, id);
-   ProcessCompass(d, id);
+   ProcessCompass(id);
   }
  while (ButtonReady(id))
   {
-   ui8 d;
-   GetButton(&d, id);
-   ProcessButton(d, id);
+   ProcessButton(id);
   }
 }
 

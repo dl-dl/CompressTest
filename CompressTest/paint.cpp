@@ -50,7 +50,7 @@ static inline COLORREF TranslateColor(ui8 c)
 	return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
 }
 
-void CopyScreen(HDC hdc, const Screen* screen)
+void DisplayRedraw(HDC hdc, const Screen* screen)
 {
 	InitButtons();
 	DrawButtons(hdc);
