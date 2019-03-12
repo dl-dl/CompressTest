@@ -140,7 +140,7 @@ static int FindInGroup(const GroupData *g, int hardwareId)
 {
  for (ui32 i = 0; i < g->n; ++i)
   {
-   if (g->data[i].data[0] == hardwareId)
+   if (g->data[i].data[0] == (ui8)hardwareId)
     return i;
   }
  return -1;
@@ -162,14 +162,14 @@ void ProcessGps(int id)
  if (i >= 0)
   {
    *(int *)(dev[id].group.data[i].data + 2) = pos.x;
-   *(int *)(dev[id].group.data[i].data + 6) = pos.x;
+   *(int *)(dev[id].group.data[i].data + 6) = pos.y;
   }
  else
   {
    i = dev[id].group.n;
-   dev[id].group.data[i].data[0] = dev[id].hardwareId;
+   dev[id].group.data[i].data[0] = (ui8)dev[id].hardwareId;
    *(int *)(dev[id].group.data[i].data + 2) = pos.x;
-   *(int *)(dev[id].group.data[i].data + 6) = pos.x;
+   *(int *)(dev[id].group.data[i].data + 6) = pos.y;
    dev[id].group.n++;
   }
  Broadcast(dev[id].hardwareId, pos, id);
@@ -220,13 +220,7 @@ void ProcessUsb(int id)
  int n = sz / BLOCK_SIZE;
  if (sz % BLOCK_SIZE)
   n++;
-
- while (n--)
-  {
-   SDCardWrite(sectorNum, data, id);
-   sectorNum++;
-   data += BLOCK_SIZE;
-  }
+ SDCardWrite(sectorNum, data, 1, id);
 }
 
 void ScreenPaint(int id)

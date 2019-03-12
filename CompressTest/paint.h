@@ -4,7 +4,8 @@
 #include "types.h"
 #include "screen.h"
 
+#ifdef _WINDOWS
 void DisplayRedraw(HDC hdc, const Screen* screen);
 ui8 TestButton(int x, int y);
-
+#endif
 #endif

@@ -12,8 +12,8 @@ static inline BlockAddr SDCardSize(void)
 extern "C"
 {
 #endif
- void SDCardRead(BlockAddr addr, void *dst, int id);
- void SDCardWrite(BlockAddr addr, const void *src, int id);
+ bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks, int id);
+ bool SDCardWrite(BlockAddr addr, const void *src, ui32 numBlocks, int id);
 #ifdef __cplusplus
 }
 #endif
