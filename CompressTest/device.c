@@ -6,10 +6,10 @@
 #include "graph.h"
 #include "text.h"
 #include "devio.h"
+#include "fsinit.h"
 
 #include <string.h>
 #include <math.h>
-#include <assert.h>
 
 typedef struct
 {

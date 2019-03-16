@@ -1,6 +1,5 @@
 #include "convert.h"
 #include "sizes.h"
-#include <math.h>
 #include <string.h>
 
 static ui8 FindColor(ui8 bCol, ui8 gCol, ui8 rCol)
@@ -57,7 +56,7 @@ static ui8 FindColor(ui8 bCol, ui8 gCol, ui8 rCol)
      minNum = cnt;
     }
   }
- return (ColorTabl[minNum][3]);
+ return (ColorTabl[minNum][3] << 1);
 }
 
 void Invert24(const void *src, void *dst)
@@ -117,7 +116,7 @@ void Convert24To8Approx(const void *src, void *dst)
 
 void Convert24To8(const void *src, void *dst)
 {
- static const ui8 flag[3] = { 0x01, 0x02, 0x04 };
+ static const ui8 flag[3] = { DEV_RED, DEV_GREEN, DEV_BLUE };
  for (int x = 0; x < TILE_CX; x++)
   {
    ui8 *dstCol = (ui8 *)dst + x * TILE_CY;
@@ -135,7 +134,7 @@ void Convert24To8(const void *src, void *dst)
 
 void Convert8To24(const void *src, void *dst)
 {
- static const ui8 flag[3] = { 0x01, 0x02, 0x04 };
+ static const ui8 flag[3] = { DEV_RED, DEV_GREEN, DEV_BLUE };
  for (int x = 0; x < TILE_CX; x++)
   {
    const ui8 *srcCol = (ui8 *)src + x * TILE_CY;
@@ -155,13 +154,13 @@ void Convert8To4(const void *src, void *dst)
    const ui8 *srcCol = (ui8 *)src + x * TILE_CY;
    ui8 *dstCol = (ui8 *)dst + x * TILE_CY / 2;
    for (int y = 0; y < TILE_CY / 2; y++)
-    dstCol[y] = (srcCol[y * 2] << 5) | (srcCol[y * 2 + 1] << 1);
+    dstCol[y] = (srcCol[y * 2] << 4) | srcCol[y * 2 + 1];
   }
 }
 
 void Convert4To24(const void *src, void *dst)
 {
- static const ui8 flag[6] = { 0x20, 0x40, 0x80, 0x02, 0x04, 0x08 };
+ static const ui8 flag[6] = { DEV_RED << 4, DEV_GREEN << 4, DEV_RED << 4, DEV_RED, DEV_GREEN, DEV_BLUE };
  for (int x = 0; x < TILE_CX; x++)
   {
    const ui8 *srcCol = (ui8 *)src + x * TILE_CY / 2;
@@ -224,6 +223,7 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
       }
      else
       {
+		// assert(0 == srcCol[y] & 0x11)
        *CompressPtr++ = srcCol[y];
        y++;
       }
@@ -299,6 +299,8 @@ void DeCompressOne(ui8 src, DecompState *s)
   }
 }
 
+#if 0
+#include <math.h>
 //---------------------------------------------------------------------------
 // sR, sG and sB (Standard RGB) input range = 0 ? 255
 // X, Y and Z output refer to a D65/2° standard illuminant.
@@ -373,3 +375,4 @@ void RGB2XYZ(ui8 *bCol, ui8 *gCol, ui8 *rCol)
  *gCol = var_G * 255;
  *bCol = var_B * 255;
 }
+#endif

@@ -91,9 +91,62 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
  return RegisterClassExW(&wcex);
 }
 
+#pragma pack(push, 1)
+struct CommMsg
+{
+ ui8 cmd;
+ ui16 len;
+ ui32 sector;
+ ui8 data[BLOCK_SIZE];
+ ui8 chksum;
+};
+#pragma pack(pop)
+
+static void transmit(HANDLE to, HANDLE from, ui32 sector)
+{
+ CommMsg buff;
+ buff.cmd = 0;
+ buff.len = sizeof(buff.sector) + sizeof(buff.data);
+ buff.sector = sector;
+ buff.chksum = 0;
+
+ DWORD fp = SetFilePointer(from, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
+ DWORD n;
+ ReadFile(from, buff.data, BLOCK_SIZE, &n, NULL);
+ if (n != BLOCK_SIZE)
+  throw "ERR";
+ for (int i = 0; i < sizeof(buff) - 1; ++i)
+  buff.chksum += *((ui8 *)&buff + i);
+ WriteFile(to, &buff, sizeof(buff), &n, NULL);
+}
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
  hInst = hInstance; // Store instance handle in our global variable
+
+#if 0
+ HANDLE src = CreateFileA("SD0.BIN", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+ HANDLE hCommPort = CreateFileA("COM2", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+ DWORD sz = GetFileSize(src, NULL);
+ for (ui32 i = 0; i < sz / BLOCK_SIZE; ++i)
+  {
+   transmit(hCommPort, src, i);
+   char s[8];
+   ui32 total = 0;
+   do
+    {
+     DWORD n;
+     ReadFile(hCommPort, s + total, 2 - total, &n, NULL);
+     total += n;
+     Sleep(0);
+    }
+   while (total < 2);
+   if (memcmp(s, "Ok", 2))
+    throw "ERR";
+  }
+ CloseHandle(hCommPort);
+ CloseHandle(src);
+#endif
 
  for (int i = 0; i < NUM_DEV; ++i)
   {

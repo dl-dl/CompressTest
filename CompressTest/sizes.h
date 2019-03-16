@@ -9,9 +9,9 @@
 #define TILE_CX 256
 #define TILE_CY 256
 
-#define DEV_RED 0x02
+#define DEV_RED 0x08
 #define DEV_GREEN 0x04
-#define DEV_BLUE 0x08
+#define DEV_BLUE 0x02
 
 typedef ui32 BlockAddr;
 #define BLOCK_SIZE 512

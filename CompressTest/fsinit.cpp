@@ -62,7 +62,7 @@ static void forgetTile(NewTile t)
 	free(t.data);
 }
 
-void FsInit(int id)
+extern "C" void FsInit(int id)
 {
 	IMS ims;
 	BlockAddr addr;
