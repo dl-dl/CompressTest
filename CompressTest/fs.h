@@ -62,7 +62,7 @@ extern "C"
  BlockAddr FsFreeSpace(int id);
  bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord, int id);
  bool FsFindIMS(int x, int y, IMS *dst, int id);
- void FsCommitIMS(IMS *ims, BlockAddr addr, int id);
+ bool FsCommitIMS(IMS *ims, BlockAddr addr, int id);
  TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id);
  void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id);
 

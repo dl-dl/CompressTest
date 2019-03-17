@@ -1,6 +1,7 @@
 #include "types.h"
 #include "graph.h"
 #include "sizes.h"
+#include <string.h>
 
 void DisplayClear(Screen *screen)
 {

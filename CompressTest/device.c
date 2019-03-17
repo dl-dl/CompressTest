@@ -6,7 +6,9 @@
 #include "graph.h"
 #include "text.h"
 #include "devio.h"
+#if CREATE_NEW_SD
 #include "fsinit.h"
+#endif
 
 #include <string.h>
 #include <math.h>
@@ -90,15 +92,15 @@ void DrawGroup(int id)
  for (ui32 i = 0; i < dev[id].group.n; ++i)
   {
    PointInt pos;
-   pos.x = *(int *)(dev[id].group.data[i].data + 2);
-   pos.y = *(int *)(dev[id].group.data[i].data + 6);
+   pos.x = dev[id].group.g[i].x;
+   pos.y = dev[id].group.g[i].y;
    int x = ScaleDownCoord(pos.x, dev[id].zoom) - dev[id].screenStart.x;
    int y = ScaleDownCoord(pos.y, dev[id].zoom) - dev[id].screenStart.y;
-   int dd = (dev[id].group.data[i].data[0] == dev[id].hardwareId) ? 10 : 5;
+   int dd = (dev[id].group.g[i].hardwareId == dev[id].hardwareId) ? 10 : 5;
    DisplayLine(x - dd, y, x + dd, y, DEV_RED, &dev[id].screen);
    DisplayLine(x, y - dd, x, y + dd, DEV_RED, &dev[id].screen);
    char s[2];
-   s[0] = '0' + dev[id].group.data[i].data[0] % 10;
+   s[0] = '0' + dev[id].group.g[i].hardwareId % 16;
    s[1] = 0;
    DisplayText(s, x + 2, y - 27, 0, DEV_RED, &dev[id].screen);
   }
@@ -140,7 +142,7 @@ static int FindInGroup(const GroupData *g, int hardwareId)
 {
  for (ui32 i = 0; i < g->n; ++i)
   {
-   if (g->data[i].data[0] == (ui8)hardwareId)
+   if (g->g[i].hardwareId == hardwareId)
     return i;
   }
  return -1;
@@ -161,15 +163,15 @@ void ProcessGps(int id)
  int i = FindInGroup(&dev[id].group, dev[id].hardwareId);
  if (i >= 0)
   {
-   *(int *)(dev[id].group.data[i].data + 2) = pos.x;
-   *(int *)(dev[id].group.data[i].data + 6) = pos.y;
+   dev[id].group.g[i].x = pos.x;
+   dev[id].group.g[i].y = pos.y;
   }
  else
   {
    i = dev[id].group.n;
-   dev[id].group.data[i].data[0] = (ui8)dev[id].hardwareId;
-   *(int *)(dev[id].group.data[i].data + 2) = pos.x;
-   *(int *)(dev[id].group.data[i].data + 6) = pos.y;
+   dev[id].group.g[i].hardwareId = dev[id].hardwareId;
+   dev[id].group.g[i].x = pos.x;
+   dev[id].group.g[i].y = pos.y;
    dev[id].group.n++;
   }
  Broadcast(dev[id].hardwareId, pos, id);
@@ -183,9 +185,18 @@ void ProcessRadio(int id)
 
  int i = FindInGroup(&dev[id].group, msg.data[0]);
  if (i >= 0)
-  dev[id].group.data[i] = msg;
+  {
+   // assert( dev[id].group.g[i].hardwareId == msg.data[0]);
+   dev[id].group.g[i].x = *(int*)&msg.data[2];
+   dev[id].group.g[i].y = *(int *)&msg.data[6];
+  }
  else
-  dev[id].group.data[dev[id].group.n++] = msg;
+  {
+   int n = dev[id].group.n++;
+   dev[id].group.g[n].hardwareId = msg.data[0];
+   dev[id].group.g[n].x = *(int *)&msg.data[2];
+   dev[id].group.g[n].y = *(int *)&msg.data[6];
+  }
  dev[id].redrawScreen = true;
 }
 

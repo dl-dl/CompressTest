@@ -10,7 +10,14 @@
 
 typedef struct
 {
- RadioMsg data[16];
+ ui32 hardwareId;
+ ui32 x;
+ ui32 y;
+} GroupItem;
+
+typedef struct
+{
+ GroupItem g[16];
  ui32 n;
 } GroupData;
 

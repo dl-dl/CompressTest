@@ -107,8 +107,8 @@ bool FsFindIMS(int x, int y, IMS *dst, int id)
 TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 {
  TileIndexItem zero = { 0, 0 };
-// assert(zoom >= MIN_ZOOM_LEVEL);
-// assert(zoom <= MAX_ZOOM_LEVEL);
+ // assert(zoom >= MIN_ZOOM_LEVEL);
+ // assert(zoom <= MAX_ZOOM_LEVEL);
  ui32 i = zoom - MIN_ZOOM_LEVEL;
  if (0 == ims->index[i].firstBlock)
   return zero;
@@ -129,8 +129,8 @@ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 
 void ImsNextZoom(IMS *ims, NewMapStatus *status, ui8 zoom)
 {
-// assert(zoom >= MIN_ZOOM_LEVEL);
-// assert(zoom <= MAX_ZOOM_LEVEL);
+ // assert(zoom >= MIN_ZOOM_LEVEL);
+ // assert(zoom <= MAX_ZOOM_LEVEL);
  status->currentZoom = zoom;
  status->tilesAtCurrentZoom = 0;
  memset(status->currentIndexBlock.idx, 0xFD, sizeof(status->currentIndexBlock.idx));
@@ -139,7 +139,7 @@ void ImsNextZoom(IMS *ims, NewMapStatus *status, ui8 zoom)
 
 bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id)
 {
-// assert(ims->dataHWM >= ims->indexHWM);
+ // assert(ims->dataHWM >= ims->indexHWM);
  TileIndexItem *ii = &status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK];
  ii->addr = ims->dataHWM;
  ii->sz = sz;
@@ -152,18 +152,18 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
   }
  status->tilesAtCurrentZoom++;
 
-// assert(status->currentZoom >= MIN_ZOOM_LEVEL);
-// assert(status->currentZoom <= MAX_ZOOM_LEVEL);
+ // assert(status->currentZoom >= MIN_ZOOM_LEVEL);
+ // assert(status->currentZoom <= MAX_ZOOM_LEVEL);
  ui32 i = status->currentZoom - MIN_ZOOM_LEVEL;
  if ((status->tilesAtCurrentZoom == ims->index[i].nx * ims->index[i].ny) || (status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK == 0))
   {
    if (status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK)
     {
-//     assert(ims->indexHWM == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
+     //     assert(ims->indexHWM == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
     }
    else
     {
-//     assert(ims->indexHWM + 1 == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
+     //     assert(ims->indexHWM + 1 == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
     }
    status->currentIndexBlock.checksum = CalcCRC(status->currentIndexBlock.idx, sizeof(status->currentIndexBlock.idx));
    SDCardWrite(ims->indexHWM, &status->currentIndexBlock, 1, id);
@@ -177,14 +177,14 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
  return true;
 }
 
-void FsCommitIMS(IMS *ims, BlockAddr addr, int id)
+bool FsCommitIMS(IMS *ims, BlockAddr addr, int id)
 {
  ims->status = IMS_READY;
  ims->checksum = CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum));
-// assert(sizeof(*ims) <= BLOCK_SIZE);
+ // assert(sizeof(*ims) <= BLOCK_SIZE);
  ui8 b[BLOCK_SIZE];
  *(IMS *)b = *ims;
- SDCardWrite(addr, b, 1, id);
+ return SDCardWrite(addr, b, 1, id);
 }
 
 void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
@@ -196,9 +196,10 @@ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
  for (ui32 i = 0; i < sz; ++i)
   {
    if (0 == (i % BLOCK_SIZE))
-    SDCardRead(addr--, b, 1, id);
+    if (!SDCardRead(addr--, b, 1, id))
+     return;
    DeCompressOne(b[i % BLOCK_SIZE], &s);
   }
-// assert(s.x == TILE_CX);
-// assert(s.y == 0);
+ // assert(s.x == TILE_CX);
+ // assert(s.y == 0);
 }

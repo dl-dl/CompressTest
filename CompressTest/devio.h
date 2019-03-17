@@ -27,7 +27,7 @@ extern "C"
  bool RadioReady(int id);
  void GetRadio(RadioMsg *dst, int id);
  bool UsbReady(int id);
- ui32 GetUsb(ui8** buff, int id);
+ ui32 GetUsb(ui8 **buff, int id);
  void Broadcast(int hardwareId, PointInt data, int id);
 #ifdef __cplusplus
 }

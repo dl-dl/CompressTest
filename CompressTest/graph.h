@@ -7,6 +7,7 @@
 extern "C"
 {
 #endif
+ void DisplayInit(void);
  void DisplayClear(Screen *screen);
  void DisplayPixel(int x, int y, ui8 color, Screen *screen);
  void DisplayLine(int x0, int y0, int x1, int y1, ui8 color, Screen *screen);
