@@ -91,16 +91,16 @@ void DrawGroup(int id)
 {
  for (ui32 i = 0; i < dev[id].group.n; ++i)
   {
-   PointInt pos;
-   pos.x = dev[id].group.g[i].x;
-   pos.y = dev[id].group.g[i].y;
-   int x = ScaleDownCoord(pos.x, dev[id].zoom) - dev[id].screenStart.x;
-   int y = ScaleDownCoord(pos.y, dev[id].zoom) - dev[id].screenStart.y;
-   int dd = (dev[id].group.g[i].hardwareId == dev[id].hardwareId) ? 10 : 5;
-   DisplayLine(x - dd, y, x + dd, y, DEV_RED, &dev[id].screen);
-   DisplayLine(x, y - dd, x, y + dd, DEV_RED, &dev[id].screen);
+   const GroupItem *p = &dev[id].group.g[i];
+   int x = ScaleDownCoord(p->x, dev[id].zoom) - dev[id].screenStart.x;
+   int y = ScaleDownCoord(p->y, dev[id].zoom) - dev[id].screenStart.y;
+   int dd = (p->hardwareId == dev[id].hardwareId) ? 10 : 5;
+   for (int k = -1; k <= 1; ++k)
+    DisplayLine(x - dd, y + k, x + dd, y + k, (k == 0) ? DEV_RED : DEV_WHITE, &dev[id].screen);
+   for (int k = -1; k <= 1; ++k)
+    DisplayLine(x + k, y - dd, x + k, y + dd, (k == 0) ? DEV_RED : DEV_WHITE, &dev[id].screen);
    char s[2];
-   s[0] = '0' + dev[id].group.g[i].hardwareId % 16;
+   s[0] = '0' + p->hardwareId % 8;
    s[1] = 0;
    DisplayText(s, x + 2, y - 27, 0, DEV_RED, &dev[id].screen);
   }
@@ -132,8 +132,7 @@ void DrawCompass(int id)
    return;
   }
 
- DisplayLine(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y,
-             COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED, &dev[id].screen);
+ DisplayLine(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED, &dev[id].screen);
  DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8, DEV_RED, &dev[id].screen);
  DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8 + 1, DEV_RED | DEV_GREEN | DEV_BLUE, &dev[id].screen);
 }
@@ -153,6 +152,9 @@ void ProcessGps(int id)
  PointFloat fpoint;
  if (!GetGps(&fpoint, id))
   return;
+
+ // fpoint.x = 38.39f;
+ // fpoint.y = 56.01f;
 
  PointInt pos;
  pos.x = lon2tilex(fpoint.x, MAX_ZOOM_LEVEL);
@@ -187,7 +189,7 @@ void ProcessRadio(int id)
  if (i >= 0)
   {
    // assert( dev[id].group.g[i].hardwareId == msg.data[0]);
-   dev[id].group.g[i].x = *(int*)&msg.data[2];
+   dev[id].group.g[i].x = *(int *)&msg.data[2];
    dev[id].group.g[i].y = *(int *)&msg.data[6];
   }
  else
@@ -212,9 +214,9 @@ void ProcessCompass(int id)
 void ProcessButton(int id)
 {
  ui8 b = GetButton(id);
- if (b == 2 && dev[id].zoom < 14)
+ if (b == 0x20 && dev[id].zoom < 14)
   dev[id].zoom++;
- else if (b == 1 && dev[id].zoom > 12)
+ else if (b == 0x80 && dev[id].zoom > 12)
   dev[id].zoom--;
 
  dev[id].screenStart.x = dev[id].screenStart.y = 0x7FFFFFFF;
@@ -244,12 +246,13 @@ void ScreenPaint(int id)
 
 void Run(int id)
 {
- GetAdc(id);
-
+ // GetAdc(id);
+ /*
  while (UsbReady(id))
   {
    ProcessUsb(id);
   }
+*/
  while (GpsReady(id))
   {
    ProcessGps(id);

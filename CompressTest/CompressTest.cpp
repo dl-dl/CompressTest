@@ -227,7 +227,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      if ('+' == wParam || '-' == wParam)
       {
        int id = getDevice(hWnd);
-       input[id].button.push_back(('-' == wParam) ? 1 : 2);
+       input[id].button.push_back(('-' == wParam) ? 0x20 : 0x80);
       }
     }
     break;
