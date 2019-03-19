@@ -1,0 +1,18 @@
+https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
+
+sudo service postgresql start
+
+/home/dmr
+touch rundemo.cpp
+make
+sudo rm -r 15
+sudo -u postgres ./rundemo
+cp -r 15 /mnt/c/tmp/
+
+
+wget -O cher.osm "https://overpass-api.de/api/map?bbox=38.0160,55.9014,38.6196,56.1232"
+sudo osm2pgsql -c -k --slim -d gis -U postgres -H localhost -S openstreetmap-carto.style cher.osm
+
+
+carto project.mml --ppi 174 > mapnik.xml
+carto project.mml --ppi 160 > mapnik.xml
