@@ -65,24 +65,27 @@ static void forgetTile(NewTile t)
 extern "C" void FsInit(int id)
 {
 	IMS ims;
-	BlockAddr addr;
-	RectInt r[2];
+	const int NUM_REG = 1;
+	RectInt r[NUM_REG];
+	const char* region[NUM_REG] = {
+		"cher",
+		// "valparaiso"
+	};
 	r[0].left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_CX;
 	r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_CY;
+	r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_CX;
 	r[0].bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_CY;
 
-	r[1].left = lon2tilex(-71.65f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[1].right = lon2tilex(-71.4f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[1].top = lat2tiley(-33.0f, MAX_ZOOM_LEVEL) / TILE_CY;
-	r[1].bottom = lat2tiley(-33.1f, MAX_ZOOM_LEVEL) / TILE_CY;
-	const char* region[2] = { "cher", "valparaiso" };
+	//r[1].left = lon2tilex(-71.65f, MAX_ZOOM_LEVEL) / TILE_CX;
+	//r[1].top = lat2tiley(-33.0f, MAX_ZOOM_LEVEL) / TILE_CY;
+	//r[1].right = lon2tilex(-71.4f, MAX_ZOOM_LEVEL) / TILE_CX;
+	//r[1].bottom = lat2tiley(-33.1f, MAX_ZOOM_LEVEL) / TILE_CY;
 
-	for (int i = 0; i < sizeof(r)/sizeof(*r); ++i)
+	for (int i = 0; i < sizeof(r) / sizeof(*r); ++i)
 	{
+		BlockAddr addr;
 		FsNewIMS(&ims, &addr, r + i, id);
-
-		for (ui8 z = 12; z <= 14 - i; ++z)
+		for (ui8 z = 12; z <= 15; ++z)
 		{
 			NewMapStatus status;
 			ImsNextZoom(&ims, &status, z);

@@ -214,7 +214,7 @@ void ProcessCompass(int id)
 void ProcessButton(int id)
 {
  ui8 b = GetButton(id);
- if (b == 0x20 && dev[id].zoom < 14)
+ if (b == 0x20 && dev[id].zoom < 15)
   dev[id].zoom++;
  else if (b == 0x80 && dev[id].zoom > 12)
   dev[id].zoom--;
