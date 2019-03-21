@@ -168,8 +168,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 static PointFloat NextGps(int id, WPARAM w)
 {
- static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
- //	static PointFloat point[NUM_DEV] = { { -71.5f, -33.05f }, { -71.5f, -33.05f }, { -71.5f, -33.05f } };
+ //static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
+ static PointFloat point[NUM_DEV] = { { -79.48f, 44.00f }, { -79.48f, 44.00f }, { -79.48f, 44.00f } };
 
  if (VK_UP == w)
   point[id].y += 0.001f;
