@@ -2,6 +2,15 @@
 #define __sound_h
 #include "types.h"
 
-void Sound(ui8 num, ui16 tick);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+ void Sound(ui8 num, ui16 tick);
+ void Vibro(ui8 num, ui16 tick);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __sound_h */

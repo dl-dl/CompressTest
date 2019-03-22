@@ -4,6 +4,7 @@
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
+#include "sound.h"
 #include "devio.h"
 #if CREATE_NEW_SD
 #include "fsinit.h"
@@ -165,7 +166,6 @@ void ProcessGps()
  if (PointEqInt(&pos, &dev.currentPos))
   return;
  dev.currentPos = pos;
- Broadcast(dev.hardwareId, pos);
  dev.redrawScreen = true;
 }
 
@@ -207,7 +207,9 @@ void ProcessButton()
   dev.zoom++;
  else if (b == 0x80 && dev.zoom > 12)
   dev.zoom--;
-
+ else
+  return;
+ Sound(1, 100);
  dev.screenStart.x = dev.screenStart.y = 0x7FFFFFFF;
  dev.redrawScreen = true;
 }
