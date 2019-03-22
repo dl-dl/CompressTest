@@ -17,18 +17,18 @@ typedef struct
 extern "C"
 {
 #endif
- void GetAdc(int id);
- bool GpsReady(int id);
- bool GetGps(PointFloat *dst, int id);
- bool CompassReady(int id);
- void GetCompass(CompassData *dst, int id);
- bool ButtonReady(int id);
- ui8 GetButton(int id);
- bool RadioReady(int id);
- void GetRadio(RadioMsg *dst, int id);
- bool UsbReady(int id);
- ui32 GetUsb(ui8 **buff, int id);
- void Broadcast(int hardwareId, PointInt data, int id);
+ void GetAdc(void);
+ bool GpsReady(void);
+ bool GetGps(PointFloat *dst);
+ bool CompassReady(void);
+ void GetCompass(CompassData *dst);
+ bool ButtonReady(void);
+ ui8 GetButton(void);
+ bool RadioReady(void);
+ void GetRadio(RadioMsg *dst);
+ bool UsbReady(void);
+ ui32 GetUsb(ui8 **buff);
+ void Broadcast(int hardwareId, PointInt data);
 #ifdef __cplusplus
 }
 #endif

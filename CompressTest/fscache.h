@@ -22,8 +22,8 @@ extern "C"
 {
 #endif
  void CacheInit(FsMapCache *cache);
- bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y, int id);
- ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom, int id);
+ bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y);
+ ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom);
 #ifdef __cplusplus
 }
 #endif

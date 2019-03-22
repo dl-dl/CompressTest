@@ -17,10 +17,4 @@
 typedef ui32 BlockAddr;
 #define BLOCK_SIZE 512
 
-#ifdef _WINDOWS
-#define NUM_DEV 3
-#else
-#define NUM_DEV 1
-#endif
-
 #endif // __SIZES_H_

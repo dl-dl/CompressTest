@@ -2,75 +2,72 @@
 #include "devio.h"
 #include "devioimpl.h"
 
-DeviceInput input[NUM_DEV];
+DeviceInput input;
 
-void GetAdc(int id)
+void GetAdc()
 {
 }
 
-bool GpsReady(int id)
+bool GpsReady()
 {
- return input[id].gps.size() > 0;
+ return input.gps.size() > 0;
 }
 
-bool GetGps(PointFloat *dst, int id)
+bool GetGps(PointFloat *dst)
 {
- *dst = input[id].gps.front();
- input[id].gps.pop_front();
+ *dst = input.gps.front();
+ input.gps.pop_front();
  return true;
 }
 
-bool CompassReady(int id)
+bool CompassReady()
 {
- return input[id].compass.size() > 0;
+ return input.compass.size() > 0;
 }
 
-void GetCompass(CompassData *dst, int id)
+void GetCompass(CompassData *dst)
 {
- *dst = input[id].compass.front();
- input[id].compass.pop_front();
+ *dst = input.compass.front();
+ input.compass.pop_front();
 }
 
-bool ButtonReady(int id)
+bool ButtonReady()
 {
- return input[id].button.size() > 0;
+ return input.button.size() > 0;
 }
 
-ui8 GetButton(int id)
+ui8 GetButton()
 {
- auto res = input[id].button.front();
- input[id].button.pop_front();
+ auto res = input.button.front();
+ input.button.pop_front();
  return res;
 }
 
-bool RadioReady(int id)
+bool RadioReady()
 {
- return input[id].radio.size() > 0;
+ return input.radio.size() > 0;
 }
 
-void GetRadio(RadioMsg *dst, int id)
+void GetRadio(RadioMsg *dst)
 {
- *dst = input[id].radio.front();
- input[id].radio.pop_front();
+ *dst = input.radio.front();
+ input.radio.pop_front();
 }
 
-bool UsbReady(int id)
+bool UsbReady()
 {
  return false;
 }
 
-ui32 GetUsb(ui8 **buff, int id)
+ui32 GetUsb(ui8 **buff)
 {
  return 0;
 }
 
-void Broadcast(int hardwareId, PointInt point, int id)
+void Broadcast(int hardwareId, PointInt point)
 {
  RadioMsg msg;
  *(int *)(msg.data + 2) = point.x;
  *(int *)(msg.data + 6) = point.y;
  msg.data[0] = hardwareId;
- for (int i = 0; i < NUM_DEV; ++i)
-  if (i != id)
-   input[i].radio.push_back(msg);
 }

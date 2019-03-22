@@ -27,11 +27,9 @@ static ATOM MyRegisterClass(HINSTANCE hInstance);
 static BOOL InitInstance(HINSTANCE, int);
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-static HWND wnd[NUM_DEV];
-
-extern DeviceInput input[NUM_DEV];
+extern DeviceInput input;
 struct Device;
-extern "C" Device dev[NUM_DEV];
+extern "C" Device dev;
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS *)
 {
@@ -61,11 +59,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
    TranslateMessage(&msg);
    DispatchMessage(&msg);
 
-   for (int i = 0; i < NUM_DEV; ++i)
-    Run(i);
-   for (int i = 0; i < NUM_DEV; ++i)
-    if (NeedRedraw(i))
-     InvalidateRect(wnd[i], NULL, FALSE);
+   Run();
+   if (NeedRedraw())
+    InvalidateRect(msg.hwnd, NULL, FALSE);
   }
  return (int)msg.wParam;
 }
@@ -112,8 +108,7 @@ static void transmit(HANDLE to, HANDLE from, ui32 sector)
 
  DWORD fp = SetFilePointer(from, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
  DWORD n;
- ReadFile(from, buff.data, BLOCK_SIZE, &n, NULL);
- if (n != BLOCK_SIZE)
+ if (!ReadFile(from, buff.data, BLOCK_SIZE, &n, NULL) || (n != BLOCK_SIZE))
   throw "ERR";
  for (int i = 0; i < sizeof(buff) - 1; ++i)
   buff.chksum += *((ui8 *)&buff + i);
@@ -148,47 +143,35 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
  CloseHandle(src);
 #endif
 
- for (int i = 0; i < NUM_DEV; ++i)
-  {
-   WCHAR s[64];
-   wsprintf(s, L"Device %u", i);
-   HWND hWnd = CreateWindowW(szWindowClass, s, WS_OVERLAPPEDWINDOW,
-                             (240 + 64 + 20) * i, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
-   if (!hWnd)
-    return FALSE;
+ WCHAR s[64];
+ wsprintf(s, L"Device %u", 0);
+ HWND hWnd = CreateWindowW(szWindowClass, s, WS_OVERLAPPEDWINDOW,
+                           0, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
+ if (!hWnd)
+  return FALSE;
 
-   wnd[i] = hWnd;
-   DeviceInit(i);
-   SetTimer(hWnd, 1, 5000, NULL);
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-  }
+ DeviceInit();
+ SetTimer(hWnd, 1, 5000, NULL);
+ ShowWindow(hWnd, nCmdShow);
+ UpdateWindow(hWnd);
+
  return TRUE;
 }
 
-static PointFloat NextGps(int id, WPARAM w)
+static PointFloat NextGps(WPARAM w)
 {
- //static PointFloat point[NUM_DEV] = { { 38.39f, 56.01f }, { 38.39f, 56.01f }, { 38.39f, 56.01f } };
- static PointFloat point[NUM_DEV] = { { -79.48f, 44.00f }, { -79.48f, 44.00f }, { -79.48f, 44.00f } };
+ //static PointFloat point = { 38.39f, 56.01f };
+ static PointFloat point = { -79.48f, 44.00f };
 
  if (VK_UP == w)
-  point[id].y += 0.001f;
+  point.y += 0.001f;
  else if (VK_DOWN == w)
-  point[id].y -= 0.001f;
+  point.y -= 0.001f;
  else if (VK_LEFT == w)
-  point[id].x -= 0.001f;
+  point.x -= 0.001f;
  else if (VK_RIGHT == w)
-  point[id].x += 0.001f;
- return point[id];
-}
-
-static int getDevice(HWND hwnd)
-{
- for (int i = 0; i < NUM_DEV; ++i)
-  if (hwnd == wnd[i])
-   return i;
- assert(0);
- return 0;
+  point.x += 0.001f;
+ return point;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -214,10 +197,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      PAINTSTRUCT ps;
      HDC hdc = BeginPaint(hWnd, &ps);
 
-     int id = getDevice(hWnd);
-     ScreenPaint(id);
-     DisplayRedraw(hdc, GetScreen(id));
-     ResetRedraw(id);
+     ScreenPaint();
+     DisplayRedraw(hdc);
+     ResetRedraw();
 
      EndPaint(hWnd, &ps);
     }
@@ -226,15 +208,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
      if ('+' == wParam || '-' == wParam)
       {
-       int id = getDevice(hWnd);
-       input[id].button.push_back(('-' == wParam) ? 0x80 : 0x20);
+       input.button.push_back(('-' == wParam) ? 0x80 : 0x20);
       }
     }
     break;
    case WM_KEYDOWN:
     {
-     int id = getDevice(hWnd);
-     input[id].gps.push_back(NextGps(id, wParam));
+     input.gps.push_back(NextGps(wParam));
     }
     break;
    case WM_TIMER:
@@ -243,8 +223,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
      c.x = rand() % 256 - 128;
      c.y = rand() % 256 - 128;
      c.z = rand() % 256 - 128;
-     int id = getDevice(hWnd);
-     input[id].compass.push_back(c);
+     input.compass.push_back(c);
     }
     break;
    case WM_LBUTTONDOWN:
@@ -256,8 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
        ui8 b = TestButton(x, y);
        if (b)
         {
-         int id = getDevice(hWnd);
-         input[id].button.push_back(b);
+         input.button.push_back(b);
         }
       }
     }

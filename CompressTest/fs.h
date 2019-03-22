@@ -58,16 +58,16 @@ typedef struct
 extern "C"
 {
 #endif
- void FsFormat(int id);
- BlockAddr FsFreeSpace(int id);
- bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord, int id);
- bool FsFindIMS(int x, int y, IMS *dst, int id);
- bool FsCommitIMS(IMS *ims, BlockAddr addr, int id);
- TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id);
- void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id);
+ void FsFormat(void);
+ BlockAddr FsFreeSpace(void);
+ bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord);
+ bool FsFindIMS(int x, int y, IMS *dst);
+ bool FsCommitIMS(IMS *ims, BlockAddr addr);
+ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy);
+ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst);
 
  void ImsNextZoom(IMS *ims, NewMapStatus *status, ui8 zoom);
- bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id);
+ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz);
 #ifdef __cplusplus
 }
 #endif

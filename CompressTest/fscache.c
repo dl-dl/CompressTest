@@ -20,22 +20,22 @@ static inline bool CacheEq(const MapCacheItem *p, ui32 x, ui32 y, ui32 z)
  return (p->tileX == x) && (p->tileY == y) && (p->zoom == z);
 }
 
-bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y, int id)
+bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y)
 {
  if (!PointInRectInt(&cache->ims.coord, x, y))
-  if (!FsFindIMS(x, y, &cache->ims, id))
+  if (!FsFindIMS(x, y, &cache->ims))
    return false;
  return true;
 }
 
-ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom, int id)
+ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
 {
  ui32 index = CacheIndex(tileX, tileY);
  if (!CacheEq(&cache->map[index], tileX, tileY, zoom))
   {
-   TileIndexItem i = FsFindTile(&cache->ims, zoom, tileX, tileY, id);
+   TileIndexItem i = FsFindTile(&cache->ims, zoom, tileX, tileY);
    if (i.addr)
-    FsReadTile(i.addr, i.sz, cache->map[index].data, id);
+    FsReadTile(i.addr, i.sz, cache->map[index].data);
    else
     memset(cache->map[index].data, 0x55, sizeof(cache->map[0].data));
    cache->map[index].zoom = zoom;

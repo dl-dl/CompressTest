@@ -13,4 +13,13 @@ typedef struct
 	ScreenLine line[SCREEN_CX];
 } Screen;
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+ extern Screen screen;
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -23,7 +23,7 @@ static const unsigned char *FindChr(const DevFont *f, ui32 c)
  return f->block[0].sym;
 }
 
-static unsigned int DisplayChr(ui32 chr, ui32 x, ui32 y, const DevFont *f, ui8 color, Screen *screen)
+static unsigned int DisplayChr(ui32 chr, ui32 x, ui32 y, const DevFont *f, ui8 color)
 {
  const unsigned char *c = FindChr(f, chr);
  for (ui32 i = 0; (i < c[0]); ++i)
@@ -31,28 +31,28 @@ static unsigned int DisplayChr(ui32 chr, ui32 x, ui32 y, const DevFont *f, ui8 c
    for (ui32 j = 0; (j < f->h); ++j)
     {
      if (c[i * f->bytesH + 1 + j / 8] & (1 << (j % 8)))
-      DisplayPixel(x + i, y + j, color, screen);
+      DisplayPixel(x + i, y + j, color);
     }
   }
  return c[0];
 }
 
-void DisplayText(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen *screen)
+void DisplayText(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color)
 {
  const DevFont *f = Fonts[fontType];
  if (f == 0)
   return;
 
  for (ui32 i = 0; s[i]; ++i)
-  x += DisplayChr(s[i], x, y, f, color, screen);
+  x += DisplayChr(s[i], x, y, f, color);
 }
 
-void DisplayTextW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color, Screen *screen)
+void DisplayTextW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color)
 {
  const DevFont *f = Fonts[fontType];
  if (f == 0)
   return;
 
  for (ui32 i = 0; s[i]; ++i)
-  x += DisplayChr(s[i], x, y, f, color, screen);
+  x += DisplayChr(s[i], x, y, f, color);
 }

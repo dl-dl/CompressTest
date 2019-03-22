@@ -84,7 +84,7 @@ extern "C" void FsInit(int id)
 	for (int i = 0; i < sizeof(r) / sizeof(*r); ++i)
 	{
 		BlockAddr addr;
-		FsNewIMS(&ims, &addr, r + i, id);
+		FsNewIMS(&ims, &addr, r + i);
 		for (ui8 z = 12; z <= 15; ++z)
 		{
 			NewMapStatus status;
@@ -95,11 +95,11 @@ extern "C" void FsInit(int id)
 				{
 					NewTile tile = getTile(idx->left + x, idx->top + y, z, region[i]);
 					assert(tile.data);
-					bool res = ImsAddTile(&ims, &status, tile.data, tile.size, id);
+					bool res = ImsAddTile(&ims, &status, tile.data, tile.size);
 					assert(res);
 					forgetTile(tile);
 				}
 		}
-		FsCommitIMS(&ims, addr, id);
+		FsCommitIMS(&ims, addr);
 	}
 }

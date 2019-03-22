@@ -13,22 +13,22 @@ static ui32 CalcCRC(const void *data, ui32 sz) // TODO: implement proper algorit
  return crc;
 }
 
-void FsFormat(int id)
+void FsFormat()
 {
  ui8 b[BLOCK_SIZE];
  memset(b, 0, sizeof(b));
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
-  SDCardWrite(i, b, 1, id);
+  SDCardWrite(i, b, 1);
 }
 
-static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr *addr, int id)
+static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr *addr)
 {
  ui8 b[BLOCK_SIZE];
  *indexHWM = NUM_IMS_BLOCKS; // init value for empty filel system
  *dataHWM = SDCardSize() - 1;
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   SDCardRead(i, b, 1, id);
+   SDCardRead(i, b, 1);
    const IMS *p = (IMS *)b;
    if (IMS_EMPTY == p->status)
     {
@@ -41,18 +41,18 @@ static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr
  return false;
 }
 
-BlockAddr FsFreeSpace(int id)
+BlockAddr FsFreeSpace()
 {
  BlockAddr dataHWM, indexHWM, addr;
- if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr, id))
+ if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr))
   return SDCardSize() - 2;
  return dataHWM - indexHWM;
 }
 
-bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord, int id)
+bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord)
 {
  BlockAddr dataHWM, indexHWM;
- if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, addr, id))
+ if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, addr))
   return false;
 
  memset(ims, 0, sizeof(*ims));
@@ -81,12 +81,12 @@ bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord, int id)
  return true;
 }
 
-bool FsFindIMS(int x, int y, IMS *dst, int id)
+bool FsFindIMS(int x, int y, IMS *dst)
 {
  ui8 b[BLOCK_SIZE];
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   SDCardRead(i, b, 1, id);
+   SDCardRead(i, b, 1);
    const IMS *ims = (IMS *)b;
    if (ims->checksum != CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum)))
     return false;
@@ -104,7 +104,7 @@ bool FsFindIMS(int x, int y, IMS *dst, int id)
  return false;
 }
 
-TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id)
+TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)
 {
  TileIndexItem zero = { 0, 0 };
  // assert(zoom >= MIN_ZOOM_LEVEL);
@@ -120,7 +120,7 @@ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy, int id)
 
  ui32 offs = dx * ims->index[i].ny + dy;
  ui8 b[BLOCK_SIZE];
- SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, 1, id);
+ SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, 1);
  const TileIndexBlock *p = (TileIndexBlock *)b;
  if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
   return zero;
@@ -137,7 +137,7 @@ void ImsNextZoom(IMS *ims, NewMapStatus *status, ui8 zoom)
  ims->index[status->currentZoom - MIN_ZOOM_LEVEL].firstBlock = ims->indexHWM;
 }
 
-bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id)
+bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
 {
  // assert(ims->dataHWM >= ims->indexHWM);
  TileIndexItem *ii = &status->currentIndexBlock.idx[status->tilesAtCurrentZoom % INDEX_ITEMS_PER_BLOCK];
@@ -145,7 +145,7 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
  ii->sz = sz;
  for (ui32 written = 0; written < sz; written += BLOCK_SIZE) // write data
   {
-   SDCardWrite(ims->dataHWM, tile + written, 1, id);
+   SDCardWrite(ims->dataHWM, tile + written, 1);
    ims->dataHWM--;
    if (ims->dataHWM <= ims->indexHWM)
     return false;
@@ -166,7 +166,7 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
      //     assert(ims->indexHWM + 1 == ims->index[i].firstBlock + status->tilesAtCurrentZoom / INDEX_ITEMS_PER_BLOCK);
     }
    status->currentIndexBlock.checksum = CalcCRC(status->currentIndexBlock.idx, sizeof(status->currentIndexBlock.idx));
-   SDCardWrite(ims->indexHWM, &status->currentIndexBlock, 1, id);
+   SDCardWrite(ims->indexHWM, &status->currentIndexBlock, 1);
    ims->indexHWM++;
    if (ims->dataHWM <= ims->indexHWM)
     return false;
@@ -177,17 +177,17 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz, int id
  return true;
 }
 
-bool FsCommitIMS(IMS *ims, BlockAddr addr, int id)
+bool FsCommitIMS(IMS *ims, BlockAddr addr)
 {
  ims->status = IMS_READY;
  ims->checksum = CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum));
  // assert(sizeof(*ims) <= BLOCK_SIZE);
  ui8 b[BLOCK_SIZE];
  *(IMS *)b = *ims;
- return SDCardWrite(addr, b, 1, id);
+ return SDCardWrite(addr, b, 1);
 }
 
-void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
+void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst)
 {
  DecompState s;
  DecompImit(&s, dst);
@@ -196,7 +196,7 @@ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst, int id)
  for (ui32 i = 0; i < sz; ++i)
   {
    if (0 == (i % BLOCK_SIZE))
-    if (!SDCardRead(addr--, b, 1, id))
+    if (!SDCardRead(addr--, b, 1))
      return;
    DeCompressOne(b[i % BLOCK_SIZE], &s);
   }
