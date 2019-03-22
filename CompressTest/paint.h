@@ -2,7 +2,6 @@
 #define __PAINT_H
 
 #include "types.h"
-#include "screen.h"
 
 #ifdef _WINDOWS
 void DisplayRedraw(HDC hdc);

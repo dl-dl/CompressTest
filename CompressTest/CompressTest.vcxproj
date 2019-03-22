@@ -229,7 +229,6 @@
     <ClInclude Include="sd.h" />
     <ClInclude Include="sizes.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="text.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
@@ -246,7 +245,6 @@
     <ClCompile Include="paint.cpp" />
     <ClCompile Include="sd.cpp" />
     <ClCompile Include="graph.c" />
-    <ClCompile Include="text.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CompressTest.rc" />

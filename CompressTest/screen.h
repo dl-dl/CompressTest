@@ -5,19 +5,14 @@
 
 typedef struct
 {
-	ui8 pix[SCREEN_CY / 2];
+	ui8 pix[SCREEN_DY / 2];
 } ScreenLine;
-
-typedef struct
-{
-	ScreenLine line[SCREEN_CX];
-} Screen;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
- extern Screen screen;
+ extern ScreenLine screen[SCREEN_DX];
 #ifdef __cplusplus
 }
 #endif

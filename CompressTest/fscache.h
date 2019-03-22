@@ -8,7 +8,7 @@ typedef struct
 {
  ui8 zoom;
  ui32 tileX, tileY;
- ui8 data[TILE_CX * TILE_CY / 2];
+ ui8 data[TILE_DX * TILE_DY / 2];
 } MapCacheItem;
 
 typedef struct

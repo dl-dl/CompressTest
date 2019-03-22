@@ -3,11 +3,11 @@
 
 #include "types.h"
 
-#define SCREEN_CX 240
-#define SCREEN_CY 400
+#define SCREEN_DX 240
+#define SCREEN_DY 400
 
-#define TILE_CX 256
-#define TILE_CY 256
+#define TILE_DX 256
+#define TILE_DY 256
 
 #define DEV_RED 0x08
 #define DEV_GREEN 0x04

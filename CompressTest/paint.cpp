@@ -6,6 +6,9 @@
 #include <windows.h>
 #include <vector>
 #include "paint.h"
+#include "screen.h"
+
+ScreenLine screen[SCREEN_DX];
 
 static const int BORDERX = -32;
 static const int BORDERY = -32;
@@ -20,9 +23,9 @@ static void InitButtons()
   for (int j = 0; j < 2; ++j)
    {
     RECT r;
-    r.left = (SCREEN_CX - BORDERX) * j;
+    r.left = (SCREEN_DX - BORDERX) * j;
     r.right = r.left - BORDERX;
-    r.top = SCREEN_CY * i / 4 - BORDERY * 2;
+    r.top = SCREEN_DY * i / 4 - BORDERY * 2;
     r.bottom = r.top - BORDERY;
     buttons.push_back(r);
    }
@@ -57,18 +60,18 @@ void DisplayRedraw(HDC hdc)
 
  SetWindowOrgEx(hdc, BORDERX, BORDERY, NULL);
  HDC hdcMem = CreateCompatibleDC(hdc);
- HBITMAP memBM = CreateCompatibleBitmap(hdc, SCREEN_CX, SCREEN_CY);
+ HBITMAP memBM = CreateCompatibleBitmap(hdc, SCREEN_DX, SCREEN_DY);
  HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, (HGDIOBJ)memBM);
 
- for (int x = 0; x < SCREEN_CX; ++x)
-  for (int y = 0; y < SCREEN_CY / 2; ++y)
+ for (int x = 0; x < SCREEN_DX; ++x)
+  for (int y = 0; y < SCREEN_DY / 2; ++y)
    {
-    ui8 c = screen.line[x].pix[y];
+    ui8 c = screen[x].pix[y];
     SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c));
     SetPixelV(hdcMem, x, y * 2, TranslateColor(c >> 4));
    }
 
- BitBlt(hdc, 0, 0, SCREEN_CX, SCREEN_CY, hdcMem, 0, 0, SRCCOPY);
+ BitBlt(hdc, 0, 0, SCREEN_DX, SCREEN_DY, hdcMem, 0, 0, SRCCOPY);
 
  SelectObject(hdcMem, hbmOld);
  DeleteDC(hdcMem);

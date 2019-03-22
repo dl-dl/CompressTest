@@ -5,7 +5,6 @@
 #include "sizes.h"
 #include "fs.h"
 #include "fscache.h"
-#include "screen.h"
 #include "devio.h"
 
 typedef struct

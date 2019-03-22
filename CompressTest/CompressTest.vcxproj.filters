@@ -54,9 +54,6 @@
     <ClInclude Include="screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="devfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,9 +99,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graph.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="text.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="devio.cpp">

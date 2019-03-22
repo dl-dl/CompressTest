@@ -1,9 +1,9 @@
 #include "types.h"
 #include "graph.h"
 #include "sizes.h"
+#include "screen.h"
+#include "devfont.h"
 #include <string.h>
-
-Screen screen;
 
 void DisplayClear()
 {
@@ -12,18 +12,18 @@ void DisplayClear()
 
 void DisplayPixel(int x, int y, ui8 color)
 {
- if ((unsigned)x >= SCREEN_CX)
+ if ((unsigned)x >= SCREEN_DX)
   return;
- if ((unsigned)y >= SCREEN_CY)
+ if ((unsigned)y >= SCREEN_DY)
   return;
  color &= 0x0F;
- ui8 b = screen.line[x].pix[y / 2];
- screen.line[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | color) : ((b & 0x0F) | (color << 4));
+ ui8 b = screen[x].pix[y / 2];
+ screen[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | color) : ((b & 0x0F) | (color << 4));
 }
 
 static void VLine(int x, int y, int height, ui8 color)
 {
- ui8 *ptr = &screen.line[x].pix[y / 2];
+ ui8 *ptr = &screen[x].pix[y / 2];
 
  if (y % 2)
   {
@@ -45,9 +45,9 @@ void DisplayFillRect(int left, int top, int width, int height, ui8 color)
   return;
  if (width <= 0)
   return;
- if (left + width > SCREEN_CX)
+ if (left + width > SCREEN_DX)
   return;
- if (top + height > SCREEN_CY)
+ if (top + height > SCREEN_DY)
   return;
 
  while (width--)
@@ -105,13 +105,70 @@ void DisplayCircle(int xm, int ym, int r, ui8 color)
 
 void CopyTileToScreen(const void *tile, int x, int y)
 {
- for (int i = 0; i < TILE_CX; ++i)
-  for (int j = 0; j < TILE_CY / 2; ++j)
+ for (int i = 0; i < TILE_DX; ++i)
+  for (int j = 0; j < TILE_DY / 2; ++j)
    {
     int ii = i + x;
     int jj = j + y;
-    if ((ii >= 0) && (ii < SCREEN_CX))
-     if ((jj >= 0) && (jj < SCREEN_CY / 2))
-      screen.line[ii].pix[jj] = *((ui8 *)tile + i * TILE_CY / 2 + j);
+    if ((ii >= 0) && (ii < SCREEN_DX))
+     if ((jj >= 0) && (jj < SCREEN_DY / 2))
+      screen[ii].pix[jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
    }
+}
+
+//===========================================
+
+static const DevFont *const Fonts[8] = {
+ // &font21x15,
+ // &font24x18,
+ // &font24x19,
+ // &font27x21,
+ // &font28x21,
+ &font32x25,
+ 0
+};
+
+static const unsigned char *FindChr(const DevFont *f, ui32 c)
+{
+ const ui32 numBlocks = sizeof(f->block) / sizeof(*(f->block));
+ for (ui32 i = 0; i < numBlocks; ++i)
+  {
+   if ((c >= f->block[i].base) && (c <= f->block[i].base + f->block[i].sz))
+    return &f->block[i].sym[(c - f->block[i].base) * (f->maxW * f->bytesH + 1)];
+  }
+ return f->block[0].sym;
+}
+
+static unsigned int DisplayChr(ui32 chr, ui32 x, ui32 y, const DevFont *f, ui8 color)
+{
+ const unsigned char *c = FindChr(f, chr);
+ for (ui32 i = 0; (i < c[0]); ++i)
+  {
+   for (ui32 j = 0; (j < f->h); ++j)
+    {
+     if (c[i * f->bytesH + 1 + j / 8] & (1 << (j % 8)))
+      DisplayPixel(x + i, y + j, color);
+    }
+  }
+ return c[0];
+}
+
+void DisplayText(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color)
+{
+ const DevFont *f = Fonts[fontType];
+ if (f == 0)
+  return;
+
+ for (ui32 i = 0; s[i]; ++i)
+  x += DisplayChr(s[i], x, y, f, color);
+}
+
+void DisplayTextW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color)
+{
+ const DevFont *f = Fonts[fontType];
+ if (f == 0)
+  return;
+
+ for (ui32 i = 0; s[i]; ++i)
+  x += DisplayChr(s[i], x, y, f, color);
 }

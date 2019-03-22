@@ -42,17 +42,17 @@ static NewTile getTile(int x, int y, ui8 z, const char* region)
 		return t;
 	free(png);
 
-	ui8* p24 = (ui8*)malloc(TILE_CX * TILE_CY * 3);
+	ui8* p24 = (ui8*)malloc(TILE_DX * TILE_DY * 3);
 	Invert24(b, p24);
 	free(b);
 
-	ui8* p8 = (ui8*)malloc(TILE_CX * TILE_CY);
+	ui8* p8 = (ui8*)malloc(TILE_DX * TILE_DY);
 	Convert24To8(p24, p8);
 	free(p24);
-	ui8* p4 = (ui8*)malloc(TILE_CX * TILE_CY / 2);
+	ui8* p4 = (ui8*)malloc(TILE_DX * TILE_DY / 2);
 	Convert8To4(p8, p4);
 	free(p8);
-	t.data = (ui8*)malloc(TILE_CX * TILE_CY + BLOCK_SIZE); // round up to BLOCK_SIZE
+	t.data = (ui8*)malloc(TILE_DX * TILE_DY + BLOCK_SIZE); // round up to BLOCK_SIZE
 	t.size = Compress4BitBuffer(p4, t.data);
 	return t;
 }
@@ -71,15 +71,15 @@ extern "C" void FsInit(int id)
 		"cher",
 		"aur"
 	};
-	r[0].left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_CY;
-	r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[0].bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_CY;
+	r[0].left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_DX;
+	r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
+	r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_DX;
+	r[0].bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_DY;
 
-	r[1].left = lon2tilex(-79.50f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[1].top = lat2tiley(44.01f, MAX_ZOOM_LEVEL) / TILE_CY;
-	r[1].right = lon2tilex(-79.46f, MAX_ZOOM_LEVEL) / TILE_CX;
-	r[1].bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_CY;
+	r[1].left = lon2tilex(-79.50f, MAX_ZOOM_LEVEL) / TILE_DX;
+	r[1].top = lat2tiley(44.01f, MAX_ZOOM_LEVEL) / TILE_DY;
+	r[1].right = lon2tilex(-79.46f, MAX_ZOOM_LEVEL) / TILE_DX;
+	r[1].bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
 
 	for (int i = 0; i < sizeof(r) / sizeof(*r); ++i)
 	{

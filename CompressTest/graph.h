@@ -1,7 +1,6 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 #include "types.h"
-#include "screen.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -14,6 +13,9 @@ extern "C"
  void DisplayFillRect(int left, int top, int width, int height, ui8 color);
  void DisplayCircle(int x, int y, int r, ui8 color);
  void CopyTileToScreen(const void *tile, int x, int y);
+
+ void DisplayText(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color);
+ void DisplayTextW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color);
 #ifdef __cplusplus
 }
 #endif

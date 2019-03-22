@@ -4,7 +4,6 @@
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
-#include "text.h"
 #include "devio.h"
 #if CREATE_NEW_SD
 #include "fsinit.h"
@@ -43,7 +42,7 @@ void DeviceInit()
  CacheInit(&dev.FsCache);
 
  dev.group.n = 0;
- dev.hardwareId = 3000;
+ dev.hardwareId = 3001;
  dev.zoom = 12;
  dev.currentPos.y = dev.currentPos.x = 0x7FFFFFFF;
 }
@@ -57,11 +56,11 @@ void AdjustScreenPos(PointInt pos)
 {
  pos.x = ScaleDownCoord(pos.x, dev.zoom);
  pos.y = ScaleDownCoord(pos.y, dev.zoom);
- pos.x -= SCREEN_CX / 2;
- pos.y -= SCREEN_CY / 2;
+ pos.x -= SCREEN_DX / 2;
+ pos.y -= SCREEN_DY / 2;
 
- if ((intabs(dev.screenStart.x - pos.x) > SCREEN_CX / 8) ||
-     (intabs(dev.screenStart.y - pos.y) > SCREEN_CY / 8))
+ if ((intabs(dev.screenStart.x - pos.x) > SCREEN_DX / 8) ||
+     (intabs(dev.screenStart.y - pos.y) > SCREEN_DY / 8))
   {
    dev.screenStart = pos;
   }
@@ -74,15 +73,15 @@ void DrawMap()
  DisplayClear();
 #endif
  PointInt pos;
- pos.x = dev.currentPos.x / TILE_CX;
- pos.y = dev.currentPos.y / TILE_CY;
+ pos.x = dev.currentPos.x / TILE_DX;
+ pos.y = dev.currentPos.y / TILE_DY;
  if (!CacheFetchIMS(&dev.FsCache, pos.x, pos.y))
   return;
 
- for (int x = (dev.screenStart.x / TILE_CX) * TILE_CX; x < dev.screenStart.x + SCREEN_CX; x += TILE_CX)
-  for (int y = (dev.screenStart.y / TILE_CY) * TILE_CY; y < dev.screenStart.y + SCREEN_CY; y += TILE_CY)
+ for (int x = (dev.screenStart.x / TILE_DX) * TILE_DX; x < dev.screenStart.x + SCREEN_DX; x += TILE_DX)
+  for (int y = (dev.screenStart.y / TILE_DY) * TILE_DY; y < dev.screenStart.y + SCREEN_DY; y += TILE_DY)
    {
-    ui32 index = CacheRead(&dev.FsCache, x / TILE_CX, y / TILE_CY, dev.zoom);
+    ui32 index = CacheRead(&dev.FsCache, x / TILE_DX, y / TILE_DY, dev.zoom);
     CopyTileToScreen(dev.FsCache.map[index].data, x - dev.screenStart.x, (y - dev.screenStart.y) / 2);
    }
 }
