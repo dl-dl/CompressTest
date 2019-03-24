@@ -13,4 +13,4 @@ extern "C"
 }
 #endif
 
-#endif /* __sound_h */
+#endif // __sound_h

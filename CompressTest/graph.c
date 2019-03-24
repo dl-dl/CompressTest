@@ -9,9 +9,9 @@ static const ui8 colorHi[8] = { 0, 0x20, 0x40, 0x80, 0x60, 0xC0, 0xA0, 0xE0 };
 static const ui8 colorLo[8] = { 0, 0x02, 0x04, 0x08, 0x06, 0x0C, 0x0A, 0x0E };
 static const ui8 colorHL[8] = { 0, 0x22, 0x44, 0x88, 0x66, 0xCC, 0xAA, 0xEE };
 
-void DisplayClear()
+void DisplayClear(ui8 color)
 {
- memset(&screen, 0, sizeof(screen));
+ memset(&Screen, color | (color << 4), sizeof(Screen));
 }
 
 void DisplayPixel(int x, int y, ui8 c)
@@ -21,13 +21,13 @@ void DisplayPixel(int x, int y, ui8 c)
  if ((unsigned)y >= SCREEN_DY)
   return;
  c &= 0x07;
- ui8 b = screen[x].pix[y / 2];
- screen[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | colorLo[c]) : ((b & 0x0F) | colorHi[c]);
+ ui8 b = Screen[x].pix[y / 2];
+ Screen[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | colorLo[c]) : ((b & 0x0F) | colorHi[c]);
 }
 
 static void VLine(int x, int y, int height, ui8 c)
 {
- ui8 *ptr = &screen[x].pix[y / 2];
+ ui8 *ptr = &Screen[x].pix[y / 2];
 
  if (y % 2)
   {
@@ -116,19 +116,24 @@ void CopyTileToScreen(const void *tile, int x, int y)
     int jj = j + y;
     if ((ii >= 0) && (ii < SCREEN_DX))
      if ((jj >= 0) && (jj < SCREEN_DY / 2))
-      screen[ii].pix[SCREEN_DY / 2 - 1 - jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
+      Screen[ii].pix[SCREEN_DY / 2 - 1 - jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
+   }
+}
+
+void DisplayRainbow()
+{
+ for (ui16 x = 0; x < SCREEN_DX; x++)
+  for (ui16 y = 0; y < SCREEN_DY / 2; y++)
+   {
+    Screen[x].pix[y] = colorHL[y / 25];
    }
 }
 
 //===========================================
 
-static const DevFont *const Fonts[8] = {
- // &font21x15,
- // &font24x18,
- // &font24x19,
- // &font27x21,
- // &font28x21,
+static const DevFont *const Fonts[] = {
  &font32x25,
+ &font24x19,
  0
 };
 

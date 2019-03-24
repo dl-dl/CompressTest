@@ -225,7 +225,7 @@
     <ClInclude Include="graph.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="paint.h" />
+    <ClInclude Include="display.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="sd.h" />
     <ClInclude Include="sizes.h" />
@@ -237,6 +237,7 @@
     <ClCompile Include="CompressTest.cpp" />
     <ClCompile Include="convert.c" />
     <ClCompile Include="coord.c" />
+    <ClCompile Include="devfont24x19.c" />
     <ClCompile Include="devfont32x25.c" />
     <ClCompile Include="device.c" />
     <ClCompile Include="devio.cpp" />
@@ -244,7 +245,7 @@
     <ClCompile Include="fscache.c" />
     <ClCompile Include="fsinit.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="paint.cpp" />
+    <ClCompile Include="display.cpp" />
     <ClCompile Include="sd.cpp" />
     <ClCompile Include="graph.c" />
     <ClCompile Include="sound.cpp" />

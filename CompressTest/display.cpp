@@ -5,11 +5,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <vector>
-#include "paint.h"
+#include "display.h"
 #include "screen.h"
 #include "color.h"
 
-ScreenLine screen[SCREEN_DX];
+ScreenLine Screen[SCREEN_DX];
 
 static const int BORDERX = -32;
 static const int BORDERY = -32;
@@ -71,7 +71,7 @@ void DisplayRedraw(HDC hdc)
  for (int x = 0; x < SCREEN_DX; ++x)
   for (int y = 0; y < SCREEN_DY / 2; ++y)
    {
-    ui8 c = screen[x].pix[SCREEN_DY / 2 - y];
+    ui8 c = Screen[x].pix[SCREEN_DY / 2 - y];
     SetPixelV(hdcMem, x, y * 2, TranslateColor(c & 0x0F));
     SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c >> 4));
    }

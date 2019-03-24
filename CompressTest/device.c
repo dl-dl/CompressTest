@@ -72,7 +72,7 @@ void DrawMap()
 {
  AdjustScreenPos(dev.currentPos);
 #ifdef _DEBUG
- DisplayClear();
+ DisplayClear(0);
 #endif
  if (!CacheFetchIMS(&dev.FsCache, dev.currentPos.x / TILE_DX, dev.currentPos.y / TILE_DY))
   return;

@@ -10,7 +10,7 @@
 #include "device.h"
 #include "coord.h"
 #include "graph.h"
-#include "paint.h"
+#include "display.h"
 #include "sizes.h"
 #include "devio.h"
 #include "devioimpl.h"

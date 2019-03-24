@@ -12,7 +12,7 @@ typedef struct
 extern "C"
 {
 #endif
- extern ScreenLine screen[SCREEN_DX];
+ extern ScreenLine Screen[SCREEN_DX];
 #ifdef __cplusplus
 }
 #endif
