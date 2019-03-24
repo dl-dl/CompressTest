@@ -62,7 +62,7 @@ static void forgetTile(NewTile t)
 	free(t.data);
 }
 
-extern "C" void FsInit(int id)
+extern "C" void FsInit()
 {
 	IMS ims;
 	const int NUM_REG = 2;

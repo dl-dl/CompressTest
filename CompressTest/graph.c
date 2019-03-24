@@ -5,38 +5,42 @@
 #include "devfont.h"
 #include <string.h>
 
+static const ui8 colorHi[8] = { 0, 0x20, 0x40, 0x80, 0x60, 0xC0, 0xA0, 0xE0 };
+static const ui8 colorLo[8] = { 0, 0x02, 0x04, 0x08, 0x06, 0x0C, 0x0A, 0x0E };
+static const ui8 colorHL[8] = { 0, 0x22, 0x44, 0x88, 0x66, 0xCC, 0xAA, 0xEE };
+
 void DisplayClear()
 {
  memset(&screen, 0, sizeof(screen));
 }
 
-void DisplayPixel(int x, int y, ui8 color)
+void DisplayPixel(int x, int y, ui8 c)
 {
  if ((unsigned)x >= SCREEN_DX)
   return;
  if ((unsigned)y >= SCREEN_DY)
   return;
- color &= 0x0F;
+ c &= 0x07;
  ui8 b = screen[x].pix[y / 2];
- screen[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | color) : ((b & 0x0F) | (color << 4));
+ screen[x].pix[y / 2] = (y % 2) ? ((b & 0xF0) | colorLo[c]) : ((b & 0x0F) | colorHi[c]);
 }
 
-static void VLine(int x, int y, int height, ui8 color)
+static void VLine(int x, int y, int height, ui8 c)
 {
  ui8 *ptr = &screen[x].pix[y / 2];
 
  if (y % 2)
   {
-   *ptr = (*ptr & 0xF0) | color;
+   *ptr = (*ptr & 0xF0) | colorLo[c];
    ptr++;
    height--;
   }
 
  for (ui16 cnt = height / 2; cnt--;)
-  *ptr++ = (color << 4) | color;
+  *ptr++ = colorHL[c];
 
  if (height % 2)
-  *ptr = ((*ptr & 0x0F) | (color << 4));
+  *ptr = ((*ptr & 0x0F) | colorHi[c]);
 }
 
 void DisplayFillRect(int left, int top, int width, int height, ui8 color)
@@ -112,7 +116,7 @@ void CopyTileToScreen(const void *tile, int x, int y)
     int jj = j + y;
     if ((ii >= 0) && (ii < SCREEN_DX))
      if ((jj >= 0) && (jj < SCREEN_DY / 2))
-      screen[ii].pix[jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
+      screen[ii].pix[SCREEN_DY / 2 - 1 - jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
    }
 }
 
@@ -142,12 +146,13 @@ static const unsigned char *FindChr(const DevFont *f, ui32 c)
 static unsigned int DisplayChr(ui32 chr, ui32 x, ui32 y, const DevFont *f, ui8 color)
 {
  const unsigned char *c = FindChr(f, chr);
- for (ui32 i = 0; (i < c[0]); ++i)
+ y += f->h;
+ for (ui32 i = 0; i < c[0]; ++i)
   {
-   for (ui32 j = 0; (j < f->h); ++j)
+   for (ui32 j = 0; j < f->h; ++j)
     {
      if (c[i * f->bytesH + 1 + j / 8] & (1 << (j % 8)))
-      DisplayPixel(x + i, y + j, color);
+      DisplayPixel(x + i, y - j, color);
     }
   }
  return c[0];

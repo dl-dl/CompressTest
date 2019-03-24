@@ -212,6 +212,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="color.h" />
     <ClInclude Include="convert.h" />
     <ClInclude Include="coord.h" />
     <ClInclude Include="devfont.h" />

@@ -7,6 +7,7 @@
 #include <vector>
 #include "paint.h"
 #include "screen.h"
+#include "color.h"
 
 ScreenLine screen[SCREEN_DX];
 
@@ -48,6 +49,10 @@ static void DrawButtons(HDC hdc)
   FillRect(hdc, &buttons[i], (HBRUSH)GetStockObject(GRAY_BRUSH));
 }
 
+#define DEV_RED 0x08
+#define DEV_GREEN 0x04
+#define DEV_BLUE 0x02
+
 static inline COLORREF TranslateColor(ui8 c)
 {
  return RGB((c & DEV_RED) ? 0xFF : 0, (c & DEV_GREEN) ? 0xFF : 0, (c & DEV_BLUE) ? 0xFF : 0);
@@ -66,9 +71,9 @@ void DisplayRedraw(HDC hdc)
  for (int x = 0; x < SCREEN_DX; ++x)
   for (int y = 0; y < SCREEN_DY / 2; ++y)
    {
-    ui8 c = screen[x].pix[y];
-    SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c));
-    SetPixelV(hdcMem, x, y * 2, TranslateColor(c >> 4));
+    ui8 c = screen[x].pix[SCREEN_DY / 2 - y];
+    SetPixelV(hdcMem, x, y * 2, TranslateColor(c & 0x0F));
+    SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c >> 4));
    }
 
  BitBlt(hdc, 0, 0, SCREEN_DX, SCREEN_DY, hdcMem, 0, 0, SRCCOPY);

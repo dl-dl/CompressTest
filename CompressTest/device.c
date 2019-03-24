@@ -6,6 +6,7 @@
 #include "graph.h"
 #include "sound.h"
 #include "devio.h"
+#include "color.h"
 #if CREATE_NEW_SD
 #include "fsinit.h"
 #endif
@@ -36,8 +37,8 @@ static void DrawCompass(void);
 void DeviceInit()
 {
 #if CREATE_NEW_SD
- FsFormat(id);
- FsInit(id);
+ FsFormat();
+ FsInit();
 #endif
  //	BlockAddr sz = FsFreeSpace();
  CacheInit(&dev.FsCache);
@@ -73,10 +74,7 @@ void DrawMap()
 #ifdef _DEBUG
  DisplayClear();
 #endif
- PointInt pos;
- pos.x = dev.currentPos.x / TILE_DX;
- pos.y = dev.currentPos.y / TILE_DY;
- if (!CacheFetchIMS(&dev.FsCache, pos.x, pos.y))
+ if (!CacheFetchIMS(&dev.FsCache, dev.currentPos.x / TILE_DX, dev.currentPos.y / TILE_DY))
   return;
 
  for (int x = (dev.screenStart.x / TILE_DX) * TILE_DX; x < dev.screenStart.x + SCREEN_DX; x += TILE_DX)
@@ -90,13 +88,13 @@ void DrawMap()
 static void DrawTouristMarker(ui32 x, ui32 y, int dd, int hardwareId)
 {
  for (int k = -1; k <= 1; ++k)
-  DisplayLine(x - dd, y + k, x + dd, y + k, (k == 0) ? DEV_RED : DEV_WHITE);
+  DisplayLine(x - dd, y + k, x + dd, y + k, (k == 0) ? CLR_RED : CLR_WHITE);
  for (int k = -1; k <= 1; ++k)
-  DisplayLine(x + k, y - dd, x + k, y + dd, (k == 0) ? DEV_RED : DEV_WHITE);
+  DisplayLine(x + k, y - dd, x + k, y + dd, (k == 0) ? CLR_RED : CLR_WHITE);
  char s[2];
  s[0] = '0' + hardwareId % 8;
  s[1] = 0;
- DisplayText(s, x + 2, y - 27, 0, DEV_RED);
+ DisplayText(s, x + 2, y, 0, CLR_RED);
 }
 
 void DrawGroup()
@@ -106,23 +104,20 @@ void DrawGroup()
    const GroupItem *p = &dev.group.g[i];
    ui32 x = ScaleDownCoord(p->x, dev.zoom) - dev.screenStart.x;
    ui32 y = ScaleDownCoord(p->y, dev.zoom) - dev.screenStart.y;
-   DrawTouristMarker(x, y, 5, p->hardwareId);
+   DrawTouristMarker(x, SCREEN_DY - y, 5, p->hardwareId);
   }
  ui32 x = ScaleDownCoord(dev.currentPos.x, dev.zoom) - dev.screenStart.x;
  ui32 y = ScaleDownCoord(dev.currentPos.y, dev.zoom) - dev.screenStart.y;
- DrawTouristMarker(x, y, 10, dev.hardwareId);
+ DrawTouristMarker(x, SCREEN_DY - y, 10, dev.hardwareId);
 }
 
 void DrawCompass()
 {
  const int COMPASS_POS_X = 20;
- const int COMPASS_POS_Y = 20;
+ const int COMPASS_POS_Y = SCREEN_DY - 20;
  const int COMPASS_R = 16;
- //	const int COMPASS_POS_X = 120;
- //	const int COMPASS_POS_Y = 200;
- //	const int COMPASS_R = COMPASS_POS_X - 8;
 
- DisplayCircle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, DEV_RED);
+ DisplayCircle(COMPASS_POS_X, COMPASS_POS_Y, COMPASS_R, CLR_RED);
  const ui32 MIN2_COMPASS = 0x100;  // TODO: find reasonable value
  const ui32 MIN3_COMPASS = 0x1000; // TODO: find reasonable value
  CompassData d = dev.currentCompass;
@@ -139,9 +134,9 @@ void DrawCompass()
    return;
   }
 
- DisplayLine(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_POS_X + d.x, COMPASS_POS_Y + d.y, DEV_RED);
- DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8, DEV_RED);
- DisplayCircle(COMPASS_POS_X - d.x, COMPASS_POS_Y - d.y, COMPASS_R / 8 + 1, DEV_RED | DEV_GREEN | DEV_BLUE);
+ DisplayLine(COMPASS_POS_X - d.y, COMPASS_POS_Y + d.x, COMPASS_POS_X + d.y, COMPASS_POS_Y - d.x, CLR_RED);
+ DisplayCircle(COMPASS_POS_X - d.y, COMPASS_POS_Y + d.x, COMPASS_R / 8, CLR_RED);
+ DisplayCircle(COMPASS_POS_X - d.y, COMPASS_POS_Y + d.x, COMPASS_R / 8 + 1, CLR_WHITE);
 }
 
 static int FindInGroup(const GroupData *g, int hardwareId)

@@ -160,8 +160,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 static PointFloat NextGps(WPARAM w)
 {
- //static PointFloat point = { 38.39f, 56.01f };
- static PointFloat point = { -79.48f, 44.00f };
+ static PointFloat point = { 38.39f, 56.01f };
+ //static PointFloat point = { -79.48f, 44.00f };
 
  if (VK_UP == w)
   point.y += 0.001f;

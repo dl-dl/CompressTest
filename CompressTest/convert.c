@@ -2,62 +2,9 @@
 #include "sizes.h"
 #include <string.h>
 
-static ui8 FindColor(ui8 bCol, ui8 gCol, ui8 rCol)
-{
- static const ui8 ColorTabl[22][4] = {
-  { 0x3F, 0x00, 0x00, 1 },
-  { 0x7F, 0x00, 0x00, 1 },
-  { 0xFF, 0x00, 0x00, 1 },
-  { 0x00, 0x3F, 0x00, 2 },
-  { 0x00, 0x7F, 0x00, 2 },
-  { 0x00, 0xFF, 0x00, 2 },
-  { 0x3F, 0x3F, 0x00, 3 },
-  { 0x7F, 0x7F, 0x00, 3 },
-  { 0xFF, 0xFF, 0x00, 3 },
-  { 0x00, 0x00, 0x3F, 4 },
-  { 0x00, 0x00, 0x7F, 4 },
-  { 0x00, 0x00, 0xFF, 4 },
-  { 0x3F, 0x00, 0x3F, 5 },
-  { 0x7F, 0x00, 0x7F, 5 },
-  { 0xFF, 0x00, 0xFF, 5 },
-  { 0x00, 0x3F, 0x3F, 6 },
-  { 0x00, 0x7F, 0x7F, 6 },
-  { 0x00, 0xFF, 0xFF, 6 },
-  { 0x3F, 0x3F, 0x3F, 0 },
-  { 0x7F, 0x7F, 0x7F, 0 },
-  { 0xFF, 0xFF, 0xFF, 7 },
-  { 0x00, 0x00, 0x00, 0 }
- };
-
- unsigned int diff;
- unsigned int minDiff = 0x1000000;
- ui8 minNum;
-
- for (int cnt = 0; cnt < 22; cnt++)
-  {
-   if (bCol > ColorTabl[cnt][0])
-    diff = bCol - ColorTabl[cnt][0];
-   else
-    diff = ColorTabl[cnt][0] - bCol;
-
-   if (gCol > ColorTabl[cnt][1])
-    diff += gCol - ColorTabl[cnt][1];
-   else
-    diff += ColorTabl[cnt][1] - gCol;
-
-   if (rCol > ColorTabl[cnt][2])
-    diff += rCol - ColorTabl[cnt][2];
-   else
-    diff += ColorTabl[cnt][2] - rCol;
-
-   if (diff < minDiff)
-    {
-     minDiff = diff;
-     minNum = cnt;
-    }
-  }
- return (ColorTabl[minNum][3] << 1);
-}
+#define DEV_RED 0x08
+#define DEV_GREEN 0x04
+#define DEV_BLUE 0x02
 
 void Invert24(const void *src, void *dst)
 {
@@ -82,34 +29,6 @@ void Invert8(const void *src, void *dst)
    for (int x = 0; x < TILE_DX; x++)
     {
      *((ui8 *)dst + x * TILE_DY + y) = srcRow[x];
-    }
-  }
-}
-
-void ConvertInv24To8Approx(const void *src, void *dst)
-{
- for (int y = 0; y < TILE_DY; y++)
-  {
-   const ui8 *srcPtr = (ui8 *)src + y * TILE_DX * 3;
-   for (int x = 0; x < TILE_DX; x++)
-    {
-     ui8 bCol = *srcPtr++;
-     ui8 gCol = *srcPtr++;
-     ui8 rCol = *srcPtr++;
-     *((ui8 *)dst + x * TILE_DY + y) = FindColor(bCol, gCol, rCol);
-    }
-  }
-}
-
-void Convert24To8Approx(const void *src, void *dst)
-{
- for (int x = 0; x < TILE_DX; x++)
-  {
-   ui8 *dstCol = (ui8 *)dst + x * TILE_DY;
-   for (int y = 0; y < TILE_DY; y++)
-    {
-     const ui8 *ptr = (ui8 *)src + (x * TILE_DY + y) * 3;
-     dstCol[y] = FindColor(ptr[0], ptr[1], ptr[2]);
     }
   }
 }
@@ -154,7 +73,7 @@ void Convert8To4(const void *src, void *dst)
    const ui8 *srcCol = (ui8 *)src + x * TILE_DY;
    ui8 *dstCol = (ui8 *)dst + x * TILE_DY / 2;
    for (int y = 0; y < TILE_DY / 2; y++)
-    dstCol[y] = (srcCol[y * 2] << 4) | srcCol[y * 2 + 1];
+    dstCol[y] = (srcCol[y * 2 + 1] << 4) | srcCol[y * 2];
   }
 }
 

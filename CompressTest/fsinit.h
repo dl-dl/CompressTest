@@ -5,7 +5,7 @@
 extern "C"
 {
 #endif
- void FsInit(int id);
+ void FsInit(void);
 #ifdef __cplusplus
 }
 #endif
