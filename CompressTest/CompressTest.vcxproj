@@ -224,6 +224,7 @@
     <ClInclude Include="fsinit.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="screen.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="sd.cpp" />
     <ClCompile Include="graph.c" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="map.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CompressTest.rc" />

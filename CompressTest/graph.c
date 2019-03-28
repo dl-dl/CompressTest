@@ -110,14 +110,16 @@ void DisplayCircle(int xm, int ym, int r, ui8 color)
 void CopyTileToScreen(const void *tile, int x, int y)
 {
  for (int i = 0; i < TILE_DX; ++i)
-  for (int j = 0; j < TILE_DY / 2; ++j)
-   {
-    int ii = i + x;
-    int jj = j + y;
-    if ((ii >= 0) && (ii < SCREEN_DX))
-     if ((jj >= 0) && (jj < SCREEN_DY / 2))
-      Screen[ii].pix[SCREEN_DY / 2 - 1 - jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
-   }
+  {
+   int ii = i + x;
+   if ((ii >= 0) && (ii < SCREEN_DX))
+    for (int j = 0; j < TILE_DY / 2; ++j)
+     {
+      int jj = j + y;
+      if ((jj >= 0) && (jj < SCREEN_DY / 2))
+       Screen[ii].pix[SCREEN_DY / 2 - 1 - jj] = *((ui8 *)tile + i * TILE_DY / 2 + j);
+     }
+  }
 }
 
 void DisplayRainbow()
@@ -125,7 +127,7 @@ void DisplayRainbow()
  for (ui16 x = 0; x < SCREEN_DX; x++)
   for (ui16 y = 0; y < SCREEN_DY / 2; y++)
    {
-    Screen[x].pix[y] = colorHL[y / 25];
+    Screen[x].pix[y] = colorHL[y / (SCREEN_DY / 16)];
    }
 }
 

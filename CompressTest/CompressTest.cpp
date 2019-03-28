@@ -28,8 +28,7 @@ static BOOL InitInstance(HINSTANCE, int);
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 extern DeviceInput input;
-struct Device;
-extern "C" Device dev;
+extern "C" ui8 MapZoom;
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS *)
 {
@@ -208,7 +207,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
      if ('+' == wParam || '-' == wParam)
       {
-       input.button.push_back(('-' == wParam) ? 0x80 : 0x20);
+       if ('+' == wParam)
+        {
+         if (MapZoom < 15)
+          MapZoom++;
+        }
+       else
+        {
+         if (MapZoom > 12)
+          MapZoom--;
+        }
       }
     }
     break;
@@ -235,7 +243,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
        ui8 b = TestButton(x, y);
        if (b)
         {
-         input.button.push_back(b);
         }
       }
     }

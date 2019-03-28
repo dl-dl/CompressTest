@@ -9,8 +9,6 @@ typedef struct
 {
  std::deque<PointFloat> gps;
  std::deque<CompassData> compass;
- std::deque<ui8> button;
- std::deque<RadioMsg> radio;
 } DeviceInput;
 
 #endif

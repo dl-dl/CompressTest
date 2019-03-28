@@ -28,7 +28,8 @@ static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr
  *dataHWM = SDCardSize() - 1;
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   SDCardRead(i, b, 1);
+   if (!SDCardRead(i, b, 1))
+    return false;
    const IMS *p = (IMS *)b;
    if (IMS_EMPTY == p->status)
     {
@@ -86,7 +87,8 @@ bool FsFindIMS(int x, int y, IMS *dst)
  ui8 b[BLOCK_SIZE];
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
-   SDCardRead(i, b, 1);
+   if (!SDCardRead(i, b, 1))
+    return false;
    const IMS *ims = (IMS *)b;
    if (ims->checksum != CalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum)))
     return false;
@@ -120,7 +122,8 @@ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)
 
  ui32 offs = dx * ims->index[i].ny + dy;
  ui8 b[BLOCK_SIZE];
- SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, 1);
+ if (!SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, 1))
+  return zero;
  const TileIndexBlock *p = (TileIndexBlock *)b;
  if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
   return zero;
