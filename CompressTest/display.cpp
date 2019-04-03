@@ -71,7 +71,7 @@ void DisplayRedraw(HDC hdc)
  for (int x = 0; x < SCREEN_DX; ++x)
   for (int y = 0; y < SCREEN_DY / 2; ++y)
    {
-    ui8 c = Screen[x].pix[SCREEN_DY / 2 - y];
+    ui8 c = Screen[x].pix[SCREEN_DY / 2 - 1 - y];
     SetPixelV(hdcMem, x, y * 2, TranslateColor(c & 0x0F));
     SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c >> 4));
    }
