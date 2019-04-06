@@ -3,7 +3,7 @@
 #include "fsinit.h"
 #include "fs.h"
 #include "sizes.h"
-#include "convert.h"
+#include "convert2.h"
 
 #include "lodepng.h"
 

@@ -223,6 +223,7 @@
     <ClInclude Include="fscache.h" />
     <ClInclude Include="fsinit.h" />
     <ClInclude Include="graph.h" />
+    <ClInclude Include="convert2.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="Resource.h" />
