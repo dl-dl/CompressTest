@@ -8,6 +8,7 @@
 #include "color.h"
 #include "map.h"
 #if CREATE_NEW_SD
+#include "fs.h"
 #include "fsinit.h"
 #endif
 
