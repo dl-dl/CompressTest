@@ -1,7 +1,6 @@
-#include "fs.h"
+#include "graph.h"
 #include "fs.h"
 #include "fscache.h"
-#include "graph.h"
 #include "sizes.h"
 #include "color.h"
 #include "tourist.h"
@@ -35,8 +34,31 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
 {
  static ui8 mode;
  static PointInt prevShift;
- static ui8 prevZoom;
  static PointInt ref;
+
+ if (mode)
+  {
+   if (0 == MapShiftH && 0 == MapShiftV)
+    mode = 0;
+  }
+ else
+  {
+   if (MapShiftH || MapShiftV)
+    {
+     mode = 1;
+     ref = center;
+     prevShift.x = prevShift.y = 0;
+    }
+  }
+
+ if (mode)
+  {
+   ref.x += (MapShiftH - prevShift.x) * ScaleUpCoord(SCREEN_DX / 2, MapZoom);
+   ref.y += (MapShiftV - prevShift.y) * ScaleUpCoord(SCREEN_DY / 2, MapZoom);
+   prevShift.x = MapShiftH;
+   prevShift.y = MapShiftV;
+   return ref;
+  }
 
  PointInt pos;
  pos.x = x;
