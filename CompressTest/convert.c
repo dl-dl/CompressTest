@@ -66,7 +66,7 @@ void DeCompressOne(ui8 src, DecompState *s)
     }
    else if (src & 0x01)
     {
-     s->numEqPixel = src >> 1;
+     s->numEqPixel = (src >> 1) + 2;
     }
    else if (src & 0x10)
     {

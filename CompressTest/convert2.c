@@ -105,6 +105,8 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
      cntEqLine++;
      if (cntEqLine < 0xFF)
       continue;
+     else
+      x++;
     }
 
    if (cntEqLine)
@@ -126,12 +128,12 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
         break;
        cntEqPix++;
        y1++;
-       if (cntEqPix >= 0x7F)
+       if (cntEqPix > 0x7F)
         break;
       }
      if (cntEqPix > 2)
       {
-       *CompressPtr++ = (cntEqPix << 1) | 0x01;
+       *CompressPtr++ = ((cntEqPix - 2) << 1) | 0x01;
        *CompressPtr++ = srcCol[y];
        y = y1;
       }
@@ -142,8 +144,7 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
       }
      else
       {
-       // assert(0 == srcCol[y] & 0x11)
-       *CompressPtr++ = srcCol[y];
+       *CompressPtr++ = srcCol[y] & ~0x11; // in case of bogus source
        y++;
       }
     }
