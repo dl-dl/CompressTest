@@ -85,7 +85,7 @@ void FsInit()
 	{
 		BlockAddr addr;
 		FsNewIMS(&ims, &addr, r + i);
-		for (ui8 z = 12; z <= 15; ++z)
+		for (ui8 z = 12; z <= 16; ++z)
 		{
 			NewMapStatus status;
 			ImsNextZoom(&ims, &status, z);

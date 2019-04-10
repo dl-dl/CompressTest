@@ -29,6 +29,8 @@ static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 extern DeviceInput input;
 extern "C" ui8 MapZoom;
+extern "C" si8 MapShiftH;
+extern "C" si8 MapShiftV;
 
 static void __cdecl trans_func(unsigned int code, EXCEPTION_POINTERS *)
 {
@@ -209,7 +211,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       {
        if ('+' == wParam)
         {
-         if (MapZoom < 15)
+         if (MapZoom < 16)
           MapZoom++;
         }
        else
@@ -217,6 +219,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
          if (MapZoom > 12)
           MapZoom--;
         }
+      }
+     else if (VK_RETURN == wParam)
+      {
+       MapShiftH = MapShiftV = 0;
+      }
+     else if ('1' == wParam)
+      {
+       MapShiftH--;
+      }
+     else if ('2' == wParam)
+      {
+       MapShiftH++;
+      }
+     else if ('3' == wParam)
+      {
+       MapShiftV--;
+      }
+     else if ('4' == wParam)
+      {
+       MapShiftV++;
       }
     }
     break;

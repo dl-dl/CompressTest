@@ -81,6 +81,9 @@
     <ClInclude Include="convert2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tourist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">

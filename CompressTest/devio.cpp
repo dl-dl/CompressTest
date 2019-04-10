@@ -1,13 +1,17 @@
 #include "sizes.h"
 #include "devio.h"
 #include "devioimpl.h"
+#include "tourist.h"
 
 DeviceInput input;
 extern "C"
 {
  ui32 CoordTileX = -1;
  ui32 CoordTileY = -1;
+ si8 MapShiftH;
+ si8 MapShiftV;
  ui8 MapZoom = 12;
+ TTourist Tourist[10];
 }
 
 void GetAdc()

@@ -43,6 +43,11 @@ static inline ui32 ScaleDownCoord(ui32 c, ui8 zoom)
  return c >> (MAX_ZOOM_LEVEL - zoom);
 }
 
+static inline ui32 ScaleUpCoord(ui32 c, ui8 zoom)
+{
+ return c << (MAX_ZOOM_LEVEL - zoom);
+}
+
 #ifdef __cplusplus
 extern "C"
 {

@@ -32,8 +32,8 @@ void DeviceInit()
 #if CREATE_NEW_SD
  FsFormat();
  FsInit();
+ BlockAddr sz = FsFreeSpace();
 #endif
- //	BlockAddr sz = FsFreeSpace();
 
  MapInit();
 
