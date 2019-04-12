@@ -131,20 +131,21 @@ unsigned int Compress4BitBuffer(const void *src, void *dst)
        if (cntEqPix > 0x7F)
         break;
       }
+     ui8 c = srcCol[y] & ~0x11; // & ~0x11: in case of bogus source
      if (cntEqPix > 2)
       {
        *CompressPtr++ = ((cntEqPix - 2) << 1) | 0x01;
-       *CompressPtr++ = srcCol[y];
+       *CompressPtr++ = c;
        y = y1;
       }
      else if (cntEqPix == 2)
       {
-       *CompressPtr++ = srcCol[y] | 0x10;
+       *CompressPtr++ = c | 0x10;
        y = y1;
       }
      else
       {
-       *CompressPtr++ = srcCol[y] & ~0x11; // in case of bogus source
+       *CompressPtr++ = c;
        y++;
       }
     }

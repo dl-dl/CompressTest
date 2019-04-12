@@ -4,7 +4,9 @@
 #ifdef _MSC_VER
 #include <assert.h>
 #else
-#define assert(expression) ((void)0)
+#include "sound.h"
+#define assert(expression) (void)((!!(expression)) || (Sound(10, 100), 0))
+//#define assert(expression) ((void)0)
 #endif
 
 void DecompImit(DecompState *s, ui8 *dst)

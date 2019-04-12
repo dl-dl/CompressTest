@@ -6,7 +6,9 @@
 #ifdef _MSC_VER
 #include <assert.h>
 #else
-#define assert(expression) ((void)0)
+#include "sound.h"
+#define assert(expression) (void)((!!(expression)) || (Sound(10, 100), 0))
+//#define assert(expression) ((void)0)
 #endif
 
 static ui32 CalcCRC(const void *data, ui32 sz) // TODO: implement proper algorithm
@@ -204,7 +206,10 @@ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst)
   {
    if (0 == (i % BLOCK_SIZE))
     if (!SDCardRead(addr--, b, 1))
-     return;
+     {
+      assert(0);
+      return;
+     }
    DeCompressOne(b[i % BLOCK_SIZE], &s);
   }
  assert(s.y == 0);
