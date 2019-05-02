@@ -4,6 +4,9 @@
 #include "fs.h"
 #include "sizes.h"
 #include "convert2.h"
+#ifdef _DEBUG
+#include "convert.h"
+#endif
 
 #include "lodepng.h"
 
@@ -52,8 +55,17 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
  ui8 *p4 = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
  Convert8To4(p8, p4);
  free(p8);
- t.data = (ui8 *)malloc(TILE_DX * TILE_DY + BLOCK_SIZE); // round up to BLOCK_SIZE
+ t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2 + BLOCK_SIZE); // round up to BLOCK_SIZE
  t.size = Compress4BitBuffer(p4, t.data);
+#ifdef _DEBUG
+ ui8 *tile = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
+ DecompState s;
+ DecompImit(&s, tile);
+ for (ui32 i = 0; i < t.size; ++i)
+   DeCompressOne(t.data[i], &s);
+ assert(0 == memcmp(p4, tile, TILE_DX * TILE_DY / 2));
+ free(tile);
+#endif
  free(p4);
  return t;
 }

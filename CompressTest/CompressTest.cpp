@@ -132,13 +132,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    do
     {
      DWORD n;
-     ReadFile(hCommPort, s + total, 2 - total, &n, NULL);
+     if (!ReadFile(hCommPort, s + total, 2 - total, &n, NULL))
+      throw "READ ERR";
      total += n;
      Sleep(0);
     }
    while (total < 2);
    if (memcmp(s, "Ok", 2))
-    throw "ERR";
+    throw "DEVICE ERR";
   }
  CloseHandle(hCommPort);
  CloseHandle(src);

@@ -17,6 +17,15 @@ static HANDLE sdopen()
    char fname[] = "SD0.BIN";
 #if CREATE_NEW_SD
    file_handle = CreateFileA(fname, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+   ui8 b[BLOCK_SIZE];
+   memset(b, 0, BLOCK_SIZE);
+   for (BlockAddr i = 0; i < SDCardSize(); ++i)
+    {
+     DWORD n;
+     BOOL res = WriteFile(file_handle, b, BLOCK_SIZE, &n, NULL);
+     assert(res);
+     assert(n == BLOCK_SIZE);
+    }
 #else
    file_handle = CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
