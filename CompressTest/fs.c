@@ -114,9 +114,9 @@ bool FsFindIMS(int x, int y, IMS *dst)
 
 TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)
 {
- TileIndexItem zero = { 0, 0 };
  assert(zoom >= MIN_ZOOM_LEVEL);
  assert(zoom <= MAX_ZOOM_LEVEL);
+ const TileIndexItem zero = { 0, 0 };
  ui32 i = zoom - MIN_ZOOM_LEVEL;
  if (0 == ims->index[i].firstBlock)
   return zero;
@@ -127,9 +127,15 @@ TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)
   return zero;
 
  ui32 offs = dx * ims->index[i].ny + dy;
- ui8 b[BLOCK_SIZE];
- if (!SDCardRead(ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK, b, 1))
-  return zero;
+ BlockAddr n = ims->index[i].firstBlock + offs / INDEX_ITEMS_PER_BLOCK;
+ static ui8 b[BLOCK_SIZE];
+ static BlockAddr lastIndex = -1;
+ if (lastIndex != n)
+  {
+   if (!SDCardRead(n, b, 1))
+    return zero;
+   lastIndex = n;
+  }
  const TileIndexBlock *p = (TileIndexBlock *)b;
  if (p->checksum != CalcCRC(p->idx, sizeof(p->idx)))
   return zero;

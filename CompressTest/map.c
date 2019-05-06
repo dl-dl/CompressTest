@@ -77,20 +77,24 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
 
 void DrawMap()
 {
- if (!CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY))
-  return;
-
  map.screenCenter = AdjustScreenPos(CoordTileX, CoordTileY, map.screenCenter);
  PointInt start;
  start.x = ScaleDownCoord(map.screenCenter.x, MapZoom) - SCREEN_DX / 2;
  start.y = ScaleDownCoord(map.screenCenter.y, MapZoom) - SCREEN_DY / 2;
 
- for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
-  for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)
-   {
-    ui32 index = CacheRead(&map.FsCache, x / TILE_DX, y / TILE_DY, MapZoom);
-    CopyTileToScreen(map.FsCache.map[index].data, x - start.x, (y - start.y) / 2);
-   }
+ if (CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY))
+  {
+   for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
+    for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)
+     {
+      ui32 index = CacheRead(&map.FsCache, x / TILE_DX, y / TILE_DY, MapZoom);
+      CopyTileToScreen(map.FsCache.map[index].data, x - start.x, (y - start.y) / 2);
+     }
+  }
+ else
+  {
+   DisplayClear(0);
+  }
 }
 
 static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
