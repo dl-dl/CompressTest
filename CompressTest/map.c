@@ -97,16 +97,49 @@ void DrawMap()
   }
 }
 
-static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
+static void DrawHaircross(int x, int y, int dd)
 {
  for (int k = -1; k <= 1; ++k)
   DisplayLine(x - dd, y + k, x + dd, y + k, (k == 0) ? CLR_RED : CLR_WHITE);
  for (int k = -1; k <= 1; ++k)
   DisplayLine(x + k, y - dd, x + k, y + dd, (k == 0) ? CLR_RED : CLR_WHITE);
- char s[2];
- s[0] = '0' + hardwareId % 8;
- s[1] = 0;
- DisplayText(s, x + 2, y, 0, CLR_RED);
+}
+
+static void DrawArrow(int x, int y)
+{
+ const int sz = 5;
+ DisplayLine(x - sz, y - sz, x + sz, y + sz, CLR_RED);
+ DisplayLine(x - sz, y + sz, x + sz, y - sz, CLR_RED);
+}
+
+static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
+{
+ int coordOk = 0;
+ if (x < 0)
+  x = 0;
+ else if (x >= SCREEN_DX)
+  x = SCREEN_DX - 1;
+ else
+  coordOk++;
+ if (y < 0)
+  y = 0;
+ else if (y > SCREEN_DY)
+  y = SCREEN_DY - 1;
+ else
+  coordOk++;
+
+ if (2 == coordOk)
+  {
+   DrawHaircross(x, y, dd);
+   char s[2];
+   s[0] = '0' + hardwareId % 8;
+   s[1] = 0;
+   DisplayText(s, x + 2, y, 0, CLR_RED);
+  }
+ else
+  {
+   DrawArrow(x, y);
+  }
 }
 
 void DrawGroup()
