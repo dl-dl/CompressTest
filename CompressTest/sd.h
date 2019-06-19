@@ -5,7 +5,7 @@
 
 static inline BlockAddr SDCardSize(void)
 {
- return 1024 * 48; // Number of blocks.
+ return 1024 * (1024+128); // Number of blocks.
 }
 
 #ifdef __cplusplus

@@ -10,7 +10,7 @@ extern "C"
  ui32 CoordTileY = -1;
  si8 MapShiftH;
  si8 MapShiftV;
- ui8 MapZoom = 12;
+ ui8 MapZoom = CURRENT_MAP_MIN_ZOOM;
  TTourist Tourist[10];
 }
 

@@ -14,7 +14,7 @@ static HANDLE sdopen()
  static HANDLE file_handle = INVALID_HANDLE_VALUE;
  if (file_handle == INVALID_HANDLE_VALUE)
   {
-   char fname[] = "SD0.BIN";
+   const char fname[] = "SD0.BIN";
 #if CREATE_NEW_SD
    file_handle = CreateFileA(fname, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
    ui8 b[BLOCK_SIZE];
@@ -39,8 +39,16 @@ static void sdclose(HANDLE file)
  //	CloseHandle(file);
 }
 
+#ifdef TRACE_SD
+#include <stdio.h>
+#endif
+
 bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks)
 {
+#ifdef TRACE_SD
+ static FILE *log = fopen("SDLOG.txt", "wt");
+ fprintf(log, "%08X\n", addr);
+#endif
  assert(addr < SDCardSize());
  HANDLE f = sdopen();
  DWORD fp = SetFilePointer(f, addr * BLOCK_SIZE, NULL, FILE_BEGIN);

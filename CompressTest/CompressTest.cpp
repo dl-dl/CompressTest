@@ -101,8 +101,11 @@ struct CommMsg
 
 static void transmit(HANDLE to, HANDLE from, ui32 sector)
 {
+#define SD_WRITE_COMMAND 0x12
+#define SD_READ_COMMAND 0x21
+
  CommMsg buff;
- buff.cmd = 0;
+ buff.cmd = SD_WRITE_COMMAND;
  buff.len = sizeof(buff.sector) + sizeof(buff.data);
  buff.sector = sector;
  buff.chksum = 0;
@@ -127,19 +130,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
  for (ui32 i = 0; i < sz / BLOCK_SIZE; ++i)
   {
    transmit(hCommPort, src, i);
-   char s[8];
+   const ui32 replyLen = 5;
+   char s[replyLen];
    ui32 total = 0;
    do
     {
      DWORD n;
-     if (!ReadFile(hCommPort, s + total, 2 - total, &n, NULL))
+     if (!ReadFile(hCommPort, s + total, replyLen - total, &n, NULL))
       throw "READ ERR";
      total += n;
      Sleep(0);
     }
-   while (total < 2);
-   if (memcmp(s, "Ok", 2))
+   while (total < replyLen);
+   if (s[0] & 0x80)
     throw "DEVICE ERR";
+   if (*(ui32 *)(s + 1) != i)
+    throw "WRONG ADDR";
   }
  CloseHandle(hCommPort);
  CloseHandle(src);
@@ -212,12 +218,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       {
        if ('+' == wParam)
         {
-         if (MapZoom < 16)
+         if (MapZoom < CURRENT_MAP_MAX_ZOOM)
           MapZoom++;
         }
        else
         {
-         if (MapZoom > 12)
+         if (MapZoom > CURRENT_MAP_MIN_ZOOM)
           MapZoom--;
         }
       }

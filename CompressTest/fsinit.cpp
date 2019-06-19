@@ -28,7 +28,10 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
 
  FILE *f = fopen(path, "rb");
  if (!f)
-  return t;
+  {
+   assert(0);
+   return t;
+  }
  fseek(f, 0, SEEK_END);
  size_t pngsize = ftell(f);
  fseek(f, 0, SEEK_SET);
@@ -57,14 +60,16 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
  free(p8);
  t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2 + BLOCK_SIZE); // round up to BLOCK_SIZE
  t.size = Compress4BitBuffer(p4, t.data);
-#ifdef _DEBUG
- ui8 *tile = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
- DecompState s;
- DecompImit(&s, tile);
- for (ui32 i = 0; i < t.size; ++i)
+#ifdef CHECK_DECOMPRESS
+ {
+  ui8 *tile = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
+  DecompState s;
+  DecompImit(&s, tile);
+  for (ui32 i = 0; i < t.size; ++i)
    DeCompressOne(t.data[i], &s);
- assert(0 == memcmp(p4, tile, TILE_DX * TILE_DY / 2));
- free(tile);
+  assert(0 == memcmp(p4, tile, TILE_DX * TILE_DY / 2));
+  free(tile);
+ }
 #endif
  free(p4);
  return t;
@@ -84,21 +89,27 @@ void FsInit()
   "cher",
   "aur"
  };
+ /*
  r[0].left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_DX;
  r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
  r[0].right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_DX;
  r[0].bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_DY;
+*/
+ r[0].left = lon2tilex(37.1f, MAX_ZOOM_LEVEL) / TILE_DX;
+ r[0].top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
+ r[0].right = lon2tilex(38.9f, MAX_ZOOM_LEVEL) / TILE_DX;
+ r[0].bottom = lat2tiley(55.4f, MAX_ZOOM_LEVEL) / TILE_DY;
 
  r[1].left = lon2tilex(-79.50f, MAX_ZOOM_LEVEL) / TILE_DX;
  r[1].top = lat2tiley(44.01f, MAX_ZOOM_LEVEL) / TILE_DY;
  r[1].right = lon2tilex(-79.46f, MAX_ZOOM_LEVEL) / TILE_DX;
  r[1].bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
 
- for (int i = 0; i < sizeof(r) / sizeof(*r); ++i)
+ for (int i = 0; i < NUM_REG - 1; ++i)
   {
    BlockAddr addr;
    FsNewIMS(&ims, &addr, r + i);
-   for (ui8 z = 12; z <= 16; ++z)
+   for (ui8 z = CURRENT_MAP_MIN_ZOOM; z <= CURRENT_MAP_MAX_ZOOM; ++z)
     {
      NewMapStatus status;
      ImsNextZoom(&ims, &status, z);
@@ -108,8 +119,7 @@ void FsInit()
        {
         NewTile tile = getTile(idx->left + x, idx->top + y, z, region[i]);
         assert(tile.data);
-        bool res = ImsAddTile(&ims, &status, tile.data, tile.size);
-        assert(res);
+        ImsAddTile(&ims, &status, tile.data, tile.size);
         forgetTile(tile);
        }
     }

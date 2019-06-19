@@ -30,7 +30,7 @@ void FsFormat()
 static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr *addr)
 {
  ui8 b[BLOCK_SIZE];
- *indexHWM = NUM_IMS_BLOCKS; // init value for empty filel system
+ *indexHWM = NUM_IMS_BLOCKS; // init value for empty file system
  *dataHWM = SDCardSize() - 1;
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
@@ -157,7 +157,10 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
    SDCardWrite(ims->dataHWM, tile + written, 1);
    ims->dataHWM--;
    if (ims->dataHWM <= ims->indexHWM)
-    return false;
+    {
+     assert(0);
+     return false;
+    }
   }
  status->tilesAtCurrentZoom++;
 
@@ -178,7 +181,10 @@ bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
    SDCardWrite(ims->indexHWM, &status->currentIndexBlock, 1);
    ims->indexHWM++;
    if (ims->dataHWM <= ims->indexHWM)
-    return false;
+    {
+     assert(0);
+     return false;
+    }
 #ifdef _DEBUG
    memset(status->currentIndexBlock.idx, 0xFD, sizeof(status->currentIndexBlock.idx));
 #endif

@@ -12,6 +12,7 @@ cp -r 15 /mnt/c/tmp/
 
 
 wget -O cher.osm "https://overpass-api.de/api/map?bbox=38.0160,55.9014,38.6196,56.1232"
+wget -O mos.osm "https://lz4.overpass-api.de/api/map?bbox=37.1,55.4,38.9,56.1"
 sudo osm2pgsql -c -k --slim -d gis -U postgres -H localhost -S openstreetmap-carto.style cher.osm
 
 /home/dmr

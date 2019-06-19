@@ -7,8 +7,8 @@
 #include "devio.h"
 #include "color.h"
 #include "map.h"
-#if CREATE_NEW_SD
 #include "fs.h"
+#if CREATE_NEW_SD
 #include "fsinit.h"
 #endif
 
@@ -32,8 +32,8 @@ void DeviceInit()
 #if CREATE_NEW_SD
  FsFormat();
  FsInit();
- BlockAddr sz = FsFreeSpace();
 #endif
+ BlockAddr sz = FsFreeSpace();
 
  MapInit();
 
