@@ -19,7 +19,7 @@ static HANDLE sdopen()
    file_handle = CreateFileA(fname, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
    ui8 b[BLOCK_SIZE];
    memset(b, 0, BLOCK_SIZE);
-   for (BlockAddr i = 0; i < SDCardSize(); ++i)
+   for (BlockAddr i = 0; i < MAP_SIZE; ++i)
     {
      DWORD n;
      BOOL res = WriteFile(file_handle, b, BLOCK_SIZE, &n, NULL);
@@ -49,7 +49,6 @@ bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks)
  static FILE *log = fopen("SDLOG.txt", "wt");
  fprintf(log, "%08X\n", addr);
 #endif
- assert(addr < SDCardSize());
  HANDLE f = sdopen();
  DWORD fp = SetFilePointer(f, addr * BLOCK_SIZE, NULL, FILE_BEGIN);
  assert(fp == addr * BLOCK_SIZE);
@@ -63,7 +62,6 @@ bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks)
 
 bool SDCardWrite(BlockAddr addr, const void *src, ui32 numBlocks)
 {
- assert(addr < SDCardSize());
  HANDLE f = sdopen();
  DWORD fp = SetFilePointer(f, addr * BLOCK_SIZE, NULL, FILE_BEGIN);
  assert(fp == addr * BLOCK_SIZE);

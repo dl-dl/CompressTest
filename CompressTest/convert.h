@@ -16,7 +16,7 @@ extern "C"
 {
 #endif
  void DecompImit(DecompState *s, ui8 *dst);
- void DeCompressOne(ui8 src, DecompState *s);
+ bool DeCompressOne(ui8 src, DecompState *s);
 #ifdef __cplusplus
 }
 #endif

@@ -3,11 +3,6 @@
 #include "types.h"
 #include "sizes.h"
 
-static inline BlockAddr SDCardSize(void)
-{
- return 1024 * (1024+128); // Number of blocks.
-}
-
 #ifdef __cplusplus
 extern "C"
 {

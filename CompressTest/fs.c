@@ -11,6 +11,9 @@
 //#define assert(expression) ((void)0)
 #endif
 
+static const BlockAddr MAP_SIZE = 1024 * (1024 + 128); // Number of blocks.
+static const ui32 NUM_IMS_BLOCKS = 1000;
+
 static ui32 CalcCRC(const void *data, ui32 sz) // TODO: implement proper algorithm
 {
  ui32 crc = 0;
@@ -31,7 +34,7 @@ static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr
 {
  ui8 b[BLOCK_SIZE];
  *indexHWM = NUM_IMS_BLOCKS; // init value for empty file system
- *dataHWM = SDCardSize() - 1;
+ *dataHWM = MAP_SIZE - 1;
  for (BlockAddr i = 0; i < NUM_IMS_BLOCKS; ++i)
   {
    if (!SDCardRead(i, b, 1))
@@ -52,7 +55,7 @@ BlockAddr FsFreeSpace()
 {
  BlockAddr dataHWM, indexHWM, addr;
  if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr))
-  return SDCardSize() - 2;
+  return MAP_SIZE - 2;
  return dataHWM - indexHWM;
 }
 
@@ -216,7 +219,11 @@ void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst)
       assert(0);
       return;
      }
-   DeCompressOne(b[i % BLOCK_SIZE], &s);
+   if (!DeCompressOne(b[i % BLOCK_SIZE], &s))
+    {
+     assert(0);
+     return;
+    }
   }
  assert(s.y == 0);
 }

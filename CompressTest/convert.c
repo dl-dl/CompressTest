@@ -17,15 +17,38 @@ void DecompImit(DecompState *s, ui8 *dst)
  s->dst = dst;
 }
 
-static inline void PutByte(DecompState *s, ui8 v)
+static bool CheckStateByte(const DecompState *s, ui8 n)
 {
- assert(s->x < TILE_DX);
- assert(s->y < TILE_DY);
  if (s->x >= TILE_DX)
-  return;
- if (s->y >= TILE_DY)
-  return;
+  {
+   assert(0);
+   return false;
+  }
+ if (s->y + n > TILE_DY / 2)
+  {
+   assert(0);
+   return false;
+  }
+ return true;
+}
 
+static bool CheckStateLine(const DecompState *s, ui8 n)
+{
+ if (s->x + n > TILE_DX)
+  {
+   assert(0);
+   return false;
+  }
+ if (s->y)
+  {
+   assert(0);
+   return false;
+  }
+ return true;
+}
+
+static void PutByte(DecompState *s, ui8 v)
+{
  *(s->dst + s->x * TILE_DY / 2 + s->y) = v;
  s->y++;
  if (s->y >= TILE_DY / 2)
@@ -35,30 +58,32 @@ static inline void PutByte(DecompState *s, ui8 v)
   }
 }
 
-static inline void CopyPrevLine(DecompState *s)
+static void CopyPrevLine(DecompState *s)
 {
- assert(s->x < TILE_DX);
- if (s->x >= TILE_DX)
-  return;
-
  ui8 *dstCol = s->dst + s->x * TILE_DY / 2;
  memcpy(dstCol, dstCol - TILE_DY / 2, TILE_DY / 2);
  s->x++;
 }
 
-void DeCompressOne(ui8 src, DecompState *s)
+bool DeCompressOne(ui8 src, DecompState *s)
 {
  if (s->eqString)
   {
+   if (!CheckStateLine(s, src))
+    return false;
    while (src--) // src == repeat count
     CopyPrevLine(s);
    s->eqString = false;
   }
  else if (s->numEqPixel)
   {
-   for (ui8 cnt = 0; cnt < s->numEqPixel; cnt++)
-    PutByte(s, src);
-   s->numEqPixel = 0;
+   if (!CheckStateByte(s, s->numEqPixel))
+    return false;
+   while (s->numEqPixel)
+    {
+     PutByte(s, src);
+     s->numEqPixel--;
+    }
   }
  else
   {
@@ -72,12 +97,17 @@ void DeCompressOne(ui8 src, DecompState *s)
     }
    else if (src & 0x10)
     {
+     if (!CheckStateByte(s, 2))
+      return false;
      PutByte(s, src & ~0x10);
      PutByte(s, src & ~0x10);
     }
    else
     {
+     if (!CheckStateByte(s, 1))
+      return false;
      PutByte(s, src);
     }
   }
+ return true;
 }

@@ -4,8 +4,6 @@
 #include "sizes.h"
 #include "coord.h"
 
-static const ui32 NUM_IMS_BLOCKS = 1000;
-
 typedef struct
 {
  ui32 nx, ny;    // number of tiles
