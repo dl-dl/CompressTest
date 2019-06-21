@@ -7,8 +7,8 @@
 extern "C"
 {
 #endif
- bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks);
- bool SDCardWrite(BlockAddr addr, const void *src, ui32 numBlocks);
+ bool SDCardMapRead(BlockAddr addr, void *dst, ui32 numBlocks);
+ bool SDCardMapWrite(BlockAddr addr, const void *src, ui32 numBlocks);
 #ifdef __cplusplus
 }
 #endif

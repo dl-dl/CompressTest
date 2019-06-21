@@ -43,7 +43,7 @@ static void sdclose(HANDLE file)
 #include <stdio.h>
 #endif
 
-bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks)
+bool SDCardMapRead(BlockAddr addr, void *dst, ui32 numBlocks)
 {
 #ifdef TRACE_SD
  static FILE *log = fopen("SDLOG.txt", "wt");
@@ -60,7 +60,7 @@ bool SDCardRead(BlockAddr addr, void *dst, ui32 numBlocks)
  return n == BLOCK_SIZE;
 }
 
-bool SDCardWrite(BlockAddr addr, const void *src, ui32 numBlocks)
+bool SDCardMapWrite(BlockAddr addr, const void *src, ui32 numBlocks)
 {
  HANDLE f = sdopen();
  DWORD fp = SetFilePointer(f, addr * BLOCK_SIZE, NULL, FILE_BEGIN);
