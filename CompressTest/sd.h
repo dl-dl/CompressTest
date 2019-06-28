@@ -13,6 +13,8 @@ extern "C"
 }
 #endif
 
-#define CREATE_NEW_SD 0
+static const BlockAddr MAP_SIZE = 1024 * (1024 + 128); // Number of blocks.
+
+#define CREATE_NEW_SD 1
 
 #endif //!__SD_H__

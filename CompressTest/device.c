@@ -8,6 +8,7 @@
 #include "color.h"
 #include "map.h"
 #include "fs.h"
+#include "fsinit.h"
 #if CREATE_NEW_SD
 #include "fsinit.h"
 #endif
@@ -33,7 +34,7 @@ void DeviceInit()
  FsFormat();
  FsInit();
 #endif
- BlockAddr sz = FsFreeSpace();
+ ui32 sz = FsFreeSpace();
 
  MapInit();
 

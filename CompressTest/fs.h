@@ -52,20 +52,16 @@ typedef struct
  TileIndexBlock currentIndexBlock;
 } NewMapStatus;
 
+static const ui32 NUM_IMS_BLOCKS = 1000;
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
- void FsFormat(void);
- BlockAddr FsFreeSpace(void);
- bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord);
+ ui32 FsCalcCRC(const void *data, ui32 sz);
  bool FsFindIMS(int x, int y, IMS *dst);
- bool FsCommitIMS(IMS *ims, BlockAddr addr);
  TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy);
  void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst);
-
- void ImsNextZoom(IMS *ims, NewMapStatus *status, ui8 zoom);
- bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz);
 #ifdef __cplusplus
 }
 #endif
