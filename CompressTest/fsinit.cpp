@@ -50,7 +50,7 @@ static bool FindFirstEmptyIMS(BlockAddr *dataHWM, BlockAddr *indexHWM, BlockAddr
  return false;
 }
 
-ui32 FsFreeSpace()
+static ui32 FsFreeSpace()
 {
  BlockAddr dataHWM, indexHWM, addr;
  if (!FindFirstEmptyIMS(&dataHWM, &indexHWM, &addr))
@@ -137,9 +137,7 @@ static bool FsNewIMS(IMS *ims, BlockAddr *addr, const RectInt *coord)
    ui32 dy = ScaleDownCoord(ims->coord.bottom, z) - ims->index[i].top + 1;
    ims->index[i].nx = dx;
    ims->index[i].ny = dy;
-   ui32 numBlocks = (dx * dy) / INDEX_ITEMS_PER_BLOCK;
-   if ((dx * dy) % INDEX_ITEMS_PER_BLOCK)
-    numBlocks++;
+   ui32 numBlocks = (dx * dy - 1) / INDEX_ITEMS_PER_BLOCK + 1;
    ims->indexHWM += numBlocks;
   }
 
@@ -261,4 +259,5 @@ void FsInit()
     }
    FsCommitIMS(&ims, addr);
   }
+ ui32 sz = FsFreeSpace();
 }

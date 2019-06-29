@@ -34,7 +34,6 @@ void DeviceInit()
  FsFormat();
  FsInit();
 #endif
- ui32 sz = FsFreeSpace();
 
  MapInit();
 

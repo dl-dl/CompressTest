@@ -9,7 +9,6 @@ extern "C"
 #endif
  void FsInit(void);
  void FsFormat(void);
- ui32 FsFreeSpace(void);
 #ifdef __cplusplus
 }
 #endif
