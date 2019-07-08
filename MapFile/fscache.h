@@ -14,16 +14,17 @@ typedef struct
 typedef struct
 {
  IMS ims;
+ ui32 fnum;
  MapCacheItem map[6];
-} FsMapCache;
+} MapTileCache;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
- void CacheInit(FsMapCache *cache);
- bool CacheFetchIMS(FsMapCache *cache, ui32 x, ui32 y);
- ui32 CacheRead(FsMapCache *cache, ui32 tileX, ui32 tileY, ui32 zoom);
+ void CacheInit(MapTileCache *cache);
+ void CacheFetchIMS(MapTileCache *cache, ui32 x, ui32 y);
+ ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom);
 #ifdef __cplusplus
 }
 #endif

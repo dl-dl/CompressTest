@@ -4,6 +4,7 @@
 #include "sizes.h"
 #include "coord.h"
 
+#pragma pack(push, 1)
 typedef struct
 {
  ui32 nx, ny;    // number of tiles
@@ -13,21 +14,16 @@ typedef struct
  // This array contains addresses of all tiles for the zoom level.
  // The array is sorted by top, left. ([x0, y0] [x1, y0] [x2, y0], [x0, y1] [x1, y1] ...
 } ImsIndexDescr;
-#pragma pack(push, 1)
+
 typedef struct
 {
  ui32 version;
- ui32 status;
  RectInt coord;
- ui16 name[32];
  BlockAddr dataHWM;
- BlockAddr indexHWM;
+// BlockAddr indexHWM;
  ImsIndexDescr index[MAX_ZOOM_LEVEL - MIN_ZOOM_LEVEL + 1]; // zoom levels
  ui32 checksum;
 } IMS;
-
-#define IMS_EMPTY 0
-#define IMS_READY 1
 
 typedef struct
 {
@@ -35,33 +31,33 @@ typedef struct
  ui32 sz;
 } TileIndexItem;
 
-#define INDEX_ITEMS_PER_BLOCK ((BLOCK_SIZE - sizeof(ui32)) / sizeof(TileIndexItem))
-
+//#define INDEX_ITEMS_PER_BLOCK ((BLOCK_SIZE - sizeof(ui32)) / sizeof(TileIndexItem))
+/*
 typedef struct
 {
  TileIndexItem idx[INDEX_ITEMS_PER_BLOCK];
  ui32 checksum;
-} TileIndexBlock;
+} TileIndexBlock;*/
 #pragma pack(pop)
 
 typedef struct
 {
- BlockAddr imsAddr;
+// BlockAddr imsAddr;
  ui8 currentZoom;
  ui32 tilesAtCurrentZoom;
- TileIndexBlock currentIndexBlock;
+// TileIndexBlock currentIndexBlock;
 } NewMapStatus;
 
-static const ui32 NUM_IMS_BLOCKS = 1000;
+static const ui32 MAX_NUM_IMS = 10;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
- ui32 FsCalcCRC(const void *data, ui32 sz);
- bool FsFindIMS(int x, int y, IMS *dst);
- TileIndexItem FsFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy);
- void FsReadTile(BlockAddr addr, ui32 sz, ui8 *dst);
+ ui32 MapCalcCRC(const void *data, ui32 sz);
+ ui32 MapFindIMS(int x, int y, IMS *dst);
+ TileIndexItem MapFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy);
+ void MapReadTile(BlockAddr addr, ui32 sz, ui8 *dst);
 #ifdef __cplusplus
 }
 #endif

@@ -7,8 +7,7 @@
 extern "C"
 {
 #endif
- void FsInit(void);
- void FsFormat(void);
+ void MapFileInit(void);
 #ifdef __cplusplus
 }
 #endif

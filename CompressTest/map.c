@@ -14,7 +14,7 @@ extern TTourist Tourist[10];
 
 typedef struct
 {
- FsMapCache FsCache;
+ MapTileCache FsCache;
  PointInt screenCenter;
 } MapData;
 
@@ -82,7 +82,8 @@ void DrawMap()
  start.x = ScaleDownCoord(map.screenCenter.x, MapZoom) - SCREEN_DX / 2;
  start.y = ScaleDownCoord(map.screenCenter.y, MapZoom) - SCREEN_DY / 2;
 
- if (CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY))
+ CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
+ if (map.FsCache.fnum)
   {
    for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
     for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)

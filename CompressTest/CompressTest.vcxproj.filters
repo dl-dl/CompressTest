@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\FatFs">
+      <UniqueIdentifier>{1caa9e96-e294-428f-a258-2a916247f327}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MapFile">
+      <UniqueIdentifier>{6966972e-583a-4a19-b540-8b61c2f6c5fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Types">
+      <UniqueIdentifier>{21cf7ebf-4c23-44f7-bd77-964c1f8aab4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -30,21 +39,6 @@
     <ClInclude Include="device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="coord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sizes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -52,12 +46,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="devfont.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fsinit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fscache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="devio.h">
@@ -78,36 +66,48 @@
     <ClInclude Include="map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="convert2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tourist.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\diskio.h">
+      <Filter>Source Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\ff.h">
+      <Filter>Source Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\ffconf.h">
+      <Filter>Source Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\integer.h">
+      <Filter>Source Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MapFile\fs.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MapFile\fscache.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MapFile\lodepng.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\coord.h">
+      <Filter>Source Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\sizes.h">
+      <Filter>Source Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\types.h">
+      <Filter>Source Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MapFile\fileio.h">
+      <Filter>Source Files\MapFile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lodepng.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="devfont32x25.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fsinit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fscache.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="convert.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="coord.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graph.c">
@@ -117,9 +117,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="device.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sound.cpp">
@@ -134,7 +131,31 @@
     <ClCompile Include="map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="convert2.c">
+    <ClCompile Include="..\FatFs\diskio.c">
+      <Filter>Source Files\FatFs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FatFs\ff.cpp">
+      <Filter>Source Files\FatFs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FatFs\ffunicode.cpp">
+      <Filter>Source Files\FatFs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MapFile\fs.c">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MapFile\fscache.c">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MapFile\lodepng.cpp">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MapFile\convert.c">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Types\coord.c">
+      <Filter>Source Files\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="fileiofatfs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

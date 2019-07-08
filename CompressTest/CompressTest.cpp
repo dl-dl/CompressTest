@@ -101,8 +101,8 @@ struct CommMsg
 
 static void transmit(HANDLE to, HANDLE from, ui32 sector)
 {
-#define SD_WRITE_COMMAND 0x12
-#define SD_READ_COMMAND 0x21
+ constexpr ui8 SD_WRITE_COMMAND = 0x12;
+ constexpr ui8 SD_READ_COMMAND = 0x21;
 
  CommMsg buff;
  buff.cmd = SD_WRITE_COMMAND;
@@ -122,7 +122,6 @@ static void transmit(HANDLE to, HANDLE from, ui32 sector)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
  hInst = hInstance; // Store instance handle in our global variable
-
 #if 0
  HANDLE src = CreateFileA("SD0.BIN", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
  HANDLE hCommPort = CreateFileA("COM2", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -159,6 +158,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
   return FALSE;
 
  DeviceInit();
+
  SetTimer(hWnd, 1, 5000, NULL);
  ShowWindow(hWnd, nCmdShow);
  UpdateWindow(hWnd);

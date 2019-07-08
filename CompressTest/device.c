@@ -1,5 +1,5 @@
 #include "device.h"
-#include "sd.h"
+#include "fileio.h"
 #include "coord.h"
 #include "convert.h"
 #include "graph.h"
@@ -8,10 +8,8 @@
 #include "color.h"
 #include "map.h"
 #include "fs.h"
-#include "fsinit.h"
-#if CREATE_NEW_SD
-#include "fsinit.h"
-#endif
+
+#include "ff.h"
 
 #include <string.h>
 #include <math.h>
@@ -27,14 +25,21 @@ typedef struct
 } Device;
 
 static Device dev;
+//#define FORAMT_FAT32
+static void MountFat32()
+{
+ const TCHAR path[] = "0:/";
+#ifdef FORAMT_FAT32
+ static BYTE buff[512 * 32];
+ f_mkfs(path, FM_FAT32, 512, &buff, sizeof(buff));
+#endif
+ FATFS fs;
+ f_mount(&fs, path, 1);
+}
 
 void DeviceInit()
 {
-#if CREATE_NEW_SD
- FsFormat();
- FsInit();
-#endif
-
+ MountFat32();
  MapInit();
 
  dev.hardwareId = 3001;
