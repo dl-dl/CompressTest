@@ -48,8 +48,6 @@ static bool MapCommitIMS(IMS *ims)
 
 static void MapNewIMS(IMS *ims, const RectInt *coord)
 {
- file_create();
-
  memset(ims, 0, sizeof(*ims));
  ims->version = 1;
  ims->coord = *coord;
@@ -162,6 +160,9 @@ void MapFileInit()
  r.bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
 */
 
+ file_create("f1.bin");
+ file_open("f1.bin", true);
+
  MapNewIMS(&ims, &r);
  for (ui8 z = CURRENT_MAP_MIN_ZOOM; z <= CURRENT_MAP_MAX_ZOOM; ++z)
   {
@@ -178,4 +179,6 @@ void MapFileInit()
      }
   }
  MapCommitIMS(&ims);
+
+ file_close();
 }

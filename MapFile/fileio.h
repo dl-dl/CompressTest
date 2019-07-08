@@ -7,9 +7,11 @@
 extern "C"
 {
 #endif
- bool file_create(void);
+ bool file_create(const char* name);
+ bool file_open(const char* name, bool write);
  bool file_read(FileAddr addr, void *dst, ui32 sz);
  bool file_write(FileAddr addr, const void *src, ui32 sz);
+ void file_close(void);
 #ifdef __cplusplus
 }
 #endif
