@@ -38,7 +38,6 @@ bool file_read(FileAddr addr, void *dst, ui32 sz)
 
 bool file_write(FileAddr addr, const void *src, ui32 sz)
 {
- FIL fil;
  UINT n = 0;
  f_lseek(&fil, addr);
  f_write(&fil, src, sz, &n);

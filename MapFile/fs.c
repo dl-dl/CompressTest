@@ -12,28 +12,26 @@
 //#define assert(expression) ((void)0)
 #endif
 
-ui32 MapCalcCRC(const void *data, ui32 sz) // TODO: implement proper algorithm
-{
- ui32 crc = 0;
- for (ui32 i = 0; i < sz; ++i)
-  crc += *((ui8 *)data + i);
- return crc;
-}
-
 ui32 MapFindIMS(int x, int y, IMS *dst)
 {
- for (ui32 i = 1; i < MAX_NUM_IMS; ++i)
+ for (ui32 i = 1; i <= 9; ++i)
   {
-   IMS ims;
-   if (!file_read(0, &ims, sizeof(ims)))
-    continue;
-   if (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum)))
+   char name[32];
+   name[0] = 'f';
+   name[1] = '0' + i;
+   strcpy(name + 2, ".map");
+   if (file_open(name, false))
     {
-     if (PointInRectInt(&ims.coord, x, y))
-      {
-       *dst = ims;
-       return i;
-      }
+     IMS ims;
+     bool res = file_read(0, &ims, sizeof(ims));
+     file_close();
+     if (res)
+      if (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum)))
+       if (PointInRectInt(&ims.coord, x, y))
+        {
+         *dst = ims;
+         return i;
+        }
     }
   }
  return 0;

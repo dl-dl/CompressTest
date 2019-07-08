@@ -20,7 +20,6 @@ typedef struct
  ui32 version;
  RectInt coord;
  BlockAddr dataHWM;
-// BlockAddr indexHWM;
  ImsIndexDescr index[MAX_ZOOM_LEVEL - MIN_ZOOM_LEVEL + 1]; // zoom levels
  ui32 checksum;
 } IMS;

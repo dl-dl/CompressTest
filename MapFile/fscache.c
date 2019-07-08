@@ -1,4 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "fscache.h"
+#include "fileio.h"
 #include <string.h>
 
 void CacheInit(MapTileCache *cache)
@@ -31,6 +33,11 @@ void CacheFetchIMS(MapTileCache *cache, ui32 x, ui32 y)
 
 ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
 {
+ char name[32];
+ name[0] = 'f';
+ name[1] = '0' + cache->fnum;
+ strcpy(name + 2, ".map");
+ file_open(name, false);
  ui32 index = CacheIndex(tileX, tileY);
  if (!CacheEq(&cache->map[index], tileX, tileY, zoom))
   {
@@ -43,5 +50,6 @@ ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
    cache->map[index].tileX = tileX;
    cache->map[index].tileY = tileY;
   }
+ file_close();
  return index;
 }

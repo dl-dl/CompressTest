@@ -157,15 +157,18 @@
   <ItemGroup>
     <ClCompile Include="..\..\MapFile\convert.c" />
     <ClCompile Include="..\..\MapFile\convert2.c" />
-    <ClCompile Include="..\..\MapFile\fs.c" />
+    <ClCompile Include="..\..\MapFile\crc.c" />
     <ClCompile Include="..\..\MapFile\fsinit.cpp" />
     <ClCompile Include="..\..\MapFile\lodepng.cpp" />
     <ClCompile Include="..\..\Types\coord.c" />
     <ClCompile Include="MakeMapFile.cpp" />
-    <ClCompile Include="fileiowin.cpp" />
+    <ClCompile Include="fileiostd.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\MapFile\convert.h" />
+    <ClInclude Include="..\..\MapFile\convert2.h" />
     <ClInclude Include="..\..\MapFile\fileio.h" />
+    <ClInclude Include="..\..\MapFile\fileiostd.h" />
     <ClInclude Include="..\..\MapFile\fs.h" />
     <ClInclude Include="..\..\MapFile\fsinit.h" />
     <ClInclude Include="..\..\MapFile\lodepng.h" />

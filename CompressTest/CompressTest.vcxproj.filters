@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Types">
       <UniqueIdentifier>{21cf7ebf-4c23-44f7-bd77-964c1f8aab4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FatFs">
+      <UniqueIdentifier>{407877b1-4aad-40d7-8298-e2c90bcaf0ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Types">
+      <UniqueIdentifier>{64930dfc-e90f-4a67-ba6d-3909d69e6baa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -31,9 +37,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="convert.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lodepng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="device.h">
@@ -69,18 +72,6 @@
     <ClInclude Include="tourist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\FatFs\diskio.h">
-      <Filter>Source Files\FatFs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FatFs\ff.h">
-      <Filter>Source Files\FatFs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FatFs\ffconf.h">
-      <Filter>Source Files\FatFs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\FatFs\integer.h">
-      <Filter>Source Files\FatFs</Filter>
-    </ClInclude>
     <ClInclude Include="..\MapFile\fs.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
@@ -90,17 +81,29 @@
     <ClInclude Include="..\MapFile\lodepng.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Types\coord.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Types\sizes.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Types\types.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
     <ClInclude Include="..\MapFile\fileio.h">
       <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\diskio.h">
+      <Filter>Header Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\ff.h">
+      <Filter>Header Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\ffconf.h">
+      <Filter>Header Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FatFs\integer.h">
+      <Filter>Header Files\FatFs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\types.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\coord.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Types\sizes.h">
+      <Filter>Header Files\Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,9 +134,6 @@
     <ClCompile Include="map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\FatFs\diskio.c">
-      <Filter>Source Files\FatFs</Filter>
-    </ClCompile>
     <ClCompile Include="..\FatFs\ff.cpp">
       <Filter>Source Files\FatFs</Filter>
     </ClCompile>
@@ -157,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="fileiofatfs.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FatFs\diskio.c">
+      <Filter>Source Files\FatFs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MapFile\crc.c">
+      <Filter>Source Files\MapFile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

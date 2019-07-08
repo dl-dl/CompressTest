@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Types">
       <UniqueIdentifier>{6ac9e435-ffde-4255-96f9-83659a771164}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Types">
+      <UniqueIdentifier>{e9a396f8-77e6-4919-ae68-906a1219a72c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MakeMapFile.cpp">
@@ -39,10 +42,10 @@
     <ClCompile Include="..\..\Types\coord.c">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\MapFile\fs.c">
+    <ClCompile Include="..\..\MapFile\crc.c">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
-    <ClCompile Include="fileiowin.cpp">
+    <ClCompile Include="fileiostd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,19 +56,28 @@
     <ClInclude Include="..\..\MapFile\lodepng.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Types\coord.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Types\sizes.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Types\types.h">
-      <Filter>Source Files\Types</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\MapFile\fs.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
     <ClInclude Include="..\..\MapFile\fileio.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MapFile\convert.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MapFile\convert2.h">
+      <Filter>Source Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Types\types.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Types\sizes.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Types\coord.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\MapFile\fileiostd.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include "fsinit.h"
 #include "fs.h"
 #include "sizes.h"
-#include "fileio.h"
+#include "fileiostd.h"
 #include "convert2.h"
 #ifdef _DEBUG
 #include "convert.h"
@@ -108,6 +108,7 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
  free(p8);
  t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2 + BLOCK_SIZE); // round up to BLOCK_SIZE
  t.size = Compress4BitBuffer(p4, t.data);
+//#define CHECK_DECOMPRESS
 #ifdef CHECK_DECOMPRESS
  {
   ui8 *tile = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
@@ -160,14 +161,14 @@ void MapFileInit()
  r.bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
 */
 
- file_create("f1.bin");
- file_open("f1.bin", true);
+ file_open("f0.bin", true);
 
  MapNewIMS(&ims, &r);
  for (ui8 z = CURRENT_MAP_MIN_ZOOM; z <= CURRENT_MAP_MAX_ZOOM; ++z)
   {
    NewMapStatus status;
    ImsNextZoom(&ims, &status, z);
+   printf("ZOOM %u\n", z);
    const ImsIndexDescr *idx = &ims.index[z - MIN_ZOOM_LEVEL];
    for (ui32 x = 0; x < idx->nx; ++x)
     for (ui32 y = 0; y < idx->ny; ++y)

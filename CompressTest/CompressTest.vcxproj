@@ -236,7 +236,6 @@
     <ClInclude Include="devio.h" />
     <ClInclude Include="devioimpl.h" />
     <ClInclude Include="graph.h" />
-    <ClInclude Include="lodepng.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="display.h" />
@@ -250,6 +249,7 @@
     <ClCompile Include="..\FatFs\ff.cpp" />
     <ClCompile Include="..\FatFs\ffunicode.cpp" />
     <ClCompile Include="..\MapFile\convert.c" />
+    <ClCompile Include="..\MapFile\crc.c" />
     <ClCompile Include="..\MapFile\fs.c" />
     <ClCompile Include="..\MapFile\fscache.c" />
     <ClCompile Include="..\MapFile\lodepng.cpp" />
