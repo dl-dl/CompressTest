@@ -5,7 +5,8 @@
 #include "sizes.h"
 #include "fileiostd.h"
 #include "convert2.h"
-#ifdef _DEBUG
+//#define CHECK_DECOMPRESS
+#ifdef CHECK_DECOMPRESS
 #include "convert.h"
 #endif
 
@@ -28,11 +29,11 @@ static bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
  TileIndexItem ii;
  ii.addr = ims->dataHWM;
  ii.sz = sz;
- if (!file_write(ims->dataHWM, tile, sz))
+ if (!map_file_write(ims->dataHWM, tile, sz))
   return false;
 
  ui32 i = status->currentZoom - MIN_ZOOM_LEVEL;
- if (!file_write(ims->index[i].firstBlock + status->tilesAtCurrentZoom * sizeof(ii), &ii, sizeof(ii)))
+ if (!map_file_write(ims->index[i].firstBlock + status->tilesAtCurrentZoom * sizeof(ii), &ii, sizeof(ii)))
   return false;
 
  ims->dataHWM += sz;
@@ -43,7 +44,7 @@ static bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
 static bool MapCommitIMS(IMS *ims)
 {
  ims->checksum = MapCalcCRC(ims, sizeof(*ims) - sizeof(ims->checksum));
- return file_write(0, ims, sizeof(*ims));
+ return map_file_write(0, ims, sizeof(*ims));
 }
 
 static void MapNewIMS(IMS *ims, const RectInt *coord)
@@ -108,7 +109,6 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
  free(p8);
  t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2 + BLOCK_SIZE); // round up to BLOCK_SIZE
  t.size = Compress4BitBuffer(p4, t.data);
-//#define CHECK_DECOMPRESS
 #ifdef CHECK_DECOMPRESS
  {
   ui8 *tile = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
@@ -161,7 +161,7 @@ void MapFileInit()
  r.bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
 */
 
- file_open("f0.bin", true);
+ map_file_open("f0.bin", true);
 
  MapNewIMS(&ims, &r);
  for (ui8 z = CURRENT_MAP_MIN_ZOOM; z <= CURRENT_MAP_MAX_ZOOM; ++z)
@@ -181,5 +181,5 @@ void MapFileInit()
   }
  MapCommitIMS(&ims);
 
- file_close();
+ map_file_close();
 }

@@ -7,11 +7,17 @@
 extern "C"
 {
 #endif
+ void MapInitFS(void);
+
  bool file_create(const char* name);
  bool file_open(const char* name, bool write);
  bool file_read(FileAddr addr, void *dst, ui32 sz);
  bool file_write(FileAddr addr, const void *src, ui32 sz);
  void file_close(void);
+
+ bool file_open_dir(void);
+ const char* file_read_dir(void);
+ void file_close_dir(void);
 #ifdef __cplusplus
 }
 #endif

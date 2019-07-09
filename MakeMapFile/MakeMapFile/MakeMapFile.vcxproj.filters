@@ -59,9 +59,6 @@
     <ClInclude Include="..\..\MapFile\fs.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\MapFile\fileio.h">
-      <Filter>Source Files\MapFile</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\MapFile\convert.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>

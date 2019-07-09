@@ -13,8 +13,7 @@ typedef struct
 
 typedef struct
 {
- IMS ims;
- ui32 fnum;
+ ExtIMS eims;
  MapCacheItem map[6];
 } MapTileCache;
 

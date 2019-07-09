@@ -1,17 +1,10 @@
-#ifndef __SD_H__
-#define __SD_H__
+#ifndef __FILEIOSTD_H__
+#define __FILEIOSTD_H__
 #include "types.h"
 #include "sizes.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
- bool file_open(const char* name, bool write);
- bool file_write(FileAddr addr, const void *src, ui32 sz);
- void file_close(void);
-#ifdef __cplusplus
-}
-#endif
+bool map_file_open(const char *name, bool write);
+bool map_file_write(FileAddr addr, const void *src, ui32 sz);
+void map_file_close(void);
 
-#endif //!__SD_H__
+#endif //!__FILEIOSTD_H__

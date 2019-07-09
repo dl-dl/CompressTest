@@ -83,7 +83,7 @@ void DrawMap()
  start.y = ScaleDownCoord(map.screenCenter.y, MapZoom) - SCREEN_DY / 2;
 
  CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
- if (map.FsCache.fnum)
+ if (map.FsCache.eims.fname[0])
   {
    for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
     for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)

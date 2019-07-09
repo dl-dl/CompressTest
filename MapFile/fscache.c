@@ -9,8 +9,7 @@ void CacheInit(MapTileCache *cache)
   {
    cache->map[i].zoom = 0; // empty
   }
- memset(&cache->ims, 0, sizeof(cache->ims));
- cache->fnum = 1;
+ memset(&cache->eims, 0, sizeof(cache->eims));
 }
 
 static inline ui32 CacheIndex(ui32 x, ui32 y)
@@ -25,23 +24,19 @@ static inline bool CacheEq(const MapCacheItem *p, ui32 x, ui32 y, ui32 z)
 
 void CacheFetchIMS(MapTileCache *cache, ui32 x, ui32 y)
 {
- if (cache->fnum && PointInRectInt(&cache->ims.coord, x, y))
+ if (cache->eims.fname[0] && PointInRectInt(&cache->eims.ims.coord, x, y))
   return;
 
- cache->fnum = MapFindIMS(x, y, &cache->ims);
+ MapFindIMS(x, y, &cache->eims);
 }
 
 ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
 {
- char name[32];
- name[0] = 'f';
- name[1] = '0' + cache->fnum;
- strcpy(name + 2, ".map");
- file_open(name, false);
+ file_open(cache->eims.fname, false);
  ui32 index = CacheIndex(tileX, tileY);
  if (!CacheEq(&cache->map[index], tileX, tileY, zoom))
   {
-   TileIndexItem i = MapFindTile(&cache->ims, zoom, tileX, tileY);
+   TileIndexItem i = MapFindTile(&cache->eims.ims, zoom, tileX, tileY);
    if (i.addr)
     MapReadTile(i.addr, i.sz, cache->map[index].data);
    else

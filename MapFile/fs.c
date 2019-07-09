@@ -12,29 +12,31 @@
 //#define assert(expression) ((void)0)
 #endif
 
-ui32 MapFindIMS(int x, int y, IMS *dst)
+void MapFindIMS(int x, int y, ExtIMS *dst)
 {
- for (ui32 i = 1; i <= 9; ++i)
+ dst->fname[0] = 0;
+ if (file_open_dir())
+  return;
+ const char *fname;
+ while (fname = file_read_dir())
   {
-   char name[32];
-   name[0] = 'f';
-   name[1] = '0' + i;
-   strcpy(name + 2, ".map");
-   if (file_open(name, false))
+   if (file_open(fname, false))
     {
      IMS ims;
      bool res = file_read(0, &ims, sizeof(ims));
      file_close();
+
      if (res)
       if (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum)))
        if (PointInRectInt(&ims.coord, x, y))
         {
-         *dst = ims;
-         return i;
+         dst->ims = ims;
+         strcpy(dst->fname, fname);
+         break;
         }
     }
   }
- return 0;
+ file_close_dir();
 }
 
 TileIndexItem MapFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)

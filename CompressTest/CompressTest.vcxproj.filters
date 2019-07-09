@@ -78,9 +78,6 @@
     <ClInclude Include="..\MapFile\fscache.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\MapFile\lodepng.h">
-      <Filter>Source Files\MapFile</Filter>
-    </ClInclude>
     <ClInclude Include="..\MapFile\fileio.h">
       <Filter>Source Files\MapFile</Filter>
     </ClInclude>
@@ -104,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="..\Types\sizes.h">
       <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MapFile\convert.h">
+      <Filter>Source Files\MapFile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -144,9 +144,6 @@
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
     <ClCompile Include="..\MapFile\fscache.c">
-      <Filter>Source Files\MapFile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MapFile\lodepng.cpp">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
     <ClCompile Include="..\MapFile\convert.c">

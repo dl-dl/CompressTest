@@ -30,21 +30,18 @@ typedef struct
  ui32 sz;
 } TileIndexItem;
 
-//#define INDEX_ITEMS_PER_BLOCK ((BLOCK_SIZE - sizeof(ui32)) / sizeof(TileIndexItem))
-/*
-typedef struct
-{
- TileIndexItem idx[INDEX_ITEMS_PER_BLOCK];
- ui32 checksum;
-} TileIndexBlock;*/
 #pragma pack(pop)
 
 typedef struct
 {
-// BlockAddr imsAddr;
+ IMS ims;
+ char fname[32];
+} ExtIMS;
+
+typedef struct
+{
  ui8 currentZoom;
  ui32 tilesAtCurrentZoom;
-// TileIndexBlock currentIndexBlock;
 } NewMapStatus;
 
 static const ui32 MAX_NUM_IMS = 10;
@@ -54,7 +51,7 @@ extern "C"
 {
 #endif
  ui32 MapCalcCRC(const void *data, ui32 sz);
- ui32 MapFindIMS(int x, int y, IMS *dst);
+ void MapFindIMS(int x, int y, ExtIMS *dst);
  TileIndexItem MapFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy);
  void MapReadTile(BlockAddr addr, ui32 sz, ui8 *dst);
 #ifdef __cplusplus

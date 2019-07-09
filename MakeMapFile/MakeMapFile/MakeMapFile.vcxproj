@@ -167,7 +167,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\MapFile\convert.h" />
     <ClInclude Include="..\..\MapFile\convert2.h" />
-    <ClInclude Include="..\..\MapFile\fileio.h" />
     <ClInclude Include="..\..\MapFile\fileiostd.h" />
     <ClInclude Include="..\..\MapFile\fs.h" />
     <ClInclude Include="..\..\MapFile\fsinit.h" />

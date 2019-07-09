@@ -10,11 +10,8 @@
 #include "map.h"
 #include "fs.h"
 
-#include "ff.h"
-
 #include <string.h>
 #include <math.h>
-#include <stdio.h>
 
 extern ui32 CoordTileX;
 extern ui32 CoordTileY;
@@ -27,42 +24,10 @@ typedef struct
 } Device;
 
 static Device dev;
-static FATFS fs;
-
-static void MountFat32()
-{
- const TCHAR path[] = "0:/";
-//#define FORAMT_FAT32
-#ifdef FORAMT_FAT32
- static BYTE buff[512 * 32];
- f_mkfs(path, FM_FAT32, 512, &buff, sizeof(buff));
- f_mount(&fs, path, 1);
-
- file_create("f1.map");
- FILE *wf = fopen("f1.bin", "rb");
- if (file_open("f1.map", true))
-  {
-   ui32 n;
-   ui32 addr = 0;
-   do
-    {
-     n = fread(buff, 1, 512, wf);
-     file_write(addr, buff, n);
-     addr += n;
-    }
-   while (n == 512);
-
-   file_close();
-   fclose(wf);
-  }
-#else
- f_mount(&fs, path, 1);
-#endif
-}
 
 void DeviceInit()
 {
- MountFat32();
+ MapInitFS();
  MapInit();
 
  dev.hardwareId = 3001;
