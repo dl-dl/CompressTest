@@ -38,7 +38,7 @@ ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
   {
    TileIndexItem i = MapFindTile(&cache->eims.ims, zoom, tileX, tileY);
    if (i.addr)
-    MapReadTile(i.addr, i.sz, cache->map[index].data);
+    MapReadTile(i.addr, i.next - i.addr, cache->map[index].data);
    else
     memset(cache->map[index].data, 0x55, sizeof(cache->map[0].data));
    cache->map[index].zoom = zoom;

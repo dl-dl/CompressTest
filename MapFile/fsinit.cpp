@@ -26,14 +26,14 @@ static bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
 {
  assert(status->currentZoom >= MIN_ZOOM_LEVEL);
  assert(status->currentZoom <= MAX_ZOOM_LEVEL);
- TileIndexItem ii;
- ii.addr = ims->dataHWM;
- ii.sz = sz;
  if (!map_file_write(ims->dataHWM, tile, sz))
   return false;
 
+ TileIndexItem ii;
+ ii.addr = ims->dataHWM;
+ ii.next = ii.addr + sz;
  ui32 i = status->currentZoom - MIN_ZOOM_LEVEL;
- if (!map_file_write(ims->index[i].firstBlock + status->tilesAtCurrentZoom * sizeof(ii), &ii, sizeof(ii)))
+ if (!map_file_write(ims->index[i].firstBlock + status->tilesAtCurrentZoom * sizeof(ii.addr), &ii, sizeof(ii)))
   return false;
 
  ims->dataHWM += sz;
@@ -50,8 +50,10 @@ static bool MapCommitIMS(IMS *ims)
 static void MapNewIMS(IMS *ims, const RectInt *coord)
 {
  memset(ims, 0, sizeof(*ims));
- ims->version = 1;
+ ims->version = 2;
  ims->coord = *coord;
+ ims->zoomMin = CURRENT_MAP_MIN_ZOOM;
+ ims->zoomMax = CURRENT_MAP_MAX_ZOOM;
  FileAddr hwm = sizeof(IMS);
 
  for (ui8 z = MIN_ZOOM_LEVEL; z <= MAX_ZOOM_LEVEL; ++z)
@@ -64,9 +66,9 @@ static void MapNewIMS(IMS *ims, const RectInt *coord)
    ui32 dy = ScaleDownCoord(ims->coord.bottom, z) - ims->index[i].top + 1;
    ims->index[i].nx = dx;
    ims->index[i].ny = dy;
-   hwm += dx * dy * sizeof(TileIndexItem);
+   hwm += dx * dy * sizeof(TileIndexItem::addr);
   }
- ims->dataHWM = hwm;
+ ims->dataHWM = hwm + sizeof(TileIndexItem::next);
 }
 
 static NewTile getTile(int x, int y, ui8 z, const char *region)
@@ -107,7 +109,7 @@ static NewTile getTile(int x, int y, ui8 z, const char *region)
  ui8 *p4 = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
  Convert8To4(p8, p4);
  free(p8);
- t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2 + BLOCK_SIZE); // round up to BLOCK_SIZE
+ t.data = (ui8 *)malloc(TILE_DX * TILE_DY / 2);
  t.size = Compress4BitBuffer(p4, t.data);
 #ifdef CHECK_DECOMPRESS
  {

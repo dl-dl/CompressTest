@@ -9,9 +9,7 @@
 #define TILE_DX 256
 #define TILE_DY 256
 
-typedef ui32 BlockAddr;
 typedef ui32 FileAddr;
-#define BLOCK_SIZE 512
 
 #define CURRENT_MAP_MAX_ZOOM 16
 #define CURRENT_MAP_MIN_ZOOM 10

@@ -94,7 +94,7 @@ struct CommMsg
  ui8 cmd;
  ui16 len;
  ui32 sector;
- ui8 data[BLOCK_SIZE];
+ ui8 data[512];
  ui8 chksum;
 };
 #pragma pack(pop)
@@ -110,9 +110,9 @@ static void transmit(HANDLE to, HANDLE from, ui32 sector)
  buff.sector = sector;
  buff.chksum = 0;
 
- DWORD fp = SetFilePointer(from, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
+ DWORD fp = SetFilePointer(from, sector * sizeof(buff.data), NULL, FILE_BEGIN);
  DWORD n;
- if (!ReadFile(from, buff.data, BLOCK_SIZE, &n, NULL) || (n != BLOCK_SIZE))
+ if (!ReadFile(from, buff.data, sizeof(buff.data), &n, NULL) || (n != sizeof(buff.data)))
   throw "ERR";
  for (int i = 0; i < sizeof(buff) - 1; ++i)
   buff.chksum += *((ui8 *)&buff + i);

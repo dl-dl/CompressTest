@@ -15,7 +15,7 @@
 void MapFindIMS(int x, int y, ExtIMS *dst)
 {
  dst->fname[0] = 0;
- if (file_open_dir())
+ if (!file_open_dir())
   return;
  const char *fname;
  while (fname = file_read_dir())
@@ -27,12 +27,15 @@ void MapFindIMS(int x, int y, ExtIMS *dst)
      file_close();
 
      if (res)
-      if (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum)))
+      if ((ims.version == 2) && (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum))))
        if (PointInRectInt(&ims.coord, x, y))
         {
-         dst->ims = ims;
-         strcpy(dst->fname, fname);
-         break;
+         if (strlen(fname) < sizeof(dst->fname))
+          {
+           dst->ims = ims;
+           strcpy(dst->fname, fname);
+           break;
+          }
         }
     }
   }
@@ -55,30 +58,32 @@ TileIndexItem MapFindTile(const IMS *ims, ui8 zoom, ui32 numx, ui32 numy)
 
  TileIndexItem ii;
  ui32 n = dx * ims->index[i].ny + dy;
- if (!file_read(ims->index[i].firstBlock + n * sizeof(ii), &ii, sizeof(ii)))
+ if (!file_read(ims->index[i].firstBlock + n * sizeof(ii.addr), &ii, sizeof(ii)))
   return zero;
  return ii;
 }
 
-void MapReadTile(BlockAddr addr, ui32 sz, ui8 *dst)
+void MapReadTile(FileAddr addr, ui32 sz, ui8 *dst)
 {
  DecompState s;
  DecompImit(&s, dst);
 
- ui8 b[BLOCK_SIZE];
+ ui8 b[512];
  for (ui32 i = 0; i < sz; ++i)
   {
-   if (0 == (i % BLOCK_SIZE))
-    if (file_read(addr, b, BLOCK_SIZE))
-     {
-      addr += BLOCK_SIZE;
-     }
-    else
-     {
-      assert(0);
-      return;
-     }
-   if (!DeCompressOne(b[i % BLOCK_SIZE], &s))
+   if (0 == (i % sizeof(b)))
+    {
+     if (file_read(addr, b, sizeof(b)))
+      {
+       addr += sizeof(b);
+      }
+     else
+      {
+       assert(0);
+       return;
+      }
+    }
+   if (!DeCompressOne(b[i % sizeof(b)], &s))
     {
      assert(0);
      return;

@@ -68,6 +68,7 @@ bool file_read(FileAddr addr, void *dst, ui32 sz)
  return n == sz;
 }
 
+#if (defined(FF_FS_READONLY) && FF_FS_READONLY == 0) || (defined(_FS_READONLY) && _FS_READONLY == 0)
 bool file_write(FileAddr addr, const void *src, ui32 sz)
 {
  UINT n = 0;
@@ -75,7 +76,11 @@ bool file_write(FileAddr addr, const void *src, ui32 sz)
  f_write(&fil, src, sz, &n);
  return n == sz;
 }
+#endif
 
+#ifndef _MSC_VER
+#define FATFS_DIR DIR
+#endif
 static FATFS_DIR dj;
 static FILINFO fno;
 
@@ -84,14 +89,14 @@ bool file_open_dir()
  return (FR_OK == f_opendir(&dj, ""));
 }
 
-const char *file_read_dir()
+const char *file_read_dir() // returns pointer to static memory
 {
  if (FR_OK != f_readdir(&dj, &fno))
   return 0;
  if (0 == *fno.fname)
   return 0;
  if (fno.fattrib & AM_DIR)
-  return 0;
+  return "";
  return fno.fname;
 }
 
