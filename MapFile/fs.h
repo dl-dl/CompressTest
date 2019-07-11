@@ -17,9 +17,9 @@ typedef struct
 typedef struct
 {
  ui32 version;
- RectInt coord;
- FileAddr dataHWM;
  ui8 zoomMin, zoomMax;
+ ui16 reserved;
+ RectInt coord;
  ImsIndexDescr index[MAX_ZOOM_LEVEL - MIN_ZOOM_LEVEL + 1]; // zoom levels
  ui32 checksum;
 } IMS;
@@ -42,6 +42,7 @@ typedef struct
 {
  ui8 currentZoom;
  ui32 tilesAtCurrentZoom;
+ FileAddr dataHWM;
 } NewMapStatus;
 
 static const ui32 MAX_NUM_IMS = 10;

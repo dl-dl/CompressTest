@@ -26,17 +26,17 @@ static bool ImsAddTile(IMS *ims, NewMapStatus *status, const ui8 *tile, ui32 sz)
 {
  assert(status->currentZoom >= MIN_ZOOM_LEVEL);
  assert(status->currentZoom <= MAX_ZOOM_LEVEL);
- if (!map_file_write(ims->dataHWM, tile, sz))
+ if (!map_file_write(status->dataHWM, tile, sz))
   return false;
 
  TileIndexItem ii;
- ii.addr = ims->dataHWM;
+ ii.addr = status->dataHWM;
  ii.next = ii.addr + sz;
  ui32 i = status->currentZoom - MIN_ZOOM_LEVEL;
  if (!map_file_write(ims->index[i].firstBlock + status->tilesAtCurrentZoom * sizeof(ii.addr), &ii, sizeof(ii)))
   return false;
 
- ims->dataHWM += sz;
+ status->dataHWM += sz;
  status->tilesAtCurrentZoom++;
  return true;
 }
@@ -47,7 +47,7 @@ static bool MapCommitIMS(IMS *ims)
  return map_file_write(0, ims, sizeof(*ims));
 }
 
-static void MapNewIMS(IMS *ims, const RectInt *coord)
+static FileAddr MapNewIMS(IMS *ims, const RectInt *coord)
 {
  memset(ims, 0, sizeof(*ims));
  ims->version = 2;
@@ -58,6 +58,9 @@ static void MapNewIMS(IMS *ims, const RectInt *coord)
 
  for (ui8 z = MIN_ZOOM_LEVEL; z <= MAX_ZOOM_LEVEL; ++z)
   {
+   if ((z < ims->zoomMin) || (z > ims->zoomMax))
+    continue;
+
    int i = z - MIN_ZOOM_LEVEL;
    ims->index[i].firstBlock = hwm;
    ims->index[i].left = ScaleDownCoord(ims->coord.left, z);
@@ -66,9 +69,9 @@ static void MapNewIMS(IMS *ims, const RectInt *coord)
    ui32 dy = ScaleDownCoord(ims->coord.bottom, z) - ims->index[i].top + 1;
    ims->index[i].nx = dx;
    ims->index[i].ny = dy;
-   hwm += dx * dy * sizeof(TileIndexItem::addr);
+   hwm += dx * dy * sizeof(TileIndexItem::addr) + sizeof(TileIndexItem::next); // one more - to calculate the size of the last tile
   }
- ims->dataHWM = hwm + sizeof(TileIndexItem::next);
+ return hwm;
 }
 
 static NewTile getTile(int x, int y, ui8 z, const char *region)
@@ -165,10 +168,10 @@ void MapFileInit()
 
  map_file_open("f0.bin", true);
 
- MapNewIMS(&ims, &r);
- for (ui8 z = CURRENT_MAP_MIN_ZOOM; z <= CURRENT_MAP_MAX_ZOOM; ++z)
+ NewMapStatus status;
+ status.dataHWM = MapNewIMS(&ims, &r);
+ for (ui8 z = ims.zoomMin; z <= ims.zoomMax; ++z)
   {
-   NewMapStatus status;
    ImsNextZoom(&ims, &status, z);
    printf("ZOOM %u\n", z);
    const ImsIndexDescr *idx = &ims.index[z - MIN_ZOOM_LEVEL];

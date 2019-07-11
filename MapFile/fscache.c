@@ -32,10 +32,10 @@ void CacheFetchIMS(MapTileCache *cache, ui32 x, ui32 y)
 
 ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
 {
- file_open(cache->eims.fname, false);
  ui32 index = CacheIndex(tileX, tileY);
  if (!CacheEq(&cache->map[index], tileX, tileY, zoom))
   {
+   file_open(cache->eims.fname, false);
    TileIndexItem i = MapFindTile(&cache->eims.ims, zoom, tileX, tileY);
    if (i.addr)
     MapReadTile(i.addr, i.next - i.addr, cache->map[index].data);
@@ -44,7 +44,7 @@ ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom)
    cache->map[index].zoom = zoom;
    cache->map[index].tileX = tileX;
    cache->map[index].tileY = tileY;
+   file_close();
   }
- file_close();
  return index;
 }
