@@ -9,13 +9,15 @@
 static FIL fil;
 static FATFS fs;
 
-void MapInitFS()
+bool MapInitFS()
 {
  const TCHAR path[] = "0:/";
 #ifdef FORAMT_FAT32
  static BYTE buff[512 * 32];
- f_mkfs(path, FM_FAT32, 512, &buff, sizeof(buff));
- f_mount(&fs, path, 1);
+ if (FR_OK != f_mkfs(path, FM_FAT32, 512, &buff, sizeof(buff)))
+  return false;
+ if (FR_OK != f_mount(&fs, path, 1))
+  return false;
 
  file_create("f1.map");
  FILE *wf = fopen("f1.bin", "rb");
@@ -34,8 +36,9 @@ void MapInitFS()
    file_close();
    fclose(wf);
   }
+ return true;
 #else
- f_mount(&fs, path, 1);
+ return FR_OK == f_mount(&fs, path, 1);
 #endif
 }
 
