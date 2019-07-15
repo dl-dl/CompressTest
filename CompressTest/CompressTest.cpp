@@ -218,12 +218,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       {
        if ('+' == wParam)
         {
-         if (MapZoom < CURRENT_MAP_MAX_ZOOM)
+         if (MapZoom < MAX_ZOOM_LEVEL)
           MapZoom++;
         }
        else
         {
-         if (MapZoom > CURRENT_MAP_MIN_ZOOM)
+         if (MapZoom > MIN_ZOOM_LEVEL)
           MapZoom--;
         }
       }

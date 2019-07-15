@@ -11,7 +11,4 @@
 
 typedef ui32 FileAddr;
 
-#define CURRENT_MAP_MAX_ZOOM 16
-#define CURRENT_MAP_MIN_ZOOM 10
-
 #endif // __SIZES_H_

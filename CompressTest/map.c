@@ -77,6 +77,13 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
 
 void DrawMap()
 {
+ if (map.FsCache.eims.fname[0])
+  {
+   if (MapZoom < map.FsCache.eims.ims.zoomMin)
+    MapZoom = map.FsCache.eims.ims.zoomMin;
+   else if (MapZoom > map.FsCache.eims.ims.zoomMax)
+    MapZoom = map.FsCache.eims.ims.zoomMax;
+  }
  map.screenCenter = AdjustScreenPos(CoordTileX, CoordTileY, map.screenCenter);
  PointInt start;
  start.x = ScaleDownCoord(map.screenCenter.x, MapZoom) - SCREEN_DX / 2;

@@ -47,13 +47,13 @@ static bool MapCommitIMS(IMS *ims)
  return map_file_write(0, ims, sizeof(*ims));
 }
 
-static FileAddr MapNewIMS(IMS *ims, const RectInt *coord)
+static FileAddr MapNewIMS(IMS *ims, const RectInt *coord, ui8 zoomMin, ui8 zoomMax)
 {
  memset(ims, 0, sizeof(*ims));
  ims->version = 2;
  ims->coord = *coord;
- ims->zoomMin = CURRENT_MAP_MIN_ZOOM;
- ims->zoomMax = CURRENT_MAP_MAX_ZOOM;
+ ims->zoomMin = zoomMin;
+ ims->zoomMax = zoomMax;
  FileAddr hwm = sizeof(IMS);
 
  for (ui8 z = MIN_ZOOM_LEVEL; z <= MAX_ZOOM_LEVEL; ++z)
@@ -147,6 +147,11 @@ void MapFileInit()
  IMS ims;
  RectInt r;
 
+ const ui8 ZOOM_MAX = 16;
+ const ui8 ZOOM_MIN = 10;
+ assert(ZOOM_MAX <= MAX_ZOOM_LEVEL);
+ assert(ZOOM_MIN >= MIN_ZOOM_LEVEL);
+
  const char region[] = "cher";
  r.left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
@@ -169,7 +174,7 @@ void MapFileInit()
  map_file_open("f0.bin", true);
 
  NewMapStatus status;
- status.dataHWM = MapNewIMS(&ims, &r);
+ status.dataHWM = MapNewIMS(&ims, &r, ZOOM_MIN, ZOOM_MAX);
  for (ui8 z = ims.zoomMin; z <= ims.zoomMax; ++z)
   {
    ImsNextZoom(&ims, &status, z);

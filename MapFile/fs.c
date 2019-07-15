@@ -73,11 +73,7 @@ void MapReadTile(FileAddr addr, ui32 sz, ui8 *dst)
   {
    if (0 == (i % sizeof(b)))
     {
-     if (file_read(addr, b, sizeof(b)))
-      {
-       addr += sizeof(b);
-      }
-     else
+     if (!file_read(addr + i, b, sizeof(b)))
       {
        assert(0);
        return;
