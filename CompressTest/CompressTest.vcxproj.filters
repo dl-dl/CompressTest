@@ -134,12 +134,6 @@
     <ClCompile Include="map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\FatFs\ff.cpp">
-      <Filter>Source Files\FatFs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FatFs\ffunicode.cpp">
-      <Filter>Source Files\FatFs</Filter>
-    </ClCompile>
     <ClCompile Include="..\MapFile\fs.c">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
@@ -160,6 +154,15 @@
     </ClCompile>
     <ClCompile Include="..\MapFile\crc.c">
       <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="fileioinit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FatFs\ff.c">
+      <Filter>Source Files\FatFs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FatFs\ffunicode.c">
+      <Filter>Source Files\FatFs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

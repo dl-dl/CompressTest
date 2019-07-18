@@ -1,0 +1,36 @@
+Сначала - IMS (одна штука)
+
+#define MAX_ZOOM_LEVEL 18
+#define MIN_ZOOM_LEVEL 4
+typedef struct
+{
+ ui32 version;
+ ui8 zoomMin, zoomMax;
+ ui16 reserved;
+ RectInt coord;
+ ImsIndexDescr index[MAX_ZOOM_LEVEL - MIN_ZOOM_LEVEL + 1]; // zoom levels
+ ui32 checksum;
+} IMS;
+
+index имеет фиксированный размер для простоты.
+обязано быть -- zoomMin >= MIX_ZOOM_LEVEL, zoomMax<= MAX_ZOOM_LEVEL.
+
+где index - массив структур
+typedef struct
+{
+ ui32 nx, ny;    // number of tiles
+ ui32 left, top; // world tile numbers
+ FileAddr firstBlock;
+ // firstBlock - address of an array that contains addresses of all tiles for the zoom level.
+ // The array is sorted by top, left. ([x0, y0] [x1, y0] [x2, y0], [x0, y1] [x1, y1] ...
+} ImsIndexDescr;
+
+nx, ny - размеры в листах (tile) данного зума.
+left, top - номера листов начала карты (в номерах данного зума).
+firstBlock - адрес упорядоченного массива адресов листов карты (смещение от начала файла),
+ nx * ny + 1 элементов 
+
+Потом упорядоченные массивы адресов (смещение от начала файла) листов карты (zoomMax - zoomMin) массивов.
+
+Потом листы карты.
+

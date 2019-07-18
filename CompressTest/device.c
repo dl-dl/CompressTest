@@ -25,8 +25,12 @@ typedef struct
 
 static Device dev;
 
+//#define FORAMT_FAT32
 void DeviceInit()
 {
+#ifdef FORAMT_FAT32
+ MapCreateFS();
+#endif
  MapInitFS();
  MapInit();
 

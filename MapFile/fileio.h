@@ -8,6 +8,7 @@ extern "C"
 {
 #endif
  bool MapInitFS(void);
+ bool MapCreateFS(void);
 
  bool file_create(const char* name);
  bool file_open(const char* name, bool write);

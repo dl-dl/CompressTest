@@ -26,7 +26,7 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 {
  DWORD fp = SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
  DWORD n;
- BOOL res = ReadFile(file_handle, buff, BLOCK_SIZE * count, &n, NULL);
+ BOOL res = ReadFile(file_handle, buff, count * BLOCK_SIZE, &n, NULL);
  if (res && (n == BLOCK_SIZE * count))
   return RES_OK;
  return RES_ERROR;
@@ -36,7 +36,7 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
  DWORD fp = SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
  DWORD n;
- BOOL res = WriteFile(file_handle, buff, BLOCK_SIZE * count, &n, NULL);
+ BOOL res = WriteFile(file_handle, buff, count * BLOCK_SIZE, &n, NULL);
  return RES_OK;
 }
 

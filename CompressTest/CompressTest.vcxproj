@@ -246,8 +246,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\FatFs\diskio.c" />
-    <ClCompile Include="..\FatFs\ff.cpp" />
-    <ClCompile Include="..\FatFs\ffunicode.cpp" />
+    <ClCompile Include="..\FatFs\ff.c" />
+    <ClCompile Include="..\FatFs\ffunicode.c" />
     <ClCompile Include="..\MapFile\convert.c" />
     <ClCompile Include="..\MapFile\crc.c" />
     <ClCompile Include="..\MapFile\fs.c" />
@@ -260,6 +260,7 @@
     <ClCompile Include="devio.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="fileiofatfs.c" />
+    <ClCompile Include="fileioinit.cpp" />
     <ClCompile Include="graph.c" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="map.c" />

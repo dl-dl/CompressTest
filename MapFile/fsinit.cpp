@@ -147,31 +147,30 @@ void MapFileInit()
  IMS ims;
  RectInt r;
 
- const ui8 ZOOM_MAX = 16;
- const ui8 ZOOM_MIN = 10;
+ const ui8 ZOOM_MAX = 17;
+ const ui8 ZOOM_MIN = 12;
  assert(ZOOM_MAX <= MAX_ZOOM_LEVEL);
  assert(ZOOM_MIN >= MIN_ZOOM_LEVEL);
-
+ /*
  const char region[] = "cher";
  r.left = lon2tilex(38.1f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
  r.right = lon2tilex(38.6f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.bottom = lat2tiley(55.95f, MAX_ZOOM_LEVEL) / TILE_DY;
- /*
+ 
  const char region[] = "cher";
  r.left = lon2tilex(37.1f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.top = lat2tiley(56.1f, MAX_ZOOM_LEVEL) / TILE_DY;
  r.right = lon2tilex(38.9f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.bottom = lat2tiley(55.4f, MAX_ZOOM_LEVEL) / TILE_DY;
-
+ */
  const char region[] = "aur";
  r.left = lon2tilex(-79.50f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.top = lat2tiley(44.01f, MAX_ZOOM_LEVEL) / TILE_DY;
  r.right = lon2tilex(-79.46f, MAX_ZOOM_LEVEL) / TILE_DX;
  r.bottom = lat2tiley(43.99f, MAX_ZOOM_LEVEL) / TILE_DY;
-*/
 
- map_file_open("f0.bin", true);
+ map_file_open("f1.bin", true);
 
  NewMapStatus status;
  status.dataHWM = MapNewIMS(&ims, &r, ZOOM_MIN, ZOOM_MAX);

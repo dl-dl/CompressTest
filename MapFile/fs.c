@@ -16,9 +16,12 @@ void MapFindIMS(int x, int y, ExtIMS *dst)
 {
  dst->fname[0] = 0;
  if (!file_open_dir())
-  return;
+  {
+   assert(0);
+   return;
+  }
  const char *fname;
- while (fname = file_read_dir())
+ while ((fname = file_read_dir()))
   {
    if (file_open(fname, false))
     {
@@ -73,7 +76,7 @@ void MapReadTile(FileAddr addr, ui32 sz, ui8 *dst)
   {
    if (0 == (i % sizeof(b)))
     {
-     if (!file_read(addr + i, b, sizeof(b)))
+     if (!file_read(addr + i, b, (sz - i > sizeof(b)) ? sizeof(b) : (sz - i)))
       {
        assert(0);
        return;
