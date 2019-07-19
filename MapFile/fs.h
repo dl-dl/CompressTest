@@ -1,8 +1,11 @@
-#pragma once
+#ifndef _FS_H_
+#define _FS_H_
 
 #include "types.h"
 #include "sizes.h"
 #include "coord.h"
+
+#define CUR_MAP_FILE_VERSION 2
 
 #pragma pack(push, 1)
 typedef struct
@@ -45,8 +48,6 @@ typedef struct
  FileAddr dataHWM;
 } NewMapStatus;
 
-static const ui32 MAX_NUM_IMS = 10;
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -57,4 +58,5 @@ extern "C"
  void MapReadTile(FileAddr addr, ui32 sz, ui8 *dst);
 #ifdef __cplusplus
 }
+#endif
 #endif

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "fileio.h"
 #include "fs.h"
 #include "coord.h"
@@ -30,7 +29,7 @@ void MapFindIMS(int x, int y, ExtIMS *dst)
      file_close();
 
      if (res)
-      if ((ims.version == 2) && (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum))))
+      if ((ims.version == CUR_MAP_FILE_VERSION) && (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum))))
        if (PointInRectInt(&ims.coord, x, y))
         {
          if (strlen(fname) < sizeof(dst->fname))

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "targetver.h"
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
@@ -151,7 +150,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 #endif
 
  WCHAR s[64];
- wsprintf(s, L"Device %u", 0);
+ wsprintfW(s, L"Device %u", 0);
  HWND hWnd = CreateWindowW(szWindowClass, s, WS_OVERLAPPEDWINDOW,
                            0, 0, 240 + 64 + 20, 400 + 64 + 100, nullptr, nullptr, hInstance, nullptr);
  if (!hWnd)

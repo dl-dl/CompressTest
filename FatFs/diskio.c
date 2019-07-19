@@ -1,4 +1,6 @@
+#include "ff.h"
 #include "diskio.h"
+
 #define WIN32_LEAN_AND_MEAN
 #define NOGDI
 #define NOUSER
@@ -10,16 +12,18 @@ static const unsigned int BLOCK_SIZE = 512;
 DSTATUS disk_initialize(BYTE pdrv)
 {
  if (file_handle != INVALID_HANDLE_VALUE)
-  return RES_OK;
+  return 0;
  file_handle = CreateFileA("FAT32.BIN", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
- if (file_handle != INVALID_HANDLE_VALUE)
-  return RES_OK;
- return RES_ERROR;
+ if (file_handle == INVALID_HANDLE_VALUE)
+  return STA_NODISK;
+ return 0;
 }
 
 DSTATUS disk_status(BYTE pdrv)
 {
- return RES_OK;
+ if (file_handle == INVALID_HANDLE_VALUE)
+  return STA_NODISK;
+ return 0;
 }
 
 DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)

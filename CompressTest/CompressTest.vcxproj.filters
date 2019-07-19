@@ -90,9 +90,6 @@
     <ClInclude Include="..\FatFs\ffconf.h">
       <Filter>Header Files\FatFs</Filter>
     </ClInclude>
-    <ClInclude Include="..\FatFs\integer.h">
-      <Filter>Header Files\FatFs</Filter>
-    </ClInclude>
     <ClInclude Include="..\Types\types.h">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
@@ -159,9 +156,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\FatFs\ff.c">
-      <Filter>Source Files\FatFs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\FatFs\ffunicode.c">
       <Filter>Source Files\FatFs</Filter>
     </ClCompile>
   </ItemGroup>

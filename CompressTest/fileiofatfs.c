@@ -48,7 +48,7 @@ bool file_write(FileAddr addr, const void *src, ui32 sz)
 }
 #endif
 
-static FATFS_DIR dj;
+static DIR dj;
 static FILINFO fno;
 
 bool file_open_dir()

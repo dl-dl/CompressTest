@@ -50,7 +50,7 @@ static bool MapCommitIMS(IMS *ims)
 static FileAddr MapNewIMS(IMS *ims, const RectInt *coord, ui8 zoomMin, ui8 zoomMax)
 {
  memset(ims, 0, sizeof(*ims));
- ims->version = 2;
+ ims->version = CUR_MAP_FILE_VERSION;
  ims->coord = *coord;
  ims->zoomMin = zoomMin;
  ims->zoomMax = zoomMax;

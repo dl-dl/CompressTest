@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "fscache.h"
 #include "fileio.h"
 #include <string.h>
