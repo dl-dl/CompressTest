@@ -11,6 +11,8 @@ typedef unsigned int ui32;
 
 typedef unsigned short int WIDE_CHAR;
 
+typedef ui32 FileAddr;
+
 #ifndef __cplusplus
 typedef unsigned char bool;
 #define false 0

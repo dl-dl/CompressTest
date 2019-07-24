@@ -6,10 +6,13 @@
 #include <windows.h>
 #include <vector>
 #include "display.h"
-#include "screen.h"
 #include "color.h"
 
-ScreenLine Screen[SCREEN_DX];
+extern "C"
+{
+ ui8 Screen[256][256];
+ ui8 ScreenChange[256];
+}
 
 static const int BORDERX = -32;
 static const int BORDERY = -32;
@@ -71,7 +74,7 @@ void DisplayRedraw(HDC hdc)
  for (int x = 0; x < SCREEN_DX; ++x)
   for (int y = 0; y < SCREEN_DY / 2; ++y)
    {
-    ui8 c = Screen[x].pix[SCREEN_DY / 2 - 1 - y];
+    ui8 c = Screen[x][SCREEN_DY / 2 - 1 - y];
     SetPixelV(hdcMem, x, y * 2, TranslateColor(c & 0x0F));
     SetPixelV(hdcMem, x, y * 2 + 1, TranslateColor(c >> 4));
    }

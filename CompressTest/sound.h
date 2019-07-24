@@ -6,7 +6,7 @@
 extern "C"
 {
 #endif
- void Sound(ui8 num, ui16 tick);
+ void Sound(ui16 tick);
  void Vibro(ui8 num, ui16 tick);
 
 #ifdef __cplusplus

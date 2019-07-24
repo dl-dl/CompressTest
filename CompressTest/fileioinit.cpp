@@ -9,11 +9,10 @@ extern "C" FATFS fs;
 
 bool MapCreateFS()
 {
- const TCHAR path[] = "0:/";
  static BYTE buff[512 * 32];
- if (FR_OK != f_mkfs(path, FM_FAT32, 512, &buff, sizeof(buff)))
+ if (FR_OK != f_mkfs("0:/", FM_FAT32, 512, &buff, sizeof(buff)))
   return false;
- if (FR_OK != f_mount(&fs, path, 1))
+ if (FR_OK != f_mount(&fs, "", 1))
   return false;
 
  file_create("f1.map");

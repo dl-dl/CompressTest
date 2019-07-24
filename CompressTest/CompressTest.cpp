@@ -10,7 +10,6 @@
 #include "coord.h"
 #include "graph.h"
 #include "display.h"
-#include "sizes.h"
 #include "devio.h"
 #include "devioimpl.h"
 
@@ -27,7 +26,7 @@ static BOOL InitInstance(HINSTANCE, int);
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 extern DeviceInput input;
-extern "C" ui8 MapZoom;
+extern "C" si8 MapZoom;
 extern "C" si8 MapShiftH;
 extern "C" si8 MapShiftV;
 

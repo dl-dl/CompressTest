@@ -7,13 +7,17 @@
 #include <assert.h>
 #else
 #include "sound.h"
-#define assert(expression) (void)((!!(expression)) || (Sound(10, 100), 0))
+#define assert(expression) (void)((!!(expression)) || (Sound(100), 0))
 //#define assert(expression) ((void)0)
 #endif
 
 void MapFindIMS(int x, int y, ExtIMS *dst)
 {
- dst->fname[0] = 0;
+ if (dst->dataReady)
+  {
+   file_close();
+   dst->dataReady = false;
+  }
  if (!file_open_dir())
   {
    assert(0);
@@ -25,20 +29,16 @@ void MapFindIMS(int x, int y, ExtIMS *dst)
    if (file_open(fname, false))
     {
      IMS ims;
-     bool res = file_read(0, &ims, sizeof(ims));
-     file_close();
-
-     if (res)
+     if (file_read(0, &ims, sizeof(ims)))
       if ((ims.version == CUR_MAP_FILE_VERSION) && (ims.checksum == MapCalcCRC(&ims, sizeof(ims) - sizeof(ims.checksum))))
        if (PointInRectInt(&ims.coord, x, y))
         {
-         if (strlen(fname) < sizeof(dst->fname))
-          {
-           dst->ims = ims;
-           strcpy(dst->fname, fname);
-           break;
-          }
+         file_optimize_read();
+         dst->ims = ims;
+         dst->dataReady = true;
+         break;
         }
+     file_close();
     }
   }
  file_close_dir();
@@ -70,7 +70,7 @@ void MapReadTile(FileAddr addr, ui32 sz, ui8 *dst)
  DecompState s;
  DecompImit(&s, dst);
 
- ui8 b[512];
+ ui8 b[512 * 8];
  for (ui32 i = 0; i < sz; ++i)
   {
    if (0 == (i % sizeof(b)))

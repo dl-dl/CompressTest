@@ -13,6 +13,7 @@ extern "C"
 {
 #endif
  extern ScreenLine Screen[SCREEN_DX];
+ extern ui8 ScreenChange[SCREEN_DX];
 #ifdef __cplusplus
 }
 #endif

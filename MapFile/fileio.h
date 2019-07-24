@@ -1,7 +1,6 @@
 #ifndef __SD_H__
 #define __SD_H__
 #include "types.h"
-#include "sizes.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -15,6 +14,7 @@ extern "C"
  bool file_read(FileAddr addr, void *dst, ui32 sz);
  bool file_write(FileAddr addr, const void *src, ui32 sz);
  void file_close(void);
+ bool file_optimize_read(void);
 
  bool file_open_dir(void);
  const char* file_read_dir(void);

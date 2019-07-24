@@ -1,23 +1,25 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
+	
 #include "types.h"
+#include "color.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
- void DisplayClear(ui8 color);
- void DisplayPixel(int x, int y, ui8 color);
- void DisplayLine(int x0, int y0, int x1, int y1, ui8 color);
- void DisplayFillRect(int left, int top, int width, int height, ui8 color);
- void DisplayCircle(int x, int y, int r, ui8 color);
- void CopyTileToScreen(const void *tile, int x, int y);
- void DisplayRainbow(void);
+void DisplayClear(ui8 color);
+void DisplayPixel(ui16 x, ui16 y, ui8 color);
+void DisplayLine(int x0, int y0, int x1, int y1, ui8 color);
+void DisplayRect(int x0, int y0, int width, int height, ui8 color);
+void DisplayFillRect(ui16 left, ui16 top, ui16 width, ui16 height, ui8 color);
+void DisplayRomb(ui16 centerX, ui16 centerY, ui16 widthHeight, ui8 color);
+void DisplayFillRomb(ui16 centerX, ui16 centerY, ui16 widthHeight, ui8 color);
+void DisplayCircle(int xm, int ym, int r, ui8 color);
+void DisplayFillCircle(int x0, int y0, int r, ui8 color);
 
- void DisplayText(const char *s, ui32 x, ui32 y, ui8 fontType, ui8 color);
- void DisplayTextW(const ui16 *s, ui32 x, ui32 y, ui8 fontType, ui8 color);
-#ifdef __cplusplus
-}
-#endif
+void CopyTileToScreen(const void *tile, int x, int y);
 
-#endif
+void DisplayText(const char* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color);
+void DisplayTextW(const WIDE_CHAR* s, unsigned int x, unsigned int y, unsigned int fontType, ui8 color);
+
+void DisplayRainbow(void);
+void DisplayTest(void);
+
+#endif //__GRAPH_H__

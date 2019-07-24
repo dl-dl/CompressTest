@@ -28,7 +28,8 @@ DSTATUS disk_status(BYTE pdrv)
 
 DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 {
- DWORD fp = SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
+ if(INVALID_SET_FILE_POINTER == SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN))
+  return RES_ERROR;
  DWORD n;
  BOOL res = ReadFile(file_handle, buff, count * BLOCK_SIZE, &n, NULL);
  if (res && (n == BLOCK_SIZE * count))
@@ -36,13 +37,16 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
  return RES_ERROR;
 }
 
+#if !FF_FS_READONLY
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
- DWORD fp = SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN);
+ if (INVALID_SET_FILE_POINTER == SetFilePointer(file_handle, sector * BLOCK_SIZE, NULL, FILE_BEGIN))
+  return RES_ERROR;
  DWORD n;
  BOOL res = WriteFile(file_handle, buff, count * BLOCK_SIZE, &n, NULL);
  return RES_OK;
 }
+#endif
 
 DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
 {

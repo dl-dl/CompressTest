@@ -1,4 +1,4 @@
-#include "sizes.h"
+#include "types.h"
 #include "devio.h"
 #include "devioimpl.h"
 #include "tourist.h"
@@ -10,7 +10,7 @@ extern "C"
  ui32 CoordTileY = -1;
  si8 MapShiftH;
  si8 MapShiftV;
- ui8 MapZoom = MIN_ZOOM_LEVEL;
+ si8 MapZoom = MIN_ZOOM_LEVEL;
  TTourist Tourist[10];
 }
 

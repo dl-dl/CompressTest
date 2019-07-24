@@ -6,7 +6,7 @@ FATFS fs;
 
 bool MapInitFS()
 {
- return FR_OK == f_mount(&fs, "0:/", 1);
+ return FR_OK == f_mount(&fs, "", 1);
 }
 
 bool file_create(const char *name)
@@ -32,18 +32,37 @@ void file_close()
 
 bool file_read(FileAddr addr, void *dst, ui32 sz)
 {
+ if (FR_OK != f_lseek(&fil, addr))
+  return false;
  UINT n = 0;
- f_lseek(&fil, addr);
- f_read(&fil, dst, sz, &n);
+ if(FR_OK != f_read(&fil, dst, sz, &n))
+	 return false;
  return n == sz;
+}
+
+bool file_optimize_read()
+{
+#if FF_USE_FASTSEEK && FF_FS_READONLY
+ static DWORD clmt[64];
+ clmt[0] = sizeof(clmt) / sizeof(clmt[0]);
+ fil.cltbl = clmt;
+ if (FR_OK != f_lseek(&fil, CREATE_LINKMAP))
+  {
+   fil.cltbl = 0;
+   return false;
+  }
+#endif
+ return true;
 }
 
 #if !FF_FS_READONLY
 bool file_write(FileAddr addr, const void *src, ui32 sz)
 {
  UINT n = 0;
- f_lseek(&fil, addr);
- f_write(&fil, src, sz, &n);
+ if (FR_OK != f_lseek(&fil, addr))
+  return false;
+ if (FR_OK != f_write(&fil, src, sz, &n))
+  return false;
  return n == sz;
 }
 #endif

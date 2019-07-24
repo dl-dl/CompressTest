@@ -5,7 +5,7 @@
 #include <assert.h>
 #else
 #include "sound.h"
-#define assert(expression) (void)((!!(expression)) || (Sound(10, 100), 0))
+#define assert(expression) (void)((!!(expression)) || (Sound(4), 0))
 //#define assert(expression) ((void)0)
 #endif
 

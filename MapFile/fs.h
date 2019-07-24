@@ -2,7 +2,6 @@
 #define _FS_H_
 
 #include "types.h"
-#include "sizes.h"
 #include "coord.h"
 
 #define CUR_MAP_FILE_VERSION 2
@@ -38,7 +37,7 @@ typedef struct
 typedef struct
 {
  IMS ims;
- char fname[32];
+ bool dataReady;
 } ExtIMS;
 
 typedef struct

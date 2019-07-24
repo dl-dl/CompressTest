@@ -9,7 +9,7 @@ extern ui32 CoordTileX;
 extern ui32 CoordTileY;
 extern si8 MapShiftH;
 extern si8 MapShiftV;
-extern ui8 MapZoom;
+extern si8 MapZoom;
 extern TTourist Tourist[10];
 
 typedef struct
@@ -77,7 +77,7 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
 
 void DrawMap()
 {
- if (map.FsCache.eims.fname[0])
+ if (map.FsCache.eims.dataReady)
   {
    if (MapZoom < map.FsCache.eims.ims.zoomMin)
     MapZoom = map.FsCache.eims.ims.zoomMin;
@@ -88,9 +88,8 @@ void DrawMap()
  PointInt start;
  start.x = ScaleDownCoord(map.screenCenter.x, MapZoom) - SCREEN_DX / 2;
  start.y = ScaleDownCoord(map.screenCenter.y, MapZoom) - SCREEN_DY / 2;
-
  CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
- if (map.FsCache.eims.fname[0])
+ if (map.FsCache.eims.dataReady)
   {
    for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
     for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)
@@ -104,7 +103,7 @@ void DrawMap()
    DisplayClear(0);
   }
 }
-
+/*
 static void DrawHaircross(int x, int y, int dd)
 {
  for (int k = -1; k <= 1; ++k)
@@ -119,36 +118,36 @@ static void DrawArrow(int x, int y)
  DisplayLine(x - sz, y - sz, x + sz, y + sz, CLR_RED);
  DisplayLine(x - sz, y + sz, x + sz, y - sz, CLR_RED);
 }
-
+*/
 static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
 {
- int coordOk = 0;
- if (x < 0)
-  x = 0;
- else if (x >= SCREEN_DX)
-  x = SCREEN_DX - 1;
- else
-  coordOk++;
- if (y < 0)
-  y = 0;
- else if (y > SCREEN_DY)
-  y = SCREEN_DY - 1;
- else
-  coordOk++;
+ if (x < 10)
+  x = 10;
+ else if (x >= SCREEN_DX - 11)
+  x = SCREEN_DX - 11;
+ if (y < 10)
+  y = 10;
+ else if (y > SCREEN_DY - 11)
+  y = SCREEN_DY - 11;
 
- if (2 == coordOk)
+ if (hardwareId == 1)
   {
-   DrawHaircross(x, y, dd);
-   char s[2];
-   s[0] = '0' + hardwareId % 8;
-   s[1] = 0;
-   DisplayText(s, x + 2, y, 0, CLR_RED);
+   DisplayFillCircle(x, y, 14, clRed);
+   DisplayCircle(x, y, 11, clYellow);
+   DisplayCircle(x, y, 12, clYellow);
+   DisplayText("1", x - 5, y - 12, 1, clYellow);
   }
  else
   {
-   DrawArrow(x, y);
+   DisplayFillRomb(x, y, 34, clRed);
+   DisplayRomb(x, y, 26, clYellow);
+   DisplayRomb(x, y, 28, clYellow);
+   DisplayText("2", x - 5, y - 12, 1, clYellow);
   }
 }
+
+int volatile DemoY;
+ui8 DemoTouristOn;
 
 void DrawGroup()
 {
@@ -164,4 +163,14 @@ void DrawGroup()
  int x = ScaleDownCoord(CoordTileX, MapZoom) - ScaleDownCoord(map.screenCenter.x, MapZoom) + SCREEN_DX / 2;
  int y = ScaleDownCoord(CoordTileY, MapZoom) - ScaleDownCoord(map.screenCenter.y, MapZoom) + SCREEN_DY / 2;
  DrawTouristMarker(x, SCREEN_DY - y, 10, 1);
+
+ if (DemoTouristOn && DemoY >= 10)
+  {
+   y = SCREEN_DY - y + DemoY / 2;
+   x = x + DemoY / 18;
+   DisplayFillRomb(x, y, 34, clRed);
+   DisplayRomb(x, y, 26, clYellow);
+   DisplayRomb(x, y, 28, clYellow);
+   DisplayText("2", x - 5, y - 12, 1, clYellow);
+  }
 }
