@@ -226,6 +226,7 @@
     <ClInclude Include="..\MapFile\fscache.h" />
     <ClInclude Include="..\MapFile\fileio.h" />
     <ClInclude Include="..\Types\coord.h" />
+    <ClInclude Include="..\Types\logbuff.h" />
     <ClInclude Include="..\Types\sizes.h" />
     <ClInclude Include="..\Types\types.h" />
     <ClInclude Include="color.h" />

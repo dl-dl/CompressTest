@@ -10,7 +10,7 @@ extern "C" FATFS fs;
 bool MapCreateFS()
 {
  static BYTE buff[512 * 32];
- if (FR_OK != f_mkfs("0:/", FM_FAT32, 512, &buff, sizeof(buff)))
+ if (FR_OK != f_mkfs("", FM_FAT32, 512*16, &buff, sizeof(buff)))
   return false;
  if (FR_OK != f_mount(&fs, "", 1))
   return false;

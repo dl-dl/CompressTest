@@ -9,7 +9,7 @@ typedef unsigned char ui8;
 typedef unsigned short int ui16;
 typedef unsigned int ui32;
 
-typedef unsigned short int WIDE_CHAR;
+typedef unsigned short WIDE_CHAR;
 
 typedef ui32 FileAddr;
 

@@ -34,7 +34,7 @@ bool file_read(FileAddr addr, void *dst, ui32 sz)
 {
  if (FR_OK != f_lseek(&fil, addr))
   return false;
- UINT n = 0;
+ UINT n;
  if(FR_OK != f_read(&fil, dst, sz, &n))
 	 return false;
  return n == sz;
@@ -58,9 +58,9 @@ bool file_optimize_read()
 #if !FF_FS_READONLY
 bool file_write(FileAddr addr, const void *src, ui32 sz)
 {
- UINT n = 0;
  if (FR_OK != f_lseek(&fil, addr))
   return false;
+ UINT n;
  if (FR_OK != f_write(&fil, src, sz, &n))
   return false;
  return n == sz;
