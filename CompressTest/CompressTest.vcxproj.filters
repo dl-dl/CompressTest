@@ -161,6 +161,9 @@
     <ClCompile Include="..\FatFs\ff.c">
       <Filter>Source Files\FatFs</Filter>
     </ClCompile>
+    <ClCompile Include="markers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CompressTest.rc">

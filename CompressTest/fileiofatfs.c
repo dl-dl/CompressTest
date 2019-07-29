@@ -3,19 +3,26 @@
 
 static FIL fil;
 FATFS fs;
+static DIR dj;
+static FILINFO fno;
 
-bool MapInitFS()
+static bool fsMounted;
+
+bool InitFileSys()
 {
- return FR_OK == f_mount(&fs, "", 1);
+ if (!fsMounted)
+  fsMounted = (FR_OK == f_mount(&fs, "", 1));
+ return fsMounted;
 }
 
-bool file_create(const char *name)
+void DeinitFileSys()
 {
- FIL newfile;
- if (FR_OK != f_open(&newfile, name, FA_WRITE | FA_CREATE_ALWAYS))
-  return false;
- f_close(&newfile);
- return true;
+ if (fsMounted)
+  {
+   file_close();
+   f_mount(0, "", 1);
+   fsMounted = false;
+  }
 }
 
 bool file_open(const char *name, bool write)
@@ -35,8 +42,8 @@ bool file_read(FileAddr addr, void *dst, ui32 sz)
  if (FR_OK != f_lseek(&fil, addr))
   return false;
  UINT n;
- if(FR_OK != f_read(&fil, dst, sz, &n))
-	 return false;
+ if (FR_OK != f_read(&fil, dst, sz, &n))
+  return false;
  return n == sz;
 }
 
@@ -56,6 +63,15 @@ bool file_optimize_read()
 }
 
 #if !FF_FS_READONLY
+bool file_create(const char *name)
+{
+ FIL newfile;
+ if (FR_OK != f_open(&newfile, name, FA_WRITE | FA_CREATE_ALWAYS))
+  return false;
+ f_close(&newfile);
+ return true;
+}
+
 bool file_write(FileAddr addr, const void *src, ui32 sz)
 {
  if (FR_OK != f_lseek(&fil, addr))
@@ -66,9 +82,6 @@ bool file_write(FileAddr addr, const void *src, ui32 sz)
  return n == sz;
 }
 #endif
-
-static DIR dj;
-static FILINFO fno;
 
 bool file_open_dir()
 {

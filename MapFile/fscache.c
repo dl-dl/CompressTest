@@ -4,11 +4,29 @@
 
 void CacheInit(MapTileCache *cache)
 {
+ InitFileSys();
+
  for (int i = 0; i < sizeof(cache->map) / sizeof(cache->map[0]); ++i)
   {
    cache->map[i].zoom = 0; // empty
   }
  memset(&cache->eims, 0, sizeof(cache->eims));
+}
+
+void CacheDeinit(MapTileCache *cache)
+{
+ for (int i = 0; i < sizeof(cache->map) / sizeof(cache->map[0]); ++i)
+  {
+   cache->map[i].zoom = 0; // empty
+  }
+ memset(&cache->eims, 0, sizeof(cache->eims));
+
+ if (cache->eims.dataReady)
+  {
+   file_close();
+   cache->eims.dataReady = false;
+  }
+ DeinitFileSys();
 }
 
 static inline ui32 CacheIndex(ui32 x, ui32 y)

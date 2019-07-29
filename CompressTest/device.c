@@ -28,9 +28,8 @@ static Device dev;
 void DeviceInit()
 {
 #ifdef FORAMT_FAT32
- MapCreateFS();
+ CreateFileSys();
 #endif
- MapInitFS();
  MapInit();
 
  dev.hardwareId = 3001;

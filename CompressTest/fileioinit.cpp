@@ -7,7 +7,7 @@
 
 extern "C" FATFS fs;
 
-bool MapCreateFS()
+bool CreateFileSys()
 {
  static BYTE buff[512 * 32];
  if (FR_OK != f_mkfs("", FM_FAT32, 512*16, &buff, sizeof(buff)))

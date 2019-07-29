@@ -24,4 +24,10 @@ typedef struct
  char Name[8];
 } TTourist;
 
+#ifdef __cplusplus
+extern "C" TTourist Tourist[10];
+#else
+extern TTourist Tourist[10];
+#endif
+
 #endif /* __tourist_h */

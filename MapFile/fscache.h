@@ -22,6 +22,7 @@ extern "C"
 {
 #endif
  void CacheInit(MapTileCache *cache);
+ void CacheDeinit(MapTileCache *cache);
  void CacheFetchIMS(MapTileCache *cache, ui32 x, ui32 y);
  ui32 CacheRead(MapTileCache *cache, ui32 tileX, ui32 tileY, ui32 zoom);
 #ifdef __cplusplus

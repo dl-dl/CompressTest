@@ -261,6 +261,7 @@
     <ClCompile Include="fileiofatfs.c" />
     <ClCompile Include="fileioinit.cpp" />
     <ClCompile Include="graph.c" />
+    <ClCompile Include="markers.c" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="map.c" />
   </ItemGroup>

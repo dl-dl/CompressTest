@@ -1,28 +1,25 @@
 #include "graph.h"
 #include "fs.h"
 #include "fscache.h"
-#include "sizes.h"
-#include "color.h"
-#include "tourist.h"
+#include "map.h"
 
 extern ui32 CoordTileX;
 extern ui32 CoordTileY;
 extern si8 MapShiftH;
 extern si8 MapShiftV;
 extern si8 MapZoom;
-extern TTourist Tourist[10];
 
-typedef struct
-{
- MapTileCache FsCache;
- PointInt screenCenter;
-} MapData;
-
-static MapData map;
+static MapTileCache FsCache;
+static PointInt screenCenter;
 
 void MapInit(void)
 {
- CacheInit(&map.FsCache);
+ CacheInit(&FsCache);
+}
+
+void MapDeinit(void)
+{
+ CacheDeinit(&FsCache);
 }
 
 static inline int intabs(int a)
@@ -30,7 +27,7 @@ static inline int intabs(int a)
  return (a >= 0) ? a : -a;
 }
 
-static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
+void AdjustScreenPos(ui32 x, ui32 y)
 {
  static ui8 mode;
  static PointInt prevShift;
@@ -38,7 +35,7 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
 
  if (mode)
   {
-   if (0 == MapShiftH && 0 == MapShiftV)
+   if ((0 == MapShiftH) && (0 == MapShiftV))
     mode = 0;
   }
  else
@@ -46,7 +43,7 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
    if (MapShiftH || MapShiftV)
     {
      mode = 1;
-     ref = center;
+     ref = screenCenter;
      prevShift.x = prevShift.y = 0;
     }
   }
@@ -57,120 +54,63 @@ static PointInt AdjustScreenPos(ui32 x, ui32 y, PointInt center)
    ref.y += (MapShiftV - prevShift.y) * ScaleUpCoord(SCREEN_DY / 2, MapZoom);
    prevShift.x = MapShiftH;
    prevShift.y = MapShiftV;
-   return ref;
+   screenCenter = ref;
+   return;
   }
 
  PointInt pos;
  pos.x = x;
  pos.y = y;
 
- if (((ui32)intabs(center.x - pos.x) > ScaleUpCoord(SCREEN_DX / 8, MapZoom)) ||
-     ((ui32)intabs(center.y - pos.y) > ScaleUpCoord(SCREEN_DY / 8, MapZoom)))
+ if (((ui32)intabs(screenCenter.x - pos.x) > ScaleUpCoord(SCREEN_DX / 8, MapZoom)) ||
+     ((ui32)intabs(screenCenter.y - pos.y) > ScaleUpCoord(SCREEN_DY / 8, MapZoom)))
   {
-   return pos;
+   screenCenter = pos;
   }
- else
+}
+
+void AdjustZoom()
+{
+ if (FsCache.eims.dataReady)
   {
-   return center;
+   if (MapZoom < FsCache.eims.ims.zoomMin)
+    MapZoom = FsCache.eims.ims.zoomMin;
+   else if (MapZoom > FsCache.eims.ims.zoomMax)
+    MapZoom = FsCache.eims.ims.zoomMax;
   }
+}
+
+PointInt GetScreenTopLeft()
+{
+ PointInt p;
+ p.x = ScaleDownCoord(screenCenter.x, MapZoom) - SCREEN_DX / 2;
+ p.y = ScaleDownCoord(screenCenter.y, MapZoom) - SCREEN_DY / 2;
+ return p;
+}
+
+PointInt GetScreenCenter()
+{
+ return screenCenter;
 }
 
 void DrawMap()
 {
- if (map.FsCache.eims.dataReady)
+ AdjustZoom();
+ AdjustScreenPos(CoordTileX, CoordTileY);
+
+ CacheFetchIMS(&FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
+ if (FsCache.eims.dataReady)
   {
-   if (MapZoom < map.FsCache.eims.ims.zoomMin)
-    MapZoom = map.FsCache.eims.ims.zoomMin;
-   else if (MapZoom > map.FsCache.eims.ims.zoomMax)
-    MapZoom = map.FsCache.eims.ims.zoomMax;
-  }
- map.screenCenter = AdjustScreenPos(CoordTileX, CoordTileY, map.screenCenter);
- PointInt start;
- start.x = ScaleDownCoord(map.screenCenter.x, MapZoom) - SCREEN_DX / 2;
- start.y = ScaleDownCoord(map.screenCenter.y, MapZoom) - SCREEN_DY / 2;
- CacheFetchIMS(&map.FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
- if (map.FsCache.eims.dataReady)
-  {
+   PointInt start = GetScreenTopLeft();
    for (int x = (start.x / TILE_DX) * TILE_DX; x < start.x + SCREEN_DX; x += TILE_DX)
     for (int y = (start.y / TILE_DY) * TILE_DY; y < start.y + SCREEN_DY; y += TILE_DY)
      {
-      ui32 index = CacheRead(&map.FsCache, x / TILE_DX, y / TILE_DY, MapZoom);
-      CopyTileToScreen(map.FsCache.map[index].data, x - start.x, (y - start.y) / 2);
+      ui32 index = CacheRead(&FsCache, x / TILE_DX, y / TILE_DY, MapZoom);
+      CopyTileToScreen(FsCache.map[index].data, x - start.x, (y - start.y) / 2);
      }
   }
  else
   {
    DisplayClear(0);
-  }
-}
-/*
-static void DrawHaircross(int x, int y, int dd)
-{
- for (int k = -1; k <= 1; ++k)
-  DisplayLine(x - dd, y + k, x + dd, y + k, (k == 0) ? CLR_RED : CLR_WHITE);
- for (int k = -1; k <= 1; ++k)
-  DisplayLine(x + k, y - dd, x + k, y + dd, (k == 0) ? CLR_RED : CLR_WHITE);
-}
-
-static void DrawArrow(int x, int y)
-{
- const int sz = 5;
- DisplayLine(x - sz, y - sz, x + sz, y + sz, CLR_RED);
- DisplayLine(x - sz, y + sz, x + sz, y - sz, CLR_RED);
-}
-*/
-static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
-{
- if (x < 10)
-  x = 10;
- else if (x >= SCREEN_DX - 11)
-  x = SCREEN_DX - 11;
- if (y < 10)
-  y = 10;
- else if (y > SCREEN_DY - 11)
-  y = SCREEN_DY - 11;
-
- if (hardwareId == 1)
-  {
-   DisplayFillCircle(x, y, 14, clRed);
-   DisplayCircle(x, y, 11, clYellow);
-   DisplayCircle(x, y, 12, clYellow);
-   DisplayText("1", x - 5, y - 12, 1, clYellow);
-  }
- else
-  {
-   DisplayFillRomb(x, y, 34, clRed);
-   DisplayRomb(x, y, 26, clYellow);
-   DisplayRomb(x, y, 28, clYellow);
-   DisplayText("2", x - 5, y - 12, 1, clYellow);
-  }
-}
-
-int volatile DemoY;
-ui8 DemoTouristOn;
-
-void DrawGroup()
-{
- for (ui32 i = 0; i < sizeof(Tourist) / sizeof(*Tourist); ++i)
-  if (Tourist[i].IsRx)
-   {
-    const TTourist *p = Tourist + i;
-    int x = ScaleDownCoord(p->CoordTileX, MapZoom) - ScaleDownCoord(map.screenCenter.x, MapZoom) + SCREEN_DX / 2;
-    int y = ScaleDownCoord(p->CoordTileY, MapZoom) - ScaleDownCoord(map.screenCenter.y, MapZoom) + SCREEN_DY / 2;
-    DrawTouristMarker(x, SCREEN_DY - y, 5, i);
-   }
-
- int x = ScaleDownCoord(CoordTileX, MapZoom) - ScaleDownCoord(map.screenCenter.x, MapZoom) + SCREEN_DX / 2;
- int y = ScaleDownCoord(CoordTileY, MapZoom) - ScaleDownCoord(map.screenCenter.y, MapZoom) + SCREEN_DY / 2;
- DrawTouristMarker(x, SCREEN_DY - y, 10, 1);
-
- if (DemoTouristOn && DemoY >= 10)
-  {
-   y = SCREEN_DY - y + DemoY / 2;
-   x = x + DemoY / 18;
-   DisplayFillRomb(x, y, 34, clRed);
-   DisplayRomb(x, y, 26, clYellow);
-   DisplayRomb(x, y, 28, clYellow);
-   DisplayText("2", x - 5, y - 12, 1, clYellow);
   }
 }

@@ -3,12 +3,12 @@
 #include "sizes.h"
 #include "devfont.h"
 
+extern ui8 Screen[256][256];
+extern ui8 ScreenChange[256];
+
 static const ui8 colorLo[8] = { 0x00, 0x20, 0x40, 0x80, 0x60, 0xC0, 0xA0, 0xE0 };
 static const ui8 colorHi[8] = { 0x00, 0x02, 0x04, 0x08, 0x06, 0x0C, 0x0A, 0x0E };
 static const ui8 colorHL[8] = { 0x00, 0x22, 0x44, 0x88, 0x66, 0xCC, 0xAA, 0xEE };
-
-extern ui8 Screen[256][256];
-extern ui8 ScreenChange[256];
 
 //---------------------------------------------------------------------------------------------------
 void DisplayPixel(ui16 x, ui16 y, ui8 color)
