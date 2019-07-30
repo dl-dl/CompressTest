@@ -1,6 +1,4 @@
 #include "graph.h"
-#include "fs.h"
-#include "fscache.h"
 #include "sizes.h"
 #include "color.h"
 #include "tourist.h"
@@ -31,7 +29,7 @@ static void DrawArrow(int x, int y)
  DisplayLine(x - sz, y + sz, x + sz, y - sz, CLR_RED);
 }
 */
-static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
+static void DrawTouristMarker(int x, int y, int id)
 {
  if (x < 10)
   x = 10;
@@ -42,7 +40,7 @@ static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
  else if (y > SCREEN_DY - 11)
   y = SCREEN_DY - 11;
 
- if (hardwareId == 1)
+ if (id == 1)
   {
    DisplayFillCircle(x, y, 14, clRed);
    DisplayCircle(x, y, 11, clYellow);
@@ -60,18 +58,19 @@ static void DrawTouristMarker(int x, int y, int dd, int hardwareId)
 
 void DrawGroup()
 {
+ const PointInt center = GetScreenCenter();
  for (ui32 i = 0; i < sizeof(Tourist) / sizeof(*Tourist); ++i)
   if (Tourist[i].IsRx)
    {
     const TTourist *p = Tourist + i;
-    int x = ScaleDownCoord(p->CoordTileX, MapZoom) - ScaleDownCoord(GetScreenCenter().x, MapZoom) + SCREEN_DX / 2;
-    int y = ScaleDownCoord(p->CoordTileY, MapZoom) - ScaleDownCoord(GetScreenCenter().y, MapZoom) + SCREEN_DY / 2;
-    DrawTouristMarker(x, SCREEN_DY - y, 5, i);
+    int x = ScaleDownCoord(p->CoordTileX, MapZoom) - ScaleDownCoord(center.x, MapZoom) + SCREEN_DX / 2;
+    int y = ScaleDownCoord(p->CoordTileY, MapZoom) - ScaleDownCoord(center.y, MapZoom) + SCREEN_DY / 2;
+    DrawTouristMarker(x, SCREEN_DY - y, i);
    }
 
- int x = ScaleDownCoord(CoordTileX, MapZoom) - ScaleDownCoord(GetScreenCenter().x, MapZoom) + SCREEN_DX / 2;
- int y = ScaleDownCoord(CoordTileY, MapZoom) - ScaleDownCoord(GetScreenCenter().y, MapZoom) + SCREEN_DY / 2;
- DrawTouristMarker(x, SCREEN_DY - y, 10, 1);
+ int x = ScaleDownCoord(CoordTileX, MapZoom) - ScaleDownCoord(center.x, MapZoom) + SCREEN_DX / 2;
+ int y = ScaleDownCoord(CoordTileY, MapZoom) - ScaleDownCoord(center.y, MapZoom) + SCREEN_DY / 2;
+ DrawTouristMarker(x, SCREEN_DY - y, 1);
 
  if (DemoTouristOn && DemoY >= 10)
   {

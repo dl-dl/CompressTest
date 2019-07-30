@@ -69,18 +69,7 @@ void AdjustScreenPos(ui32 x, ui32 y)
   }
 }
 
-void AdjustZoom()
-{
- if (FsCache.eims.dataReady)
-  {
-   if (MapZoom < FsCache.eims.ims.zoomMin)
-    MapZoom = FsCache.eims.ims.zoomMin;
-   else if (MapZoom > FsCache.eims.ims.zoomMax)
-    MapZoom = FsCache.eims.ims.zoomMax;
-  }
-}
-
-PointInt GetScreenTopLeft()
+static PointInt GetScreenTopLeft()
 {
  PointInt p;
  p.x = ScaleDownCoord(screenCenter.x, MapZoom) - SCREEN_DX / 2;
@@ -88,17 +77,19 @@ PointInt GetScreenTopLeft()
  return p;
 }
 
-PointInt GetScreenCenter()
-{
- return screenCenter;
-}
-
 void DrawMap()
 {
- AdjustZoom();
+ CacheFetchIMS(&FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
+ if (FsCache.eims.dataReady)
+  {
+   if (MapZoom < FsCache.eims.ims.zoomMin)
+    MapZoom = FsCache.eims.ims.zoomMin;
+   else if (MapZoom > FsCache.eims.ims.zoomMax)
+    MapZoom = FsCache.eims.ims.zoomMax;
+  }
+
  AdjustScreenPos(CoordTileX, CoordTileY);
 
- CacheFetchIMS(&FsCache, CoordTileX / TILE_DX, CoordTileY / TILE_DY);
  if (FsCache.eims.dataReady)
   {
    PointInt start = GetScreenTopLeft();
@@ -113,4 +104,9 @@ void DrawMap()
   {
    DisplayClear(0);
   }
+}
+
+PointInt GetScreenCenter()
+{
+ return screenCenter;
 }

@@ -45,9 +45,6 @@
     <ClInclude Include="graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="screen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="devfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
