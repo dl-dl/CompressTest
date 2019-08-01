@@ -11,8 +11,11 @@ static bool fsMounted;
 bool InitFileSys()
 {
  if (!fsMounted)
-  fsMounted = (FR_OK == f_mount(&fs, "", 1));
- return fsMounted;
+  {
+   fsMounted = (FR_OK == f_mount(&fs, "", 1));
+   return fsMounted;
+  }
+ return false;
 }
 
 void DeinitFileSys()

@@ -15,17 +15,18 @@ void CacheInit(MapTileCache *cache)
 
 void CacheDeinit(MapTileCache *cache)
 {
+ if (cache->eims.dataReady)
+  {
+   file_close();
+   cache->eims.dataReady = false;
+  }
+
  for (int i = 0; i < sizeof(cache->map) / sizeof(cache->map[0]); ++i)
   {
    cache->map[i].zoom = 0; // empty
   }
  memset(&cache->eims, 0, sizeof(cache->eims));
 
- if (cache->eims.dataReady)
-  {
-   file_close();
-   cache->eims.dataReady = false;
-  }
  DeinitFileSys();
 }
 
