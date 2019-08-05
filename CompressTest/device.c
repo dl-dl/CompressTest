@@ -77,10 +77,33 @@ void ProcessGps()
  dev.redrawScreen = true;
 }
 
+static void DisplayMag(int x0, int y0, int len)
+{
+#ifndef GOTOG2
+ static float demoAngl = 0;
+
+ int MagX = 256 * (sinf(demoAngl));
+ int MagY = 256 * (cosf(demoAngl));
+ demoAngl += 0.1f;
+ if (demoAngl >= 360)
+  demoAngl = 0;
+#endif
+
+ float k = len;
+ k /= sqrtf(MagX * MagX + MagY * MagY);
+
+ MagX = MagX * k;
+ MagY = MagY * k;
+
+ DisplayTrian(MagX + x0, MagY + y0, MagY / 4 + x0, -MagX / 4 + y0, -MagY / 4 + x0, MagX / 4 + y0, clRed);
+ DisplayTrian(-MagX + x0, -MagY + y0, MagY / 4 + x0, -MagX / 4 + y0, -MagY / 4 + x0, MagX / 4 + y0, clBlue);
+}
+
 void ScreenPaint()
 {
  DrawMap();
  DrawGroup();
+ DisplayMag(120, 200, 50);
 }
 
 void Run()

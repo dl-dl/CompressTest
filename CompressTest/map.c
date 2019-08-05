@@ -102,7 +102,7 @@ void DrawMap()
   }
  else
   {
-   DisplayClear(0);
+   DisplayFill(clBlack);
   }
 }
 

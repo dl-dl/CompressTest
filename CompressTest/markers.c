@@ -42,7 +42,15 @@ static void DrawTouristMarker(int x, int y, int id)
 
  if (id == 1)
   {
-   DisplayFillCircle(x, y, 14, clRed);
+   for (int i = 0; i < 512; ++i)
+    {
+     DisplayCircle(x, y, i, clRed);
+
+     DisplayFillCircle(x, y, i, clRed);
+    }
+
+	 
+DisplayFillCircle(x, y, 14, clRed);
    DisplayCircle(x, y, 11, clYellow);
    DisplayCircle(x, y, 12, clYellow);
    DisplayText("1", x - 5, y - 12, 1, clYellow);

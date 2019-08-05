@@ -27,13 +27,15 @@ void DisplayPixel(ui16 x, ui16 y, ui8 color)
  ScreenChange[x] = 1;
 }
 //---------------------------------------------------------------------------------------------------
-void DisplayVLine(ui16 x, ui16 y, ui16 height, ui8 color)
+static void DisplayVLine(ui16 x, ui16 y, ui16 height, ui8 color)
 {
+ if (height == 0)
+  return;
  if (x >= SCREEN_DX || y >= SCREEN_DY)
   return;
 
- if (y + height > SCREEN_DY)
-  height = SCREEN_DY - y;
+ if (y + height >= SCREEN_DY)
+  height = SCREEN_DY - y - 1;
 
  color &= 0x07;
 
@@ -64,13 +66,13 @@ void DisplayLine(int x0, int y0, int x1, int y1, ui8 color)
 {
  const int dx = intAbs(x1 - x0), sx = x0 < x1 ? 1 : -1;
  const int dy = -intAbs(y1 - y0), sy = y0 < y1 ? 1 : -1;
- int err = dx + dy, e2;
+ int err = dx + dy;
  for (;;)
   {
    DisplayPixel(x0, y0, color);
    if (x0 == x1 && y0 == y1)
     break;
-   e2 = 2 * err;
+   int e2 = 2 * err;
    if (e2 >= dy)
     {
      err += dy;
@@ -102,73 +104,119 @@ void DisplayFillRect(ui16 left, ui16 top, ui16 width, ui16 height, ui8 color)
   DisplayVLine(left + width, top, height, color);
 }
 //---------------------------------------------------------------------------------------------------
-void DisplayRomb(ui16 centerX, ui16 centerY, ui16 widthHeight, ui8 color)
+void DisplayRomb(ui16 x0, ui16 y0, ui16 widthHeight, ui8 color)
 {
  ui16 len = widthHeight / 2;
- DisplayLine(centerX - len, centerY, centerX, centerY + len, color);
- DisplayLine(centerX, centerY + len, centerX + len, centerY, color);
- DisplayLine(centerX, centerY - len, centerX + len, centerY, color);
- DisplayLine(centerX - len, centerY, centerX, centerY - len, color);
+ DisplayLine(x0 - len, y0, x0, y0 + len, color);
+ DisplayLine(x0, y0 + len, x0 + len, y0, color);
+ DisplayLine(x0, y0 - len, x0 + len, y0, color);
+ DisplayLine(x0 - len, y0, x0, y0 - len, color);
 }
 //---------------------------------------------------------------------------------------------------
-void DisplayFillRomb(ui16 centerX, ui16 centerY, ui16 widthHeight, ui8 color)
+void DisplayFillRomb(ui16 x0, ui16 y0, ui16 widthHeight, ui8 color)
 {
- // if (left + width >= SCREEN_DX || top + height >= SCREEN_DY )
- //	return;
  color &= 0x07;
 
  ui16 len = widthHeight / 2;
  ui16 cnt = 0;
  while (len > 0)
   {
-   DisplayVLine(centerX + cnt, centerY - len, len * 2, color);
-   DisplayVLine(centerX - cnt, centerY - len, len * 2, color);
+   DisplayVLine(x0 + cnt, y0 - len, len * 2, color);
+   DisplayVLine(x0 - cnt, y0 - len, len * 2, color);
    cnt++;
    len--;
   }
 }
 //---------------------------------------------------------------------------------------------------
-void DisplayCircle(int xm, int ym, int r, ui8 color)
+void DisplayCircle(int x0, int y0, int r, ui8 color)
 {
  int x = -r, y = 0, err = 2 - 2 * r;
  do
   {
-   DisplayPixel(xm - x, ym + y, color);
-   DisplayPixel(xm - y, ym - x, color);
-   DisplayPixel(xm + x, ym - y, color);
-   DisplayPixel(xm + y, ym + x, color);
-   r = err;
-   if (r > x)
-    err += ++x * 2 + 1;
-   if (r <= y)
+   DisplayPixel(x0 - x, y0 + y, color);
+   DisplayPixel(x0 - y, y0 - x, color);
+   DisplayPixel(x0 + x, y0 - y, color);
+   DisplayPixel(x0 + y, y0 + x, color);
+   int e2 = err;
+   if (e2 <= y)
     err += ++y * 2 + 1;
+   if (e2 > x)
+    err += ++x * 2 + 1;
   }
  while (x < 0);
 }
 //---------------------------------------------------------------------------------------------------
 void DisplayFillCircle(int x0, int y0, int r, ui8 color)
 {
- int x = 0;
- int y = r;
- int delta = 1 - 2 * r;
- int error = 0;
- while (y >= 0)
+ int x = -r, y = 0, err = 2 - 2 * r;
+ do
   {
-   DisplayLine(x0 - x, y0 + y, x0 + x, y0 + y, color);
-   DisplayLine(x0 - x, y0 - y, x0 + x, y0 - y, color);
+   int e2 = err;
+   if (e2 <= y)
+    err += ++y * 2 + 1;
+   if (e2 > x)
+    {
+     DisplayVLine(x0 - x, y0 - y, 2 * y + 1, color);
+     DisplayVLine(x0 + x, y0 - y, 2 * y + 1, color);
+     err += ++x * 2 + 1;
+    }
+  }
+ while (x <= 0);
+}
+//---------------------------------------------------------------------------------------------------
+static void swap(int *x1, int *x2, int *y1, int *y2)
+{
+ int tmp = *x2;
+ *x2 = *x1;
+ *x1 = tmp;
+ tmp = *y2;
+ *y2 = *y1;
+ *y1 = tmp;
+}
+//---------------------------------------------------------------------------------------------------
+void DisplayTrian(int x0, int y0, int x1, int y1, int x2, int y2, ui8 color)
+{
+ float d0, d1;
+ float yL0, yL1;
 
-   error = 2 * (delta + y) - 1;
-   if ((delta < 0) && (error <= 0))
+ if (x0 > x1)
+  swap(&x0, &x1, &y0, &y1);
+ if (x1 > x2)
+  {
+   swap(&x1, &x2, &y1, &y2);
+   if (x0 > x1)
+    swap(&x0, &x1, &y0, &y1);
+  }
+ if (x2 == x0)
+  return;
+ d0 = y2 - y0;
+ d0 /= x2 - x0;
+ yL0 = y0;
+ if (x1 != x0)
+  {
+   d1 = y1 - y0;
+   d1 /= x1 - x0;
+   yL1 = y0;
+  }
+ else
+  {
+   d1 = yL1 = 0;
+  }
+ DisplayPixel(x0, y0, color);
+ for (; x0 < x2; x0++)
+  {
+   yL0 += d0;
+   yL1 += d1;
+   if (x0 == x1)
     {
-     delta += 2 * ++x + 1;
-     continue;
+     yL1 = y1;
+     d1 = y2 - y1;
+     d1 /= x2 - x1;
     }
-   if ((delta > 0) && (error > 0))
-    {
-     delta -= 2 * --y + 1;
-     continue;
-    }
-   delta += 2 * (++x - y--);
+   if (yL0 > yL1)
+    DisplayVLine(x0, yL1, yL0 - yL1, color);
+   else
+    DisplayVLine(x0, yL0, yL1 - yL0, color);
   }
 }
 //---------------------------------------------------------------------------------------------------
@@ -184,7 +232,7 @@ void DisplayRainbow()
   }
 }
 //---------------------------------------------------------------------------------------------------
-void DisplayClear(ui8 color)
+void DisplayFill(ui8 color)
 {
  DisplayFillRect(0, 0, SCREEN_DX - 1, SCREEN_DY - 1, color);
 }
@@ -192,6 +240,7 @@ void DisplayClear(ui8 color)
 void DisplayTest()
 {
  DisplayRainbow();
+ // Please do not call DisplayRedraw here
 }
 //---------------------------------------------------------------------------------------------------
 extern const DevFont font32x25;
