@@ -3,8 +3,8 @@
 #include "sizes.h"
 #include "devfont.h"
 
-extern ui8 Screen[256][256];
-extern ui8 ScreenChange[256];
+extern ui8 Screen[SCREEN_DX][SCREEN_DY / 2];
+extern ui8 ScreenChange[SCREEN_DX];
 
 static const ui8 colorLo[8] = { 0x00, 0x20, 0x40, 0x80, 0x60, 0xC0, 0xA0, 0xE0 };
 static const ui8 colorHi[8] = { 0x00, 0x02, 0x04, 0x08, 0x06, 0x0C, 0x0A, 0x0E };
@@ -198,20 +198,19 @@ void DisplayTrian(int x0, int y0, int x1, int y1, int x2, int y2, ui8 color)
    d1 /= x1 - x0;
    yL1 = y0;
   }
- else
-  {
-   d1 = yL1 = 0;
-  }
  DisplayPixel(x0, y0, color);
  for (; x0 < x2; x0++)
   {
    yL0 += d0;
-   yL1 += d1;
    if (x0 == x1)
     {
      yL1 = y1;
      d1 = y2 - y1;
      d1 /= x2 - x1;
+    }
+   else
+    {
+     yL1 += d1;
     }
    if (yL0 > yL1)
     DisplayVLine(x0, yL1, yL0 - yL1, color);

@@ -8,6 +8,7 @@
 #include "color.h"
 #include "map.h"
 #include "fs.h"
+#include "sizes.h"
 
 #include <string.h>
 #include <math.h>
@@ -89,8 +90,7 @@ static void DisplayMag(int x0, int y0, int len)
   demoAngl = 0;
 #endif
 
- float k = len;
- k /= sqrtf(MagX * MagX + MagY * MagY);
+ float k = len / sqrtf(MagX * MagX + MagY * MagY);
 
  MagX = MagX * k;
  MagY = MagY * k;
@@ -103,7 +103,7 @@ void ScreenPaint()
 {
  DrawMap();
  DrawGroup();
- DisplayMag(120, 200, 50);
+ DisplayMag(50, SCREEN_DY - 50, 20);
 }
 
 void Run()

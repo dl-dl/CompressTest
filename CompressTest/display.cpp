@@ -10,8 +10,8 @@
 
 extern "C"
 {
- ui8 Screen[256][256];
- ui8 ScreenChange[256];
+ ui8 Screen[SCREEN_DX][SCREEN_DY/2];
+ ui8 ScreenChange[SCREEN_DX];
 }
 
 static const int BORDERX = -32;
